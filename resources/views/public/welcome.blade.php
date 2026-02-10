@@ -15,7 +15,8 @@
             'resources/css/app.css', 
             'resources/js/app.js', 
             'resources/css/spotlight.css', 
-            'resources/js/spotlight.js'
+            'resources/js/spotlight.js',
+            'resources/js/bg_code.js',
         ])
 
         <style>
@@ -199,7 +200,10 @@
         <main class="flex-grow">
             
             <!-- HERO SECTION -->
-            <section id="home" class="pt-32 pb-20 bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300">
+            <section id="home" class="relative pt-32 pb-20 bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300">
+                <!-- Canvas para el fondo de código -->
+                <canvas id="code-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[1] dark:opacity-[1]"></canvas>
+
                 <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
                     
                     <div class="mr-auto place-self-center lg:col-span-7 z-10">
