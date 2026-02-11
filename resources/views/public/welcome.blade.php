@@ -204,8 +204,10 @@
                 <!-- Canvas para el fondo de código -->
                 <canvas id="code-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[1] dark:opacity-[1]"></canvas>
 
+                <!-- Contenedor -->
                 <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
                     
+                    <!-- Texto presentación -->
                     <div class="mr-auto place-self-center lg:col-span-7 z-10">
                         <span class="inline-block py-1 px-3 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4 animate-subtle-breath border border-indigo-200 dark:border-indigo-800/50">
                             🚀 Disponible para nuevos proyectos
@@ -236,6 +238,7 @@
                         </div>
                     </div>
                     
+                    <!-- Imagen -->
                     <div class="hidden lg:mt-0 lg:col-span-5 lg:flex justify-end relative">
                         <div class="relative w-80 h-80">
                             <div class="absolute top-0 right-0 w-72 h-72 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-3xl opacity-40"></div>
@@ -244,7 +247,7 @@
                                 <img src="{{ asset('img/me.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codes" class="w-full h-full object-cover">
                             </div>
 
-                            <!-- ADORNO PORTATIL ANIMADO -->
+                            <!-- Icono Portatil -->
                             <div class="absolute bottom-4 left-0 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 animate-floating">
                                 <x-icons.laptop class="w-8 h-8" />
                             </div>

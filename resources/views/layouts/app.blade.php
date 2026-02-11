@@ -1,3 +1,5 @@
+{{-- LAYOUT PRINCIPAL (PRIVADO): Estructura base para usuarios autenticados. Incluye el menú de navegación y carga los recursos de la aplicación privada. --}}
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>

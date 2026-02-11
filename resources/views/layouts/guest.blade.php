@@ -1,3 +1,5 @@
+{{-- LAYOUT DE INVITADOS (PÚBLICO): Estructura base para páginas que no requieren login (como Login, Registro o Landing Page). Es más ligero y suele carecer de menú complejo. --}}
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -5,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Carlos Codes') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
