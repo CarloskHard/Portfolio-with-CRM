@@ -55,113 +55,197 @@
         </div>
     </section>
 
+    <!-- SOBRE MÍ SECTION -->
+    <section id="about" class="relative py-24 bg-gray-50 dark:bg-gray-800/30 transition-colors duration-300 overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-screen-xl px-4 mx-auto relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+                
+                <!-- Columna izquierda decorativa -->
+                <div class="lg:col-span-5 relative group lg:pr-10"> 
+                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
+                    <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
+                        <div class="overflow-hidden rounded-xl">
+                            <img src="{{ asset('img/me-alt.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos trabajando" class="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105">
+                        </div>
+                    </div>
+
+                    <div class="absolute -bottom-6 -right-2 lg:right-4 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-4 animate-floating z-20">
+                        <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
+                            <x-icons.cpu class="w-6 h-6" />
+                        </div>
+                        <div class="whitespace-nowrap">
+                            <p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">+7 años de experiencia</p>
+                            <p class="text-sm font-bold text-gray-900 dark:text-white">Desarrollando software</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna derecha -->
+                <div class="lg:col-span-7">
+                    <!-- Badge con pulso sutil -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                        </span>
+                        <span class="text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase text-xs">
+                            Conoce mi perfil
+                        </span>
+                    </div>
+    
+                                    
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.15]">
+                        Diseñando y programando apps y webs con la mejor <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-blue-400">arquitectura de software.</span>
+                    </h2>
+
+                    <div class="space-y-4 text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
+                        <p>Empecé como profesional en el sector electrónico aeroespacial, un entorno <strong>científico y metódico</strong>.</p>
+                        <p>Con el tiempo decidí licenciarme como programador web y de aplicaciones y actualmente llevo <strong>más de 7 años</strong> combinando una metodología científica y mi visión creativa para construir proyectos modernos y óptimos para particulares y empresas.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+                        <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div class="text-indigo-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg></div>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">Sistemas ERP/CRM</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div class="text-indigo-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">Compose Multiplatform</span>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('public.about') }}" class="group inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold text-white bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg">
+                        Conoce mi historia completa
+                        <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <!-- SKILLS SECTION -->
-    <section id="skills" class="py-20 bg-gray-50 dark:bg-gray-800 border-y border-gray-100 dark:border-gray-700 transition-colors duration-300">
-        <div class="max-w-screen-xl px-4 mx-auto">
+    <section id="skills" x-data="skillsComponent()" class="py-20 bg-gray-50 dark:bg-gray-800 border-y border-gray-100 dark:border-gray-700 transition-colors duration-300">
+        <div class="max-w-screen-xl px-4 mx-auto relative">
             <div class="mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Habilidades Técnicas</h2>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Stack Tecnológico</h2>
                 <div class="w-20 h-1.5 bg-indigo-600 mt-4 rounded-full"></div>
                 <p class="text-gray-600 dark:text-gray-300 max-w-4xl mt-4 text-lg leading-relaxed">
-                    Trato con una gran gama de tecnologías pues he trabajado desde webs dinámicas (Desde portfolios hasta CRMs, ERPs y CMS) hasta aplicaciones móviles (Tanto nativas como multiplataforma) en completo fullstack.
+                    Trato con una gran gama de tecnologías pues he trabajado desde webs dinámicas (Desde portfolios hasta CRMs, ERPs y CMS) hasta aplicaciones móviles y multiplataforma en completo fullstack.
                 </p>
             </div>
             
+            <!-- Grid Principal (6 Tarjetas) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- CARD 1 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                <template x-for="(skill, key) in skillsData" :key="key">
+                    <div @click="openModal(key)" class="skill-card js-spotlight-card group cursor-pointer bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
+                        <div class="flex items-center gap-4 mb-5 relative z-10">
+                            <div :class="`p-3 rounded-xl ${skill.bg} ${skill.color} transition-transform group-hover:scale-110`">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="skill.icon"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight" x-text="skill.title"></h3>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Lenguajes</h3>
+                        
+                        <div class="flex flex-wrap gap-2 mt-auto relative z-10">
+                            <template x-for="(tech, index) in skill.technologies.slice(0, 4)" :key="index">
+                                <img :src="tech.badge" :alt="tech.name" class="h-6 rounded shadow-sm">
+                            </template>
+                            <span x-show="skill.technologies.length > 4" class="flex items-center px-2 py-1 text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded" x-text="`+${skill.technologies.length - 4}`"></span>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
+                            Ver detalle de tecnologías
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">PHP</span>
-                        <span class="skill-tag">JavaScript</span>
-                        <span class="skill-tag">Java</span>
-                        <span class="skill-tag">SQL</span>
+                </template>
+            </div>
+        </div>
+
+        <!-- MODAL OVERLAY -->
+        <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-[100] overflow-y-auto">
+            
+            <!-- Fondo Oscuro -->
+            <div x-show="modalOpen" x-transition.opacity.duration.300ms @click="closeModal()" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm min-h-screen"></div>
+
+            <!-- Contenedor Flex -->
+            <div class="relative min-h-screen flex flex-col md:flex-row items-center justify-center p-4 md:p-8 overflow-hidden pointer-events-none">
+                
+                <!-- TARJETA PRINCIPAL (Izquierda - Z-INDEX ALTO) -->
+                <!-- 'relative z-20' para que tape a la otra card al salir -->
+                <div x-show="modalOpen" 
+                    x-transition:enter="ease-out duration-500" 
+                    x-transition:enter-start="opacity-0 translate-y-8 sm:scale-95" 
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                    x-transition:leave="ease-in duration-300" 
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                    x-transition:leave-end="opacity-0 translate-y-8 sm:scale-95" 
+                    class="relative z-20 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-500 pointer-events-auto">
+                    
+                    <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+                        <div class="flex items-center gap-3">
+                            <div x-if="activeSkill" :class="`p-2 rounded-lg ${activeSkill?.bg} ${activeSkill?.color}`">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="activeSkill?.icon"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white" x-text="activeSkill?.title"></h3>
+                        </div>
+                        <button @click="closeModal()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <div class="px-6 py-6">
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl" x-html="activeSkill?.description"></p>
+                        
+                        <h4 class="text-xs font-bold tracking-wider uppercase text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-2">
+                            Haz clic en una tecnología
+                            <svg class="w-4 h-4 text-indigo-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                        </h4>
+                        
+                        <div class="flex flex-wrap gap-3 mb-2">
+                            <template x-for="(tech, index) in activeSkill?.technologies" :key="index">
+                                <img :src="tech.badge" :alt="tech.name" 
+                                    @click="openTech(tech)"
+                                    class="h-8 rounded shadow-sm transition-all duration-300 cursor-pointer ring-offset-2 dark:ring-offset-gray-900"
+                                    :class="activeTech === tech ? 'ring-2 ring-indigo-500 scale-105 opacity-100' : 'hover:scale-105 opacity-80 hover:opacity-100 grayscale-[20%] hover:grayscale-0'">
+                            </template>
+                        </div>
                     </div>
                 </div>
 
-                <!-- CARD 2 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path></svg>
+                <!-- TARJETA DE DETALLE (Z-INDEX BAJO) -->
+                <!-- Poner '!' da prioridad a la animación y los márgenes negativos fuerzan a la tarjeta a esconderse detrás -->
+                <div x-show="showTechDetails"
+                    x-transition:enter="transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)"
+                    x-transition:enter-start="opacity-0 !-mt-[20rem] md:!mt-0 md:!-ml-[24rem] scale-95"
+                    x-transition:enter-end="opacity-100 mt-4 md:mt-0 md:ml-6 scale-100"
+                    x-transition:leave="transition-all duration-300 ease-in"
+                    x-transition:leave-start="opacity-100 mt-4 md:mt-0 md:ml-6 scale-100"
+                    x-transition:leave-end="opacity-0 !-mt-[20rem] md:!mt-0 md:!-ml-[24rem] scale-95"
+                    class="relative z-10 w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 pointer-events-auto mt-4 md:mt-0 md:ml-6">
+                    
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <img :src="activeTech?.badge" :alt="activeTech?.name" class="h-8 rounded shadow-sm">
+                            <button @click="closeTech()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-100 dark:bg-gray-700 p-1 rounded-full transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Frontend</h3>
+                        
+                        <h4 class="text-lg font-extrabold text-gray-900 dark:text-white mb-2">Mi experiencia</h4>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed" x-text="activeTech?.description"></p>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">Tailwind</span>
-                        <span class="skill-tag">React</span>
-                        <span class="skill-tag">Blade</span>
-                        <span class="skill-tag">Alpine.js</span>
+                    
+                    <!-- Decoración -->
+                    <div class="absolute bottom-0 right-0 p-4 opacity-5 pointer-events-none">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                     </div>
                 </div>
 
-                <!-- CARD 3 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Backend</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">Laravel</span>
-                        <span class="skill-tag">Node.js</span>
-                        <span class="skill-tag">Spring Boot</span>
-                        <span class="skill-tag">REST APIs</span>
-                    </div>
-                </div>
-
-                <!-- CARD 4 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Base de Datos</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">MySQL</span>
-                        <span class="skill-tag">PostgreSQL</span>
-                        <span class="skill-tag">HeidiSQL</span>
-                        <span class="skill-tag">Eloquent ORM</span>
-                    </div>
-                </div>
-
-                <!-- CARD 5 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="16" height="16" x="4" y="4" rx="2"></rect><path d="M15 2v2"></path><path d="M15 20v2"></path><path d="M2 15h2"></path><path d="M20 15h2"></path></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Herramientas</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">Git / GitHub</span>
-                        <span class="skill-tag">Docker</span>
-                        <span class="skill-tag">VS Code</span>
-                        <span class="skill-tag">Postman</span>
-                    </div>
-                </div>
-
-                <!-- CARD 6 -->
-                <div class="skill-card js-spotlight-card bg-white dark:bg-gray-900 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-0.5">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83m13.79-4l-5.74 9.94"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Diseño</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="skill-tag">Figma</span>
-                        <span class="skill-tag">Wireframing</span>
-                        <span class="skill-tag">Responsive</span>
-                        <span class="skill-tag">UI/UX</span>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -215,63 +299,6 @@
         </div>
     </section>
 
-    <!-- SOBRE MÍ SECTION -->
-    <section id="about" class="relative py-24 bg-gray-50 dark:bg-gray-800/30 transition-colors duration-300 overflow-hidden">
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="max-w-screen-xl px-4 mx-auto relative z-10">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-                
-                <div class="lg:col-span-5 relative group lg:pr-10"> 
-                    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
-                    <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
-                        <div class="overflow-hidden rounded-xl">
-                            <img src="{{ asset('img/me-alt.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos trabajando" class="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105">
-                        </div>
-                    </div>
-
-                    <div class="absolute -bottom-6 -right-2 lg:right-4 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-4 animate-floating z-20">
-                        <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
-                            <x-icons.cpu class="w-6 h-6" />
-                        </div>
-                        <div class="whitespace-nowrap">
-                            <p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">Background</p>
-                            <p class="text-sm font-bold text-gray-900 dark:text-white">Hardware & Software</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7">
-                    <span class="text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider uppercase text-sm mb-3 block">Conoce mi perfil</span>
-                    
-                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.15]">
-                        De la precisión aeroespacial a la <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-blue-400">arquitectura de software.</span>
-                    </h2>
-
-                    <div class="space-y-4 text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
-                        <p>Llevo más de 7 años escribiendo código. Empecé diseñando PCBs en el sector aeroespacial, un entorno donde <strong>un fallo no es una opción</strong>.</p>
-                        <p>Esa misma mentalidad de robustez es la que aplico hoy al desarrollo. Dejé los transistores para licenciarme en DAW y DAM, y hoy construyo sistemas que no solo funcionan, sino que escalan.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                        <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div class="text-indigo-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg></div>
-                            <span class="font-medium text-gray-800 dark:text-gray-200">Sistemas ERP/CRM</span>
-                        </div>
-                        <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div class="text-indigo-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
-                            <span class="font-medium text-gray-800 dark:text-gray-200">Compose Multiplatform</span>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('public.about') }}" class="group inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold text-white bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg">
-                        Conoce mi historia completa
-                        <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- SECCIÓN DE CONTACTO -->
     <section id="contact" class="py-20 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 transition-colors duration-300">
@@ -412,5 +439,140 @@
             }
         }
     });
+</script>
+
+<!-- Tarjetas skills técnicas -->
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('skillsComponent', () => ({
+        modalOpen: false,
+        activeSkill: null,
+        activeTech: null,
+        showTechDetails: false,
+        
+        skillsData: {
+            web: {
+                title: 'Desarrollo Web & Frameworks',
+                icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9',
+                color: 'text-indigo-600 dark:text-indigo-400',
+                bg: 'bg-indigo-50 dark:bg-indigo-900/30',
+                description: 'Mi núcleo de trabajo diario. Construyo plataformas robustas y escalables dominando tanto el ciclo backend como el renderizado frontend.',
+                technologies:[
+                    { name: 'Laravel', badge: 'https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Framework principal para el backend. Desarrollo de APIs REST complejas, autenticación segura, middlewares, colas de trabajo y lógica de negocio mediante Eloquent ORM.' },
+                    { name: 'PHP', badge: 'https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white', description: 'Lenguaje base de mi stack backend. Escritura de código limpio, fuertemente tipado en sus últimas versiones y enfocado en Programación Orientada a Objetos.' },
+                    { name: 'JavaScript', badge: 'https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black', description: 'Creación de interactividad en el frontend, consumo asíncrono de APIs (Fetch/Axios) y manipulación avanzada del DOM en Vanilla JS.' },
+                    { name: 'Tailwind CSS', badge: 'https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white', description: 'Mi framework CSS de cabecera. Lo aplico para maquetar interfaces modernas, 100% responsivas y altamente personalizadas sin abandonar el HTML.' },
+                    { name: 'HTML5', badge: 'https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white', description: 'Creación de estructuras semánticas y accesibles, garantizando un buen SEO técnico y compatibilidad cross-browser.' },
+                    { name: 'CSS3', badge: 'https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white', description: 'Aplicación de estilos nativos, variables CSS, animaciones complejas y layouts modernos con Flexbox y CSS Grid.' },
+                    { name: 'jQuery', badge: 'https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jquery&logoColor=white', description: 'Mantenimiento y refactorización de proyectos heredados, así como creación de scripts rápidos para validaciones en el lado del cliente.' },
+                    { name: 'Bootstrap', badge: 'https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white', description: 'Uso en proyectos corporativos o sistemas de gestión (dashboards) donde se requiere un prototipado UI estable e inmediato.' }
+                ]
+            },
+            movil: {
+                title: 'Desarrollo Multiplataforma & Móvil',
+                icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z',
+                color: 'text-green-600 dark:text-green-400',
+                bg: 'bg-green-50 dark:bg-green-900/30',
+                description: 'Creación de ecosistemas de software interactivos. Desde aplicaciones móviles nativas conectadas a mis propios backends, hasta lógicas de alto rendimiento.',
+                technologies:[
+                    { name: 'Kotlin', badge: 'https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white', description: 'Desarrollo de aplicaciones nativas para el ecosistema Android. Manejo de corrutinas, inyección de dependencias e integración con APIs REST.' },
+                    { name: 'Android Studio', badge: 'https://img.shields.io/badge/Android%20Studio-3DDC84?style=flat&logo=android-studio&logoColor=white', description: 'Entorno de desarrollo principal para el ciclo de vida completo de la app: perfilado de memoria, diseño XML/Compose y compilación para producción.' },
+                    { name: 'C++', badge: 'https://img.shields.io/badge/C++-00599C?style=flat&logo=c%2B%2B&logoColor=white', description: 'Vengo de diseñar hardware y software crítico. El uso de C++ forjó mis bases en la gestión estricta de memoria, punteros y eficiencia a bajo nivel.' },
+                    { name: 'C#', badge: 'https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white', description: 'Creación de lógicas complejas, scripting y herramientas orientadas a objetos, principalmente aplicadas dentro de ecosistemas como Unity o backend corporativo.' },
+                    { name: 'Unity', badge: 'https://img.shields.io/badge/Unity-100000?style=flat&logo=unity&logoColor=white', description: 'Desarrollo de entornos interactivos, físicas y UI avanzadas, gestionando los patrones de diseño específicos para el desarrollo de videojuegos y simulaciones.' }
+                ]
+            },
+            ecommerce: {
+                title: 'E-commerce, ERPs & CMS',
+                icon: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z',
+                color: 'text-pink-600 dark:text-pink-400',
+                bg: 'bg-pink-50 dark:bg-pink-900/30',
+                description: 'Digitalización de negocios. Implemento tiendas online y las integro con sistemas de facturación para automatizar los flujos empresariales.',
+                technologies:[
+                    { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Creación y configuración de tiendas B2C/B2B avanzadas. Desarrollo de módulos a medida en PHP, overrides y adaptación de plantillas Smarty.' },
+                    { name: 'Dolibarr ERP', badge: 'https://img.shields.io/badge/Dolibarr_ERP-2980B9?style=flat', description: 'Implantación del sistema para control de facturación, stock y clientes (CRM). Programación de integraciones por API para sincronizarlo con tiendas web.' },
+                    { name: 'WooCommerce', badge: 'https://img.shields.io/badge/WooCommerce-96588A?style=flat&logo=woocommerce&logoColor=white', description: 'Desarrollo e-commerce sobre ecosistema WordPress. Modificación de hooks, creación de pasarelas de pago y adaptación de flujos de carrito.' },
+                    { name: 'WordPress', badge: 'https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white', description: 'Construcción de webs corporativas y catálogos autogestionables, securización del CMS y creación de Custom Post Types y lógicas a medida.' }
+                ]
+            },
+            bbdd: {
+                title: 'Bases de Datos (SGBD)',
+                icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4',
+                color: 'text-blue-600 dark:text-blue-400',
+                bg: 'bg-blue-50 dark:bg-blue-900/30',
+                description: 'Diseño estructuras de datos asegurando integridad relacional y eficiencia en consultas complejas para sostener la lógica de negocio.',
+                technologies:[
+                    { name: 'MySQL', badge: 'https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white', description: 'Motor relacional principal para webs. Diseño esquemas normalizados, optimizo índices y escribo consultas crudas complejas para reportes.' },
+                    { name: 'MariaDB', badge: 'https://img.shields.io/badge/MariaDB-003545?style=flat&logo=mariadb&logoColor=white', description: 'Despliegue como alternativa OpenSource de alto rendimiento a MySQL en servidores Linux (VPS), garantizando la seguridad de los datos.' },
+                    { name: 'Firebase', badge: 'https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black', description: 'Uso de Bases de Datos NoSQL en Tiempo Real y Firestore, además de implementar sus servicios de autenticación y notificaciones Push en apps.' },
+                    { name: 'SQLite', badge: 'https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white', description: 'Base de datos ligera elegida para almacenamiento persistente local en aplicaciones Android y entornos de testing en Laravel.' },
+                    { name: 'phpMyAdmin', badge: 'https://img.shields.io/badge/phpMyAdmin-6C78AF?style=flat', description: 'Gestión visual en entornos de hosting compartido, exportación de volcados y administración de privilegios de usuario.' },
+                    { name: 'HeidiSQL', badge: 'https://img.shields.io/badge/HeidiSQL-FFD43B?style=flat', description: 'Mi cliente SQL preferido para conectar remotamente a bases de datos en producción y realizar mantenimientos o scripts de migración masiva.' }
+                ]
+            },
+            infra: {
+                title: 'Infraestructura & DevOps',
+                icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2',
+                color: 'text-orange-600 dark:text-orange-400',
+                bg: 'bg-orange-50 dark:bg-orange-900/30',
+                description: 'No solo escribo código, también lo pongo en producción. Gestiono los servidores, el control de versiones y el ciclo de testing.',
+                technologies:[
+                    { name: 'Docker', badge: 'https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white', description: 'Containerización de entornos (Sail en Laravel) para garantizar que el software funcione idéntico en desarrollo, staging y producción.' },
+                    { name: 'Nginx', badge: 'https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white', description: 'Configuración como proxy inverso y servidor web de alto rendimiento en entornos VPS para servir aplicaciones Laravel y Node.' },
+                    { name: 'Apache', badge: 'https://img.shields.io/badge/Apache-D22128?style=flat&logo=apache&logoColor=white', description: 'Gestión de servidores web tradicionales, control de reglas de reescritura en archivos .htaccess y gestión de certificados SSL.' },
+                    { name: 'Git', badge: 'https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white', description: 'Uso avanzado del control de versiones: ramificaciones estructuradas (GitFlow), resolución de conflictos y rebase.' },
+                    { name: 'GitHub', badge: 'https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white', description: 'Alojamiento de repositorios, trabajo colaborativo en equipos, code reviews y automatización de acciones CI/CD.' },
+                    { name: 'Postman', badge: 'https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white', description: 'Herramienta vital para documentar y probar rigurosamente todos los endpoints de las APIs REST antes de implementarlas en el frontend.' },
+                    { name: 'Bash', badge: 'https://img.shields.io/badge/Terminal/Bash-4EAA25?style=flat&logo=gnu-bash&logoColor=white', description: 'Dominio de la terminal Linux para administración de servidores por SSH y creación de scripts automatizados de backups.' },
+                    { name: 'FileZilla', badge: 'https://img.shields.io/badge/FileZilla-BF0000?style=flat&logo=filezilla&logoColor=white', description: 'Transferencia segura de archivos vía SFTP para despliegues manuales en entornos de hosting convencionales.' }
+                ]
+            },
+            arquitectura: {
+                title: 'Arquitectura y Patrones',
+                icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+                color: 'text-purple-600 dark:text-purple-400',
+                bg: 'bg-purple-50 dark:bg-purple-900/30',
+                description: 'La diferencia entre un código que "funciona" y uno "profesional". Aplico principios de ingeniería para crear software escalable y libre de deuda técnica.',
+                technologies:[
+                    { name: 'Clean Architecture', badge: 'https://img.shields.io/badge/Clean_Architecture-607D8B?style=flat', description: 'Separación estricta del código en capas (Dominio, Casos de Uso, Infraestructura). Permite cambiar la base de datos o el framework sin afectar la lógica del negocio.' },
+                    { name: 'SOLID Principles', badge: 'https://img.shields.io/badge/SOLID_Principles-607D8B?style=flat', description: 'Aplicación constante de los 5 principios. Diseño clases con responsabilidad única, inyección de dependencias e interfaces claras para código altamente testeable.' },
+                    { name: 'Design Patterns', badge: 'https://img.shields.io/badge/Design_Patterns-607D8B?style=flat', description: 'Implementación de soluciones probadas: Singleton para conexiones, Factory para creación de objetos, Repository para abstracción de datos o Observer para eventos.' },
+                    { name: 'MVVM', badge: 'https://img.shields.io/badge/MVVM-607D8B?style=flat', description: 'Patrón Modelo-Vista-ViewModel, indispensable en mis desarrollos móviles e interfaces reactivas modernas para separar la UI de la lógica de estado.' },
+                    { name: 'REST APIs', badge: 'https://img.shields.io/badge/REST_APIs-607D8B?style=flat', description: 'Diseño de arquitecturas sin estado. Implemento verbos HTTP correctos, códigos de estado semánticos, tokens JWT y endpoints altamente predecibles.' }
+                ]
+            }
+        },
+        
+        openModal(skillKey) {
+            this.activeSkill = this.skillsData[skillKey];
+            this.showTechDetails = false;
+            this.activeTech = null;
+            this.modalOpen = true;
+            document.body.classList.add('overflow-hidden');
+        },
+        closeModal() {
+            this.modalOpen = false;
+            this.showTechDetails = false;
+            setTimeout(() => {
+                this.activeSkill = null;
+                this.activeTech = null;
+            }, 500); // Espera a que termine la animación css
+            document.body.classList.remove('overflow-hidden');
+        },
+        openTech(tech) {
+            // Si hace click en la misma que ya está abierta, la cierra
+            if (this.activeTech === tech) {
+                this.closeTech();
+            } else {
+                this.activeTech = tech;
+                this.showTechDetails = true;
+            }
+        },
+        closeTech() {
+            this.showTechDetails = false;
+            setTimeout(() => this.activeTech = null, 400);
+        }
+    }))
+})
 </script>
 @endpush

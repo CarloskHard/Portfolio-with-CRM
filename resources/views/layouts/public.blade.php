@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Carlos Codes | Full Stack Developer</title>
+    <meta name="description" content="Desarrollo de aplicaciones y webs para particulares y empresas. +7 años desarrollando software. Cuéntame tu idea y te devolveré un producto real."> <!-- Snippet en búsqueda de Google -->
     <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/png">
     
     <!-- Fonts -->
