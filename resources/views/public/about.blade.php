@@ -74,17 +74,30 @@
 
             <div class="relative border-l-4 border-indigo-100 dark:border-gray-800 ml-3 md:ml-6 space-y-12">
                 
-                <!-- Item 1 -->
+                <!-- Item 0 -->
                 <div class="relative pl-8 md:pl-12">
                     <!-- Bolita del timeline -->
                     <div class="absolute -left-[10px] top-1 w-5 h-5 bg-indigo-600 rounded-full border-4 border-white dark:border-gray-900"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider">
-                        Jun 2023 - Nov 2023 / Finales 2024
+                        2025 - Actualidad
                     </span>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Programador Web</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Desarrollador de Apps Web y Móvil</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Freelancer</p>
+                    <p class="text-gray-600 dark:text-gray-400">Creación de apps web de gestión de empresa y portfolios. Desarrollo de apps móviles: Desde la red social "Platorama" hasta apps de entretenimiento.</p>
+                </div>
+
+                <!-- Item 1 -->
+                <div class="relative pl-8 md:pl-12">
+                    <!-- Bolita del timeline -->
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    
+                    <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
+                        2023 - 2024
+                    </span>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Programador Web Fullstack</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Al Rescate Asistencia Informática</p>
-                    <p class="text-gray-600 dark:text-gray-400">Desarrollo de aplicaciones web ERP y CRM.</p>
+                    <p class="text-gray-600 dark:text-gray-400">Desarrollo de aplicaciones web ERP y CRM fullstack. Despliegue y mantenimiento de servidores.</p>
                 </div>
 
                 <!-- Item 2 -->
@@ -92,9 +105,9 @@
                     <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
-                        Jul 2020 - Nov 2020
+                        2022
                     </span>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Técnico Electrónico y Gestión Apple</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Técnico Informático en Ecosistema IOS</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Goldenmac EDU (Grupo K-tuin)</p>
                     <p class="text-gray-600 dark:text-gray-400">Gestión remota de dispositivos Apple para uso académico y servicio técnico.</p>
                 </div>
@@ -104,11 +117,22 @@
                     <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
-                        Feb 2021 - Abr 2022
+                        2021 - 2022
                     </span>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Técnico Electrónico</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">NEED TECH</p>
                     <p class="text-gray-600 dark:text-gray-400">Análisis, diseño de circuitos, montaje automático SMD, soldadura por ola y testeo de PCBs. Resolución de problemas a nivel de componente.</p>
+                </div>
+
+                <div class="relative pl-8 md:pl-12">
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    
+                    <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
+                        2019 - 2020
+                    </span>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">Técnico Informático en Ecosistema IOS</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Goldenmac EDU (Grupo K-tuin)</p>
+                    <p class="text-gray-600 dark:text-gray-400">Gestión remota de dispositivos Apple para uso académico y servicio técnico.</p>
                 </div>
 
                 <!-- Item 4 -->
@@ -116,7 +140,7 @@
                     <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
-                        Mar 2018 - Jul 2018
+                        2018
                     </span>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Testing Electrónico</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">ALTER TECHNOLOGY TÜV NORD</p>
@@ -146,7 +170,7 @@
                     <div class="text-3xl">📱</div>
                     <div>
                         <h3 class="font-bold text-gray-900 dark:text-white">Desarrollo de Aplicaciones Multiplataforma (DAM)</h3>
-                        <p class="text-sm text-gray-500 mt-1">Ago 2022 - Jun 2024</p>
+                        <p class="text-sm text-gray-500 mt-1">Ago 2021 - Jun 2023</p>
                     </div>
                 </div>
 

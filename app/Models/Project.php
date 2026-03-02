@@ -9,19 +9,21 @@ class Project extends Model
 {
     use HasFactory;
 
-    // Campos que permitimos rellenar masivamente (seguridad)
-    protected $fillable = [
-        'title', 'description', 'image_url', 
+    protected $fillable =[
+        'title', 'description', 'images',
         'visibility', 'url_demo', 'url_repo'
     ];
 
-    // Relación N:M con Tecnologías
+    // Esto convierte automáticamente el JSON de la base de datos a un array de PHP y viceversa
+    protected $casts =[
+        'images' => 'array', 
+    ];
+
     public function technologies()
     {
         return $this->belongsToMany(Technology::class);
     }
 
-    // Relación N:M con Clientes (Uso 'project_client' porque no sigue el orden alfabético estricto de Laravel)
     public function clients()
     {
         return $this->belongsToMany(Client::class, 'project_client');

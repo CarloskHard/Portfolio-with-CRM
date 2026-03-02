@@ -24,7 +24,7 @@
                 </p>
                 
                 <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                    <a href="#projects" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white rounded-lg bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition">
+                    <a href="#projects" class="inline-flex items-center justify-center px-5 py-3 proyecto-button-hero text-base font-medium text-center text-white rounded-lg bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition">
                         Ver Proyectos
                     </a>
                     <a href="#contact" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 dark:text-white dark:border-gray-600 dark:hover:bg-gray-800 transition">
@@ -156,7 +156,7 @@
             <!-- Grid Principal (6 Tarjetas) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <template x-for="(skill, key) in skillsData" :key="key">
-                    <div @click="openModal(key)" class="skill-card js-spotlight-card group cursor-pointer bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
+                    <div @click="openModal(key)" class="skill-card js-spotlight-card group cursor-pointer bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-indigo-500/10 hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
                         <div class="flex items-center gap-4 mb-5 relative z-10">
                             <div :class="`p-3 rounded-xl ${skill.bg} ${skill.color} transition-transform group-hover:scale-110`">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,52 +281,10 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @forelse($projects->take(3) as $project)
-                    <article class="project-card js-project-card bg-gray-50 dark:bg-gray-800/50 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-sm">
-                        <!-- Imagen -->
-                        <div class="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            @if($project->image_url)
-                                <img src="{{ asset($project->image_url) }}" class="w-full h-full object-cover">
-                            @else
-                                <img src="{{ asset('img/logo.png') }}" class="w-16 h-16">
-                            @endif
-                        </div>
+                    
+                    <!-- Usamos nuestro nuevo componente de Card -->
+                    <x-project-card :project="$project" />
 
-                        <!-- Contenido -->
-                        <div class="p-6 flex-grow flex flex-col relative z-10">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ $project->title }}</h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-6 flex-grow leading-relaxed">{{ $project->description }}</p>
-
-                            <!-- Tecnologías -->
-                            <!--
-                            <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700 mb-4">
-                                @php
-                                    $techs = is_string($project->technologies) ? explode(',', $project->technologies) : $project->technologies;
-                                @endphp
-                                @if($techs)
-                                    @foreach($techs as $tech)
-                                        <span class="skill-tag">{{ trim($tech instanceof \App\Models\Technology ? $tech->name : $tech) }}</span>
-                                    @endforeach
-                                @endif
-                            </div>
-                            -->
-
-                            <!-- BOTONES DE GITHUB Y DEMO-->
-                            <div class="flex gap-4 mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                                @if($project->url_repo)
-                                    <a href="{{ $project->url_repo }}" target="_blank" class="text-xs font-bold uppercase text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                        GitHub
-                                    </a>
-                                @endif
-                                @if($project->url_demo)
-                                    <a href="{{ $project->url_demo }}" target="_blank" class="text-xs font-bold uppercase text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                        Demo
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </article>
                 @empty
                     <p class="col-span-full text-center text-gray-500 py-12">No hay proyectos destacados.</p>
                 @endforelse
@@ -511,14 +469,14 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-indigo-50 dark:bg-indigo-900/30',
                 description: 'Mi núcleo de trabajo diario. Monto webs de portfolio, tiendas online, ERPs(Gestión de recursos internos para negocios) y CRMs.(Sistemas internos para gestión de clientes).',
                 technologies:[
-                    { name: 'Laravel', badge: 'https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Framework principal para el backend. Desarrollo de APIs REST complejas, autenticación segura, middlewares, colas de trabajo y lógica de negocio mediante Eloquent ORM.' },
-                    { name: 'PHP', badge: 'https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white', description: 'Lenguaje base de mi stack backend. Escritura de código limpio, fuertemente tipado en sus últimas versiones y enfocado en Programación Orientada a Objetos.' },
-                    { name: 'JavaScript', badge: 'https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black', description: 'Creación de interactividad en el frontend, consumo asíncrono de APIs (Fetch/Axios) y manipulación avanzada del DOM en Vanilla JS.' },
-                    { name: 'Tailwind CSS', badge: 'https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white', description: 'Mi framework CSS de cabecera. Lo aplico para maquetar interfaces modernas, 100% responsivas y altamente personalizadas sin abandonar el HTML.' },
-                    { name: 'HTML5', badge: 'https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white', description: 'Creación de estructuras semánticas y accesibles, garantizando un buen SEO técnico y compatibilidad cross-browser.' },
-                    { name: 'CSS3', badge: 'https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white', description: 'Aplicación de estilos nativos, variables CSS, animaciones complejas y layouts modernos con Flexbox y CSS Grid.' },
-                    { name: 'jQuery', badge: 'https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jquery&logoColor=white', description: 'Mantenimiento y refactorización de proyectos heredados, así como creación de scripts rápidos para validaciones en el lado del cliente.' },
-                    { name: 'Bootstrap', badge: 'https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white', description: 'Uso en proyectos corporativos o sistemas de gestión (dashboards) donde se requiere un prototipado UI estable e inmediato.' }
+                    { name: 'Laravel', badge: 'https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Mi framework principal de backend: Me permite desplegar webs sólidas en minutos. Lo utilizo a diario para gestionar autenticaciones seguras y orquestar toda la lógica de negocio de mis proyectos usando Eloquent ORM.' },
+                    { name: 'PHP', badge: 'https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white', description: 'Como es estandar en desarrollo web, PHP es el motor de la mayoría de mis desarrollos backend. He evolucionado con el lenguaje, aprovechando su tipado fuerte en las últimas versiones para escribir código limpio, moderno y orientado a objetos.' },
+                    { name: 'JavaScript', badge: 'https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black', description: 'Lo uso para dar vida a mis interfaces. Desde manipular el DOM de forma directa hasta consumir mis propias APIs asíncronas, es mi herramienta clave para crear una experiencia de usuario fluida.' },
+                    { name: 'Tailwind CSS', badge: 'https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white', description: 'Mi framework CSS de cabecera. Es una mejora a simplemente usar CSS: Agiliza enormemente mi flujo de trabajo maquetando directamente en el HTML lo cual crea un código más limpio y mejor arquitectura. CSS todavía tiene sus usos, especialmente para elementos repetitivos/consistentes.' },
+                    { name: 'HTML5', badge: 'https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white', description: 'La base de todo proyecto web. He usado HTML en todos mis proyectos web ( Aunque obviamente en proyectos con CMS no se usa apenas pues se programa mediante bloques, lo cual puede servir para proyectos rápidos y simples, pero no hay nada tan flexible y básico para diseñar web como HTML).' },
+                    { name: 'CSS3', badge: 'https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white', description: 'Aunque use frameworks CSS, el uso de CSS nativo sigue teniendo cavida para los detalles precisos o cuando se repite un estilo en varios elementos. Además también lo he trabajado en proyectos no tan modernos mientras trabajé con empresas de ERP.' },
+                    { name: 'jQuery', badge: 'https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jquery&logoColor=white', description: 'Me ha salvado la vida al tomar el relevo de proyectos heredados. Aún lo utilizo para dar mantenimiento a sistemas más antiguos o implementar scripts rápidos de validación.' },
+                    { name: 'Bootstrap', badge: 'https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white', description: 'Mi opción rápida y segura cuando necesito levantar el panel de administración de un CRM o un dashboard interno. Me permite entregar prototipos funcionales y estables en tiempo récord.' }
                 ]
             },
             movil: {
@@ -528,11 +486,11 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-green-50 dark:bg-green-900/30',
                 description: 'Desarrollo apps nativas para Android que luego también puedo adaptar a dispositivos de Apple (IOS). Además he diseñado videojuegos en Unity para móviles y VR.',
                 technologies:[
-                    { name: 'Kotlin', badge: 'https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white', description: 'Desarrollo de aplicaciones nativas para el ecosistema Android. Manejo de corrutinas, inyección de dependencias e integración con APIs REST.' },
-                    { name: 'Android Studio', badge: 'https://img.shields.io/badge/Android%20Studio-3DDC84?style=flat&logo=android-studio&logoColor=white', description: 'Entorno de desarrollo principal para el ciclo de vida completo de la app: perfilado de memoria, diseño XML/Compose y compilación para producción.' },
-                    { name: 'C++', badge: 'https://img.shields.io/badge/C++-00599C?style=flat&logo=c%2B%2B&logoColor=white', description: 'Vengo de diseñar hardware y software crítico. El uso de C++ forjó mis bases en la gestión estricta de memoria, punteros y eficiencia a bajo nivel.' },
-                    { name: 'C#', badge: 'https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white', description: 'Creación de lógicas complejas, scripting y herramientas orientadas a objetos, principalmente aplicadas dentro de ecosistemas como Unity o backend corporativo.' },
-                    { name: 'Unity', badge: 'https://img.shields.io/badge/Unity-100000?style=flat&logo=unity&logoColor=white', description: 'Desarrollo de entornos interactivos, físicas y UI avanzadas, gestionando los patrones de diseño específicos para el desarrollo de videojuegos y simulaciones.' }
+                    { name: 'Kotlin', badge: 'https://img.shields.io/badge/Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white', description: 'Es el lenguaje recomendado para el desarrollo móvil y lo he estado usando intensivamente al desarrollar apps nativas como mi aplicación "Platorama". Es uno de los lenguajes con los que más familiarizado estoy al haber pasado mucho tiempo desarrollando en Android Studio.' },
+                    { name: 'Android Studio', badge: 'https://img.shields.io/badge/Android%20Studio-3DDC84?style=flat&logo=android-studio&logoColor=white', description: 'Mi centro de operaciones para crear apps móviles. Aquí es donde gestiono todo el ciclo de vida: desde el diseño de la interfaz y la inyección de dependencias, hasta el perfilado de rendimiento y la compilación final.' },
+                    { name: 'C++', badge: 'https://img.shields.io/badge/C++-00599C?style=flat&logo=c%2B%2B&logoColor=white', description: 'C++ es un lenguaje pilar de la programación y actualmente sigue teniendo uso para programación a bajo nivel. Aunque no estoy tan familiarizado con él, sí que lo he estudiado y estado usando durante un tiempo para diseñar juegos en Unreal Engine.' },
+                    { name: 'C#', badge: 'https://img.shields.io/badge/C%23-239120?style=flat&logo=csharp&logoColor=white', description: 'El lenguaje que utilizo principalmente como motor lógico detrás de Unity. Con él he programado comportamientos complejos, físicas y herramientas personalizadas orientadas a objetos.' },
+                    { name: 'Unity', badge: 'https://img.shields.io/badge/Unity-100000?style=flat&logo=unity&logoColor=white', description: 'Mi motor de desarrollo de confianza para desarrollar apps interactivas y videojuegos. Lo he utilizado para desarrollar tanto videojuegos (de móvil y PC) como simulaciones y entornos inmersivos de realidad virtual (VR).' }
                 ]
             },
             ecommerce: {
@@ -542,10 +500,10 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-pink-50 dark:bg-pink-900/30',
                 description: 'Digitalizo negocios implementando tiendas online y desarrollando programas internos de gestión de los recursos (ERP) y clientes (CRM).',
                 technologies:[
-                    { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Creación y configuración de tiendas B2C/B2B avanzadas. Desarrollo de módulos a medida en PHP, overrides y adaptación de plantillas Smarty.' },
-                    { name: 'Dolibarr ERP', badge: 'https://img.shields.io/badge/Dolibarr_ERP-2980B9?style=flat', description: 'Implantación del sistema para control de facturación, stock y clientes (CRM). Programación de integraciones por API para sincronizarlo con tiendas web.' },
-                    { name: 'WooCommerce', badge: 'https://img.shields.io/badge/WooCommerce-96588A?style=flat&logo=woocommerce&logoColor=white', description: 'Desarrollo e-commerce sobre ecosistema WordPress. Modificación de hooks, creación de pasarelas de pago y adaptación de flujos de carrito.' },
-                    { name: 'WordPress', badge: 'https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white', description: 'Construcción de webs corporativas y catálogos autogestionables, securización del CMS y creación de Custom Post Types y lógicas a medida.' }
+                    { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Lo utilizo para montar tiendas online rápidamente con un sistema ya establecido. He trabajado con él durante mi trabajo como programador en "Al Rescate". No solo lo he configuradp, también he desarrollado módulos a medida en PHP y adaptado plantillas para cubrir flujos de venta B2B y B2C muy específicos.' },
+                    { name: 'Dolibarr ERP', badge: 'https://img.shields.io/badge/Dolibarr_ERP-2980B9?style=flat', description: 'He usado este sistema para digitalizar la gestión de empresas durante mi trabajo en "Al rescate". Lo he usado para darle a clientes el control total de facturación, almacén e incluso lo he sincronizado por API con sus tiendas web.' },
+                    { name: 'WooCommerce', badge: 'https://img.shields.io/badge/WooCommerce-96588A?style=flat&logo=woocommerce&logoColor=white', description: 'Mi elección para e-commerce más ágiles e integrados. Podeis ver un ejemplo de mi trabajo con WooCommerce en la web "LaBichaTattoo.es". Me he metido a fondo en su código modificando hooks, creando pasarelas de pago personalizadas y optimizando el proceso de checkout.' },
+                    { name: 'WordPress', badge: 'https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white', description: 'Mientras que los CMS no son una buena opción para proyectos grandes o complejos, para el desarrollo de webs medianamente sencillas WordPress es una herramienta útil para diseños super rápidos y autogestionables por el usuario final.' }
                 ]
             },
             bbdd: {
@@ -555,12 +513,12 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-blue-50 dark:bg-blue-900/30',
                 description: 'Todo proyecto complejo en el que trabajo requiere gestión de datos: Diseño estructuras de datos buscando los mejores patrones de diseño para asegurar la integridad y escalabilidad de los datos.',
                 technologies:[
-                    { name: 'MySQL', badge: 'https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white', description: 'Motor relacional principal para webs. Diseño esquemas normalizados, optimizo índices y escribo consultas crudas complejas para reportes.' },
-                    { name: 'MariaDB', badge: 'https://img.shields.io/badge/MariaDB-003545?style=flat&logo=mariadb&logoColor=white', description: 'Despliegue como alternativa OpenSource de alto rendimiento a MySQL en servidores Linux (VPS), garantizando la seguridad de los datos.' },
-                    { name: 'Firebase', badge: 'https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black', description: 'Uso de Bases de Datos NoSQL en Tiempo Real y Firestore, además de implementar sus servicios de autenticación y notificaciones Push en apps.' },
-                    { name: 'SQLite', badge: 'https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white', description: 'Base de datos ligera elegida para almacenamiento persistente local en aplicaciones Android y entornos de testing en Laravel.' },
-                    { name: 'phpMyAdmin', badge: 'https://img.shields.io/badge/phpMyAdmin-6C78AF?style=flat', description: 'Gestión visual en entornos de hosting compartido, exportación de volcados y administración de privilegios de usuario.' },
-                    { name: 'HeidiSQL', badge: 'https://img.shields.io/badge/HeidiSQL-FFD43B?style=flat', description: 'Mi cliente SQL preferido para conectar remotamente a bases de datos en producción y realizar mantenimientos o scripts de migración masiva.' }
+                    { name: 'MySQL', badge: 'https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white', description: 'El pilar de los datos de mis proyectos web. Diseño esquemas relacionales desde cero, optimizo índices para acelerar búsquedas y lanzo consultas SQL crudas complejas para reportes internos.' },
+                    { name: 'MariaDB', badge: 'https://img.shields.io/badge/MariaDB-003545?style=flat&logo=mariadb&logoColor=white', description: 'La alternativa de código abierto y altísimo rendimiento que suelo montar cuando configuro mis propios servidores Linux, dándome total tranquilidad en la gestión de miles de registros.' },
+                    { name: 'Firebase', badge: 'https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=black', description: 'He usado mucho Firebase en proyectos de desarrollo móvil como en la red social que desarrollé: "Platorama". Además utilizo su base de datos NoSQL para sincronización en tiempo real, autenticación de usuarios y envíos masivos de notificaciones Push.' },
+                    { name: 'SQLite', badge: 'https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white', description: 'Mi comodín ligero. Lo utilizo para el almacenamiento local persistente en mis apps Android (para que funcionen offline) y para ejecutar baterías de testing ultrarrápidas en Laravel.' },
+                    { name: 'phpMyAdmin', badge: 'https://img.shields.io/badge/phpMyAdmin-6C78AF?style=flat', description: 'La herramienta visual clásica a la que recurro en entornos de hosting compartido para hacer volcados rápidos de datos o gestionar privilegios de usuarios directamente en producción.' },
+                    { name: 'HeidiSQL', badge: 'https://img.shields.io/badge/HeidiSQL-FFD43B?style=flat', description: 'El cliente SQL que abro cada día en mi equipo. Me permite conectarme remotamente a las bases de datos de mis clientes para lanzar scripts de mantenimiento o hacer migraciones masivas.' }
                 ]
             },
             infra: {
@@ -568,16 +526,16 @@ document.addEventListener('alpine:init', () => {
                 icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2',
                 color: 'text-orange-600 dark:text-orange-400',
                 bg: 'bg-orange-50 dark:bg-orange-900/30',
-                description: 'No solo escribo código, también lo pongo en producción. Publico las aplicaciones y gestiono los servidores, el control de versiones y el posicionamiento en motores de búsqueda (SEO).',
+                description: 'No solo escribo código, también lo pongo en producción. Publico las aplicaciones, gestiono los servidores, el control de versiones y el posicionamiento en motores de búsqueda (SEO).',
                 technologies:[
-                    { name: 'Docker', badge: 'https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white', description: 'Containerización de entornos (Sail en Laravel) para garantizar que el software funcione idéntico en desarrollo, staging y producción.' },
-                    { name: 'Nginx', badge: 'https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white', description: 'Configuración como proxy inverso y servidor web de alto rendimiento en entornos VPS para servir aplicaciones Laravel y Node.' },
-                    { name: 'Apache', badge: 'https://img.shields.io/badge/Apache-D22128?style=flat&logo=apache&logoColor=white', description: 'Gestión de servidores web tradicionales, control de reglas de reescritura en archivos .htaccess y gestión de certificados SSL.' },
-                    { name: 'Git', badge: 'https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white', description: 'Uso avanzado del control de versiones: ramificaciones estructuradas (GitFlow), resolución de conflictos y rebase.' },
-                    { name: 'GitHub', badge: 'https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white', description: 'Alojamiento de repositorios, trabajo colaborativo en equipos, code reviews y automatización de acciones CI/CD.' },
-                    { name: 'Postman', badge: 'https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white', description: 'Herramienta vital para documentar y probar rigurosamente todos los endpoints de las APIs REST antes de implementarlas en el frontend.' },
-                    { name: 'Bash', badge: 'https://img.shields.io/badge/Terminal/Bash-4EAA25?style=flat&logo=gnu-bash&logoColor=white', description: 'Dominio de la terminal Linux para administración de servidores por SSH y creación de scripts automatizados de backups.' },
-                    { name: 'FileZilla', badge: 'https://img.shields.io/badge/FileZilla-BF0000?style=flat&logo=filezilla&logoColor=white', description: 'Transferencia segura de archivos vía SFTP para despliegues manuales en entornos de hosting convencionales.' }
+                    { name: 'Docker', badge: 'https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white', description: 'Lo uso para acabar con el problema de "en mi máquina funciona" cuando pretendo compartir el proyecto o migrarlo a un servidor. Containerizando con entornos como Sail, garantizo que el código se comporte exactamente igual en mi PC que en el servidor.' },
+                    { name: 'Nginx', badge: 'https://img.shields.io/badge/Nginx-009639?style=flat&logo=nginx&logoColor=white', description: 'El motor de mis servidores VPS, esta web y la mayoría de webs que he hecho las hosteo en mi servidor privado con Nginx. Lo configuro como proxy inverso para despachar aplicaciones web y soportar grandes picos de concurrencia de forma supereficiente.' },
+                    { name: 'Apache', badge: 'https://img.shields.io/badge/Apache-D22128?style=flat&logo=apache&logoColor=white', description: 'Aunque actualmente prefiera usar Nginx sobre Apache por ser más moderno, veloz y optimizado, he usado mucho Apache en mi tiempo desarrollando en "Al Rescate" usando XAMPP y aprecio que todavía tiene algunas ventajas como servidor, especialmente para contenido dinámico y complejo.' },
+                    { name: 'Git', badge: 'https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white', description: 'Es la herramienta que más uso pues es fundamental en cualquier proyecto de desarrollo de software: Me permite trabajar con ramas estructuradas, experimentar sin romper nada y contar con puntos de guardado.' },
+                    { name: 'GitHub', badge: 'https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white', description: 'El hogar de mi código. Además de mis repositorios Git en la nube, lo utilizo para establecer flujos de trabajo profesionales donde puedo trabajar con otros desarrolladores, automatizar los despliegues a producción (CI/CD) o participar en proyectos públicos.' },
+                    { name: 'Postman', badge: 'https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white', description: 'Mi banco de pruebas en proyectos web. Antes de escribir una sola línea en el frontend, lo uso para estresar y validar mis APIs, asegurándome de que cada endpoint responda con la data exacta.' },
+                    { name: 'Bash', badge: 'https://img.shields.io/badge/Terminal/Bash-4EAA25?style=flat&logo=gnu-bash&logoColor=white', description: 'Paso gran parte de mi tiempo conectado a servidores Linux por SSH a través de Bash. En la terminal, actualizo dependencias, administro el contenido o ejecuto mis propios scripts para automatizar rutinas pesadas, como los sistemas de copias de seguridad.' },
+                    { name: 'FileZilla', badge: 'https://img.shields.io/badge/FileZilla-BF0000?style=flat&logo=filezilla&logoColor=white', description: 'Mi herramienta SFTP: Aunque gestionar servidores por Bash suele ser suficiente, a menudo uso Filezilla para conectarme de forma rápida por SFTP a servidores para comprobarlos o administrar el contenido de forma rápida si no se trata de muchos archivos (En cuyo caso preferiría subir un .zip y descomprimirlo con bash).' }
                 ]
             },
             arquitectura: {
@@ -587,11 +545,11 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-purple-50 dark:bg-purple-900/30',
                 description: 'La diferencia entre un código que "funciona" y uno "profesional". Me tomo en serio estudiar y aplicar principios de ingeniería para crear software escalable y libre de deuda técnica.',
                 technologies:[
-                    { name: 'Clean Architecture', badge: 'https://img.shields.io/badge/Clean_Architecture-607D8B?style=flat', description: 'Separación estricta del código en capas (Dominio, Casos de Uso, Infraestructura). Permite cambiar la base de datos o el framework sin afectar la lógica del negocio.' },
-                    { name: 'SOLID Principles', badge: 'https://img.shields.io/badge/SOLID_Principles-607D8B?style=flat', description: 'Aplicación constante de los 5 principios. Diseño clases con responsabilidad única, inyección de dependencias e interfaces claras para código altamente testeable.' },
-                    { name: 'Design Patterns', badge: 'https://img.shields.io/badge/Design_Patterns-607D8B?style=flat', description: 'Implementación de soluciones probadas: Singleton para conexiones, Factory para creación de objetos, Repository para abstracción de datos o Observer para eventos.' },
-                    { name: 'MVVM', badge: 'https://img.shields.io/badge/MVVM-607D8B?style=flat', description: 'Patrón Modelo-Vista-ViewModel, indispensable en mis desarrollos móviles e interfaces reactivas modernas para separar la UI de la lógica de estado.' },
-                    { name: 'REST APIs', badge: 'https://img.shields.io/badge/REST_APIs-607D8B?style=flat', description: 'Diseño de arquitecturas sin estado. Implemento verbos HTTP correctos, códigos de estado semánticos, tokens JWT y endpoints altamente predecibles.' }
+                    { name: 'Clean Architecture', badge: 'https://img.shields.io/badge/Clean_Architecture-607D8B?style=flat', description: 'Me permite tener código separado por responsabilidades y escalable. Aislando el núcleo del negocio de la infraestructura consigo que cambiar de base de datos o framework en el futuro no implique reescribir toda la aplicación.' },
+                    { name: 'SOLID Principles', badge: 'https://img.shields.io/badge/SOLID_Principles-607D8B?style=flat', description: 'Considero que son principios básicos que todo programador debe conocer para un buen código. Aplicar estos principios permite escribir un código modular y testeable, que no se convierta en una pesadilla cuando haya que hacerle mantenimiento años después.' },
+                    { name: 'Design Patterns', badge: 'https://img.shields.io/badge/Design_Patterns-607D8B?style=flat', description: 'No reinvento la rueda. Ante problemas de diseño recurrentes, aplico patrones probados (Observer, Factory, Repository, Singleton) para que mis soluciones sean elegantes y entendibles por otros.' },
+                    { name: 'MVVM', badge: 'https://img.shields.io/badge/MVVM-607D8B?style=flat', description: 'La arquitectura que estructura mis apps móviles modernas como "Platorama". Desacoplar la interfaz gráfica de la lógica de negocio me ha permitido tener interfaces reactivas, predecibles y fáciles de probar.' },
+                    { name: 'REST APIs', badge: 'https://img.shields.io/badge/REST_APIs-607D8B?style=flat', description: 'Es como comunico mis sistemas. Me aseguro de diseñar APIs sin estado y sumamente lógicas, utilizando los verbos HTTP correctos, tokens JWT y códigos de estado semánticos en cada respuesta.' }
                 ]
             }
         },
