@@ -43,8 +43,13 @@
         .dark #scroll-progress-container { background-color: rgba(55, 65, 81, 0.3); }
         #scroll-progress-bar { width: 100%; height: 0%; background: linear-gradient(to bottom, #818cf8, #4f46e5); box-shadow: 0 0 8px rgba(79, 70, 229, 0.5); transition: height 0.1s ease-out; }
 
-        @keyframes float-natural { 0% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(5px, -10px) rotate(2deg); } 66% { transform: translate(-5px, -15px) rotate(-2deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
-        .animate-floating { animation: float-natural 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
+        @keyframes float-natural { 
+            0%   { transform: translate(0, 0) rotate(0deg); } 
+            33%  { transform: translate(2px, -5px) rotate(0.8deg); } 
+            66%  { transform: translate(-2px, -7px) rotate(-0.8deg); } 
+            100% { transform: translate(0, 0) rotate(0deg); } 
+        }
+        .animate-floating { animation: float-natural 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
 
         @keyframes soft-breath { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(129, 140, 248, 0); } 50% { transform: scale(1.03); box-shadow: 0 0 15px 2px rgba(129, 140, 248, 0.2); } }
         .animate-subtle-breath { animation: soft-breath 5s ease-in-out infinite; display: inline-block; }
