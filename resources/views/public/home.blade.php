@@ -18,12 +18,12 @@
                 </span>
                 <h1 class="max-w-2xl mx-auto lg:mx-0 mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl text-gray-900 dark:text-white">
                     Hola 👋🏼, soy <br>
-                    <span class="js-footer-name-spotlight footer-name-wrapper hero-name-vfx inline-block cursor-default relative text-indigo-600 dark:text-indigo-400 font-extrabold">
+                    <span class="js-footer-name-spotlight js-hero-wave footer-name-wrapper hero-name-vfx inline-block cursor-default relative text-indigo-600 dark:text-indigo-400 font-extrabold">
                         <span class="footer-name-vfx-base">
-                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
+                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
                         </span>
                         <span class="footer-name-vfx-sweep" aria-hidden="true">
-                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
+                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
                         </span>
                     </span>
                 </h1>

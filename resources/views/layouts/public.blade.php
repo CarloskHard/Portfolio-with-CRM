@@ -207,9 +207,27 @@
             40% { transform: translateY(-2px); }
             70% { transform: translateY(-0.5px); }
         }
-        .hero-name-vfx:hover .footer-name-char {
+        .hero-name-vfx:hover .hero-wave-char {
             animation: hero-wave-expand 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
             animation-delay: calc(var(--char-index) * 26ms);
+        }
+        /* Desktop: ola guiada por raton (sustituye a la animacion hover) */
+        @media (min-width: 1024px) {
+            .hero-name-vfx .hero-wave-char {
+                animation: none !important;
+                transform: translate(
+                    var(--hero-shift-x, 0px),
+                    var(--hero-shift-y, 0px)
+                );
+                transition: transform 180ms cubic-bezier(0.22, 0.8, 0.2, 1);
+            }
+            .hero-name-vfx:hover .hero-wave-char {
+                animation: none !important;
+                transform: translate(
+                    var(--hero-shift-x, 0px),
+                    var(--hero-shift-y, 0px)
+                );
+            }
         }
         /* "Diseño & Desarrollo": mismo color, reflejo metálico que sigue al ratón */
         .footer-design-wrapper {
@@ -239,11 +257,8 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: transparent;
-            opacity: 0;
+            opacity: var(--design-proximity, 0);
             transition: opacity 0.25s ease;
-        }
-        .footer-design-wrapper:hover .footer-design-reflection {
-            opacity: 1;
         }
     </style>
 
@@ -347,10 +362,16 @@
                     const rect = designSpotlight.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-                        designSpotlight.style.setProperty('--mouse-x', `${x}px`);
-                        designSpotlight.style.setProperty('--mouse-y', `${y}px`);
-                    }
+                    designSpotlight.style.setProperty('--mouse-x', `${x}px`);
+                    designSpotlight.style.setProperty('--mouse-y', `${y}px`);
+
+                    // Proximity fade-in before entering text area (smooth approach)
+                    const dx = x < 0 ? -x : (x > rect.width ? x - rect.width : 0);
+                    const dy = y < 0 ? -y : (y > rect.height ? y - rect.height : 0);
+                    const distance = Math.hypot(dx, dy);
+                    const sigma = 95;
+                    const proximity = Math.exp(-(distance * distance) / (2 * sigma * sigma));
+                    designSpotlight.style.setProperty('--design-proximity', proximity.toFixed(3));
                 });
             });
 
@@ -367,6 +388,78 @@
                     sweep.addEventListener('transitionend', resetPosition);
                 });
             });
+
+            // Hero desktop wave: letters repel away from mouse (Y-aware)
+            const heroWaveNodes = document.querySelectorAll('.js-hero-wave');
+            const isDesktopWave = window.matchMedia('(min-width: 1024px)');
+
+            function bindHeroWave(node) {
+                const chars = Array.from(node.querySelectorAll('.hero-wave-char'));
+                if (!chars.length) return;
+
+                const sigmaX = 40;        // horizontal spread
+                const sigmaY = 105;       // vertical spread
+                const maxShiftX = 6;      // max horizontal attraction
+                const maxShiftY = 11;     // max vertical attraction
+                const lerp = 0.16;        // smoother easing
+                const currentShifts = chars.map(() => ({ x: 0, y: 0 }));
+                const targetShifts = chars.map(() => ({ x: 0, y: 0 }));
+                let mouseX = null;
+                let mouseY = null;
+
+                const updateTargets = () => {
+                    if (!isDesktopWave.matches || mouseX === null) {
+                        for (let i = 0; i < targetShifts.length; i++) {
+                            targetShifts[i].x = 0;
+                            targetShifts[i].y = 0;
+                        }
+                        return;
+                    }
+
+                    chars.forEach((ch, i) => {
+                        const rect = ch.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+                        const dx = mouseX - centerX;
+                        const dy = mouseY - centerY;
+
+                        // Smooth radial influence around cursor
+                        const influence = Math.exp(
+                            -((dx * dx) / (2 * sigmaX * sigmaX) + (dy * dy) / (2 * sigmaY * sigmaY))
+                        );
+
+                        // Continuous attraction on both axes (no sign flip jump)
+                        targetShifts[i].x = maxShiftX * Math.tanh(dx / 75) * influence;
+                        targetShifts[i].y = maxShiftY * Math.tanh(dy / 70) * influence;
+                    });
+                };
+
+                const animate = () => {
+                    updateTargets();
+                    chars.forEach((ch, i) => {
+                        currentShifts[i].x += (targetShifts[i].x - currentShifts[i].x) * lerp;
+                        currentShifts[i].y += (targetShifts[i].y - currentShifts[i].y) * lerp;
+                        if (Math.abs(currentShifts[i].x) < 0.02) currentShifts[i].x = 0;
+                        if (Math.abs(currentShifts[i].y) < 0.02) currentShifts[i].y = 0;
+                        ch.style.setProperty('--hero-shift-x', currentShifts[i].x.toFixed(2) + 'px');
+                        ch.style.setProperty('--hero-shift-y', currentShifts[i].y.toFixed(2) + 'px');
+                    });
+                    requestAnimationFrame(animate);
+                };
+
+                window.addEventListener('mousemove', (e) => {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                });
+                window.addEventListener('mouseleave', () => {
+                    mouseX = null;
+                    mouseY = null;
+                });
+
+                requestAnimationFrame(animate);
+            }
+
+            heroWaveNodes.forEach(bindHeroWave);
         });
 
         // 3. Barra de Progreso Vertical
