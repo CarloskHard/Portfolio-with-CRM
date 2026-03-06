@@ -3,9 +3,24 @@
         
         <div class="order-2 md:order-1">
             <p class="text-sm font-light tracking-wide text-gray-500">
-                &copy; {{ date('Y') }} <span class="text-indigo-400 font-medium mx-1 hover:text-indigo-100 transition-colors duration-300">Carlos Codes</span> 
-                <span class="hidden md:inline-block mx-2 text-gray-700">|</span> 
-                <span class="hover:text-indigo-400 transition-colors duration-300">Diseño & Desarrollo</span>
+                &copy; {{ date('Y') }}
+                <span class="js-footer-name-spotlight footer-name-wrapper mx-1 inline-block cursor-default relative text-indigo-400 font-medium">
+                    <span class="footer-name-vfx-base">
+                        @foreach(mb_str_split('Carlos Codes') as $i => $char)
+                        <span class="footer-name-char" style="--char-index: {{ $i }}">{{ $char }}</span>
+                        @endforeach
+                    </span>
+                    <span class="footer-name-vfx-sweep" aria-hidden="true">
+                        @foreach(mb_str_split('Carlos Codes') as $i => $char)
+                        <span class="footer-name-char" style="--char-index: {{ $i }}">{{ $char }}</span>
+                        @endforeach
+                    </span>
+                </span>
+                <span class="hidden md:inline-block mx-2 text-gray-700">|</span>
+                <span class="js-footer-design-spotlight footer-design-wrapper inline-block cursor-default relative">
+                    <span class="footer-design-base text-gray-500">Diseño & Desarrollo</span>
+                    <span class="footer-design-reflection" aria-hidden="true">Diseño & Desarrollo</span>
+                </span>
             </p>
         </div>
 

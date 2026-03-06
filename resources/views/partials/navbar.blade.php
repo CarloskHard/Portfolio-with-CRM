@@ -15,7 +15,10 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center space-x-3 rtl:space-x-reverse group">
             <img src="{{ asset('img/logo.png') }}" class="h-10 w-10 rounded-full shadow-sm" alt="Logo">
-            <span class="self-center text-xl font-bold whitespace-nowrap text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Carlos Codex</span>
+            <span class="js-footer-design-spotlight footer-design-wrapper self-center text-xl font-bold whitespace-nowrap text-gray-900 dark:text-indigo-400 inline-block cursor-default relative">
+                <span class="footer-design-base">Carlos Codex</span>
+                <span class="footer-design-reflection" aria-hidden="true">Carlos Codex</span>
+            </span>
         </a>
         
         <div class="flex items-center gap-4 md:order-2">

@@ -17,7 +17,15 @@
                     🚀 Disponible para nuevos proyectos
                 </span>
                 <h1 class="max-w-2xl mx-auto lg:mx-0 mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl text-gray-900 dark:text-white">
-                    Hola 👋🏼, soy <br> <span class="text-indigo-600 dark:text-indigo-400">Carlos Codex</span>
+                    Hola 👋🏼, soy <br>
+                    <span class="js-footer-name-spotlight footer-name-wrapper hero-name-vfx inline-block cursor-default relative text-indigo-600 dark:text-indigo-400 font-extrabold">
+                        <span class="footer-name-vfx-base">
+                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
+                        </span>
+                        <span class="footer-name-vfx-sweep" aria-hidden="true">
+                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
+                        </span>
+                    </span>
                 </h1>
                 <p class="max-w-2xl mx-auto lg:mx-0 mb-8 font-light text-gray-600 dark:text-gray-400 lg:mb-8 md:text-lg lg:text-xl leading-relaxed">
                     Desarrollador Full Stack web y móvil
@@ -33,10 +41,10 @@
                     
                     <div class="w-full sm:w-auto h-0 sm:h-8 border-t sm:border-l border-gray-300 dark:border-gray-700 mx-0 sm:mx-2"></div>
 
-                    <a href="{{ env('APP_GITHUB_URL') }}" target="_blank" class="text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition" title="GitHub">
+                    <a href="{{ env('APP_GITHUB_URL') }}" target="_blank" class="group text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition" title="GitHub">
                         <x-icons.github class="w-7 h-7" />
                     </a>
-                    <a href="{{ env('APP_LINKEDIN_URL') }}" target="_blank" class="text-gray-500 hover:text-[#0077b5] dark:text-gray-400 dark:hover:text-[#0077b5] transition" title="LinkedIn">
+                    <a href="{{ env('APP_LINKEDIN_URL') }}" target="_blank" class="group text-gray-500 hover:text-[#0077b5] dark:text-gray-400 dark:hover:text-[#0077b5] transition" title="LinkedIn">
                         <x-icons.linkedin class="w-7 h-7" />
                     </a>
                 </div>
@@ -468,7 +476,7 @@
             <!-- Tarjeta del Formulario -->
             <div class="bg-white dark:bg-gray-900 p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden">
                 
-                <form id="contactForm" action="{{ route('contact.store') }}" method="POST" class="space-y-6 relative z-10">
+                <form id="contactForm" action="{{ route('contact.store') }}" method="POST" class="space-y-6 relative z-10" novalidate>
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Nombre -->
@@ -543,7 +551,40 @@
                 const originalBtnText = submitBtn.innerHTML;
                 
                 form.querySelectorAll('.error-msg, .server-error-banner').forEach(el => el.remove());
-                form.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500'));
+                form.querySelectorAll('.border-red-500, .border-indigo-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400'));
+
+                // Frontend Validation to prevent loading flicker on empty fields
+                if (!form.checkValidity()) {
+                    let firstInvalid = null;
+                    const elements = form.elements;
+                    for (let i = 0; i < elements.length; i++) {
+                        const input = elements[i];
+                        if (input.willValidate && !input.checkValidity()) {
+                            if (!firstInvalid) firstInvalid = input;
+                            input.classList.add('border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400');
+                            const errorDiv = document.createElement('p');
+                            errorDiv.className = 'error-msg mt-1.5';
+                            errorDiv.setAttribute('role', 'alert');
+                            
+                            let errorMsg = 'Este campo es obligatorio.';
+                            if (input.validity.typeMismatch) {
+                                errorMsg = 'El formato no es válido.';
+                            }
+
+                            errorDiv.innerHTML = `
+                                <span class="inline-flex items-center gap-1.5 rounded-md border border-indigo-200/70 bg-indigo-50/80 px-2 py-1 text-sm text-indigo-600 dark:border-indigo-500/20 dark:bg-indigo-950/20 dark:text-indigo-400">
+                                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                    </svg>
+                                    <span>${errorMsg}</span>
+                                </span>
+                            `;
+                            input.parentNode.appendChild(errorDiv);
+                        }
+                    }
+                    if (firstInvalid) firstInvalid.focus();
+                    return; // Detenemos aquí para no hacer fetch ni poner el spinner
+                }
 
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = `
@@ -571,13 +612,21 @@
                                 for (const [field, errors] of Object.entries(data.errors)) {
                                     const input = form.querySelector(`[name="${field}"]`);
                                     if (input) {
-                                        input.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                                        input.classList.add('border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400');
                                         const errorDiv = document.createElement('p');
-                                        errorDiv.className = 'error-msg mt-1 text-sm text-red-600 dark:text-red-400 animate-pulse';
-                                        errorDiv.innerText = errors[0];
+                                        errorDiv.className = 'error-msg mt-1.5';
+                                        errorDiv.setAttribute('role', 'alert');
+                                        errorDiv.innerHTML = `
+                                            <span class="inline-flex items-center gap-1.5 rounded-md border border-indigo-200/70 bg-indigo-50/80 px-2 py-1 text-sm text-indigo-600 dark:border-indigo-500/20 dark:bg-indigo-950/20 dark:text-indigo-400">
+                                                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                                </svg>
+                                                <span>${errors[0]}</span>
+                                            </span>
+                                        `;
                                         input.parentNode.appendChild(errorDiv);
                                     } else {
-                                        mostrarError(form, `Error en el campo backend "${field}": ${errors[0]}`);
+                                        mostrarError(form, `Error en el campo "${field}": ${errors[0]}`);
                                     }
                                 }
                             } else {
@@ -610,8 +659,22 @@
 
             function mostrarError(formulario, mensaje) {
                 const errorBanner = document.createElement('div');
-                errorBanner.className = 'server-error-banner p-4 mb-6 text-sm text-red-700 bg-red-100 rounded-xl dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50';
-                errorBanner.innerHTML = `<strong>Algo salió mal:</strong> ${mensaje}`;
+                errorBanner.className = 'server-error-banner mb-6';
+                errorBanner.setAttribute('role', 'alert');
+                errorBanner.innerHTML = `
+                    <div class="flex gap-3 rounded-xl border border-indigo-200/80 bg-indigo-50/60 px-4 py-3 dark:border-indigo-500/30 dark:bg-indigo-950/30">
+                        <span class="flex shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 p-1.5" aria-hidden="true">
+                            <svg class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Algo salió mal</p>
+                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-300 message-text"></p>
+                        </div>
+                    </div>
+                `;
+                errorBanner.querySelector('.message-text').textContent = mensaje;
                 formulario.prepend(errorBanner);
             }
         }

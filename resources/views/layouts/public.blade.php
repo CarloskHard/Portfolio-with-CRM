@@ -51,8 +51,200 @@
         }
         .animate-floating { animation: float-natural 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
 
-        @keyframes soft-breath { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(129, 140, 248, 0); } 50% { transform: scale(1.03); box-shadow: 0 0 15px 2px rgba(129, 140, 248, 0.2); } }
-        .animate-subtle-breath { animation: soft-breath 5s ease-in-out infinite; display: inline-block; }
+        /* GitHub Icon Animation (sutil pero notable) */
+        .hover-wiggle {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .group:hover .hover-wiggle, .hover-wiggle:hover {
+            transform: scale(1.15) rotate(-10deg);
+        }
+
+        .hover-pop {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .group:hover .hover-pop, .hover-pop:hover {
+            transform: scale(1.15);
+        }
+
+        /* Email Icon Animation (real envelope depth behavior) */
+        .hover-email .email-state-closed,
+        .hover-email .email-state-open {
+            transition: opacity 0.35s ease;
+        }
+        .hover-email .email-state-open {
+            opacity: 0;
+        }
+        .hover-email .email-open-letter {
+            transform: translateY(0);
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;
+        }
+        .hover-email .email-open-flap-front,
+        .hover-email .email-open-flap-back {
+            transform-origin: center 112px;
+            transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+        }
+        /* Solapa visible delante cuando esta cerrado */
+        .hover-email .email-open-flap-front {
+            opacity: 1;
+            transform: translateY(0) scaleY(1);
+        }
+        /* Solapa "trasera": misma geometria pero oculta al inicio */
+        .hover-email .email-open-flap-back {
+            opacity: 0;
+            transform: translateY(-30px) scaleY(0.05);
+        }
+        .group:hover .hover-email .email-state-closed,
+        .hover-email:hover .email-state-closed {
+            opacity: 0;
+        }
+        .group:hover .hover-email .email-state-open,
+        .hover-email:hover .email-state-open {
+            opacity: 1;
+        }
+        .group:hover .hover-email .email-open-letter,
+        .hover-email:hover .email-open-letter {
+            transform: translateY(-70px);
+        }
+        /* La solapa delantera se abre y desaparece (pasa "hacia atras") */
+        .group:hover .hover-email .email-open-flap-front,
+        .hover-email:hover .email-open-flap-front {
+            opacity: 0;
+            transform: translateY(-30px) scaleY(0.05);
+        }
+        /* Aparece la solapa trasera, por detras de la carta */
+        .group:hover .hover-email .email-open-flap-back,
+        .hover-email:hover .email-open-flap-back {
+            opacity: 1;
+            transform: translateY(-30px) scaleY(0.05);
+        }
+
+        /* Footer name VFX: shimmer + cursor glow + letter stagger */
+        .footer-name-wrapper {
+            position: relative;
+            overflow: visible;
+        }
+        .footer-name-wrapper::after {
+            content: "";
+            position: absolute;
+            left: -40px; right: -40px; top: -20px; bottom: -20px;
+            background: radial-gradient(
+                420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(129, 140, 248, 0.32),
+                transparent 50%
+            );
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .footer-name-wrapper:hover::after {
+            opacity: 1;
+        }
+        /* Capa base: color sólido, siempre visible */
+        .footer-name-vfx-base {
+            position: relative;
+            z-index: 0;
+            font-weight: inherit;
+            color: inherit;
+        }
+        /* Capa superior: solo el barrido de luz; oculta por defecto para evitar blanco a la derecha y salto al quitar hover */
+        .footer-name-vfx-sweep {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+            font-weight: inherit;
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.98) 58%,
+                rgba(255, 255, 255, 0.95) 65%,
+                transparent 72%,
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            opacity: 0;
+            transition: opacity 0.18s ease-out;
+        }
+        .footer-name-wrapper:hover .footer-name-vfx-sweep {
+            opacity: 1;
+            background-position: 100% 0;
+            transition: opacity 0.2s ease, background-position 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .footer-name-char {
+            display: inline-block;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: calc(var(--char-index) * 22ms);
+        }
+        .footer-name-wrapper:hover .footer-name-char {
+            transform: translateY(-1.2px);
+        }
+        /* Hero: mismo efecto de letras, sin halo externo */
+        .hero-name-vfx::after {
+            display: none;
+        }
+        /* Ajustes del split por letras en hero */
+        .hero-name-vfx .footer-name-vfx-base,
+        .hero-name-vfx .footer-name-vfx-sweep {
+            font-size: inherit;
+            line-height: inherit;
+        }
+        .hero-name-vfx .footer-name-char {
+            font-size: inherit;
+            line-height: inherit;
+            transform-origin: 50% 70%;
+        }
+        @keyframes hero-wave-expand {
+            0%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-2px); }
+            70% { transform: translateY(-0.5px); }
+        }
+        .hero-name-vfx:hover .footer-name-char {
+            animation: hero-wave-expand 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            animation-delay: calc(var(--char-index) * 26ms);
+        }
+        /* "Diseño & Desarrollo": mismo color, reflejo metálico que sigue al ratón */
+        .footer-design-wrapper {
+            position: relative;
+            overflow: visible;
+        }
+        .footer-design-base {
+            position: relative;
+            z-index: 0;
+            color: inherit;
+            transition: none;
+        }
+        .footer-design-reflection {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: radial-gradient(
+                120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                rgba(255, 255, 255, 0.9) 0%,
+                rgba(255, 255, 255, 0.5) 12%,
+                rgba(255, 255, 255, 0.15) 25%,
+                transparent 45%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .footer-design-wrapper:hover .footer-design-reflection {
+            opacity: 1;
+        }
     </style>
 
     <script>
@@ -128,13 +320,51 @@
             requestAnimationFrame(updateButton);
         }); 
 
-        // 2. Seguimiento del ratón (Tarjetas)
+        // 2. Seguimiento del ratón (Tarjetas + textos con efectos)
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.js-spotlight-card, .js-project-card').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
                     const rect = card.getBoundingClientRect();
                     card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
                     card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+                });
+            });
+            const nameSpotlights = document.querySelectorAll('.js-footer-name-spotlight');
+            const designSpotlights = document.querySelectorAll('.js-footer-design-spotlight');
+
+            document.addEventListener('mousemove', (e) => {
+                nameSpotlights.forEach((nameSpotlight) => {
+                    const rect = nameSpotlight.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                        nameSpotlight.style.setProperty('--mouse-x', `${x}px`);
+                        nameSpotlight.style.setProperty('--mouse-y', `${y}px`);
+                    }
+                });
+
+                designSpotlights.forEach((designSpotlight) => {
+                    const rect = designSpotlight.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+                        designSpotlight.style.setProperty('--mouse-x', `${x}px`);
+                        designSpotlight.style.setProperty('--mouse-y', `${y}px`);
+                    }
+                });
+            });
+
+            nameSpotlights.forEach((nameSpotlight) => {
+                const sweep = nameSpotlight.querySelector('.footer-name-vfx-sweep');
+                if (!sweep) return;
+                nameSpotlight.addEventListener('mouseleave', () => {
+                    function resetPosition(e) {
+                        if (e.propertyName === 'opacity') {
+                            sweep.style.backgroundPosition = '0 0';
+                            sweep.removeEventListener('transitionend', resetPosition);
+                        }
+                    }
+                    sweep.addEventListener('transitionend', resetPosition);
                 });
             });
         });

@@ -16,17 +16,7 @@
                           class="space-y-8">
                         
                         @csrf
-                        @if ($errors->any())
-                            <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                                <strong>¡Hay errores en el formulario!</strong>
-                                <ul class="mt-2 list-disc list-inside text-sm">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-                        
+                        <x-form-errors :errors="$errors" class="mb-6" />
                         @if($project->exists)
                             @method('PUT')
                         @endif
