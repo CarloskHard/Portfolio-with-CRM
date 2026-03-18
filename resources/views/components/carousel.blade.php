@@ -6,12 +6,37 @@
     'fallback' => asset('img/logo.png')
 ])
 
-<div x-data="{ 
-        currentIndex: 0, 
+<div x-data="{
+        currentIndex: 0,
         total: {{ count($images) }},
-        next() { if (this.currentIndex < this.total - 1) this.currentIndex++ },
-        prev() { if (this.currentIndex > 0) this.currentIndex-- }
-     }" 
+        hasMultiple: {{ count($images) > 1 ? 'true' : 'false' }},
+        autoplayMs: 3500,
+        autoplayTimer: null,
+        next() {
+            if (!this.hasMultiple) return;
+            this.currentIndex = (this.currentIndex + 1) % this.total;
+        },
+        prev() {
+            if (!this.hasMultiple) return;
+            this.currentIndex = (this.currentIndex - 1 + this.total) % this.total;
+        },
+        startAutoplay() {
+            if (!this.hasMultiple) return;
+            this.stopAutoplay();
+            this.autoplayTimer = setInterval(() => this.next(), this.autoplayMs);
+        },
+        stopAutoplay() {
+            if (this.autoplayTimer) {
+                clearInterval(this.autoplayTimer);
+                this.autoplayTimer = null;
+            }
+        },
+        pauseAutoplay() { this.stopAutoplay(); },
+        resumeAutoplay() { this.startAutoplay(); }
+     }"
+     x-init="startAutoplay()"
+     @mouseenter="pauseAutoplay()"
+     @mouseleave="resumeAutoplay()"
      class="relative aspect-video overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center group">
     
     @if(count($images) > 0)
@@ -28,15 +53,13 @@
         @if(count($images) > 1)
             <!-- Botón Izquierda -->
             <button @click.prevent.stop="prev()" 
-                    x-show="currentIndex > 0"
-                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/55 hover:bg-black/75 text-white p-2 rounded-full transition-all duration-200 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </button>
             
             <!-- Botón Derecha -->
             <button @click.prevent.stop="next()" 
-                    x-show="currentIndex < total - 1"
-                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/55 hover:bg-black/75 text-white p-2 rounded-full transition-all duration-200 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </button>
             

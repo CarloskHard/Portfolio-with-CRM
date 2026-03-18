@@ -6,7 +6,7 @@
 <div class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
     
     <!-- CONTENEDOR PRINCIPAL -->
-    <div class="max-w-4xl mx-auto px-6 lg:px-8 py-12 lg:py-20">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 pt-28 pb-12 lg:pt-32 lg:pb-20">
 
         <!-- 1. SECCIÓN INTRODUCCIÓN (NARRATIVA) -->
         <section class="mb-20">
@@ -16,10 +16,11 @@
             
             <div class="prose prose-lg dark:prose-invert text-gray-600 dark:text-gray-300 leading-relaxed max-w-none">
                 <p class="mb-6">
-                    Llevo más de <span class="font-bold text-gray-900 dark:text-white">7 años escribiendo código</span> (y borrándolo, para qué engañarnos). Mi viaje en la tecnología fue tal que así:
+                    Llevo más de <span class="font-bold text-gray-900 dark:text-white">7 años escribiendo código</span> (y borrando también, prueba y error). Mi recorrido fue tal que así:
                 </p>
                 <p class="mb-6">
-                    Empecé mi carrera como técnico en electrónica aeroespacial y diseño de PCBs. Aunque me encantaba el hardware, desde los 17 años mi pasión era programar videojuegos en mi tiempo libre. Al final, el lado oscuro (el del software) me sedujo: Dejé mi trabajo, me licencié en <span class="font-semibold text-indigo-600 dark:text-indigo-400">Desarrollo de Aplicaciones Web (DAW)</span> y <span class="font-semibold text-indigo-600 dark:text-indigo-400">Multiplataforma (DAM)</span>, y cambié los transistores por el código.
+                    Empecé mi carrera como técnico en electrónica aeroespacial y diseño de PCBs. Aunque me encantaba el hardware, desde los 17 años mi pasión era programar videojuegos en mi tiempo libre.
+                     Al final, el lado el del software me pudo: Dejé mi trabajo, me licencié en <span class="font-semibold text-indigo-600 dark:text-indigo-400">Desarrollo de Aplicaciones Web (DAW)</span> y <span class="font-semibold text-indigo-600 dark:text-indigo-400">Multiplataforma (DAM)</span>, y cambié la electrónica por el código.
                 </p>
                 <p>
                     Al principio trabajé desarrollando sistemas de control remoto para iOS y actualmente me especializo en desarrollo <strong>Web Fullstack</strong> (Especialmente Servidores, ERPs y CRMs) y <strong>Aplicaciones Multiplataforma</strong> (Android Studio con Compose Multiplatform).
@@ -35,7 +36,7 @@
                 <span>🎸</span> El Humano detrás del código
             </h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">!
                 
                 <!-- Card Música -->
                 <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-2xl border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
@@ -51,7 +52,7 @@
                     <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-2xl mb-4">🌍</div>
                     <h3 class="font-bold text-gray-900 dark:text-white text-lg mb-2">Intento de políglota</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Hablo <strong>Inglés (C1)</strong> y <strong>Coreano</strong>. Actualmente en plena batalla estudiando <strong>Chino</strong> (¡Pregúntame sobre los palacios mentales!).
+                        Hablo <strong>Inglés</strong> avanzado y <strong>Coreano</strong> intermedio. Actualmente en plena batalla estudiando <strong>Chino</strong> (¡Pregúntame sobre los palacios mentales!).
                     </p>
                 </div>
 
@@ -72,12 +73,14 @@
                 <span>💼</span> Experiencia Profesional
             </h2>
 
-            <div class="relative border-l-4 border-indigo-100 dark:border-gray-800 ml-3 md:ml-6 space-y-12">
+            <div class="relative ml-3 md:ml-6 space-y-12">
+                <div class="absolute left-0 top-3 bottom-6 w-1 -translate-x-1/2 bg-indigo-100 dark:bg-gray-800 transition-colors duration-300"></div>
+                <div class="absolute left-0 bottom-0 h-6 w-1 -translate-x-1/2 bg-gradient-to-b from-indigo-100 to-transparent dark:from-gray-800 dark:to-transparent transition-colors duration-300"></div>
                 
                 <!-- Item 0 -->
                 <div class="relative pl-8 md:pl-12">
                     <!-- Bolita del timeline -->
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-indigo-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-indigo-600 dark:bg-indigo-500 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300 shadow-[0_0_0_2px_rgba(79,70,229,0.28),0_0_0_6px_rgba(79,70,229,0.14),0_0_0_10px_rgba(79,70,229,0.06)] dark:shadow-[0_0_0_2px_rgba(129,140,248,0.24),0_0_0_6px_rgba(129,140,248,0.12),0_0_0_10px_rgba(129,140,248,0.05)]"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-bold uppercase tracking-wider">
                         2025 - Actualidad
@@ -90,7 +93,7 @@
                 <!-- Item 1 -->
                 <div class="relative pl-8 md:pl-12">
                     <!-- Bolita del timeline -->
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
                         2023 - 2024
@@ -102,7 +105,7 @@
 
                 <!-- Item 2 -->
                 <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
                         2022
@@ -114,7 +117,7 @@
 
                 <!-- Item 3 -->
                 <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
                         2021 - 2022
@@ -125,7 +128,7 @@
                 </div>
 
                 <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
                         2019 - 2020
@@ -137,7 +140,7 @@
 
                 <!-- Item 4 -->
                 <div class="relative pl-8 md:pl-12">
-                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900"></div>
+                    <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
                         2018

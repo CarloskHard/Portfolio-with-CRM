@@ -86,5 +86,52 @@
     opacity: 1;
 }
 
+/* Spotlight exclusivo para el borde del carrusel (sin cubrir la imagen) */
+.project-carousel-border {
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(
+        140px circle at var(--mouse-x) var(--mouse-y),
+        rgba(129, 140, 248, 0.55) 0%,
+        rgba(129, 140, 248, 0.2) 48%,
+        transparent 100%
+    );
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+.dark .project-carousel-border {
+    background: radial-gradient(
+        120px circle at var(--mouse-x) var(--mouse-y),
+        rgba(112, 126, 251, 0.9) 0%,
+        rgba(115, 128, 252, 0.45) 50%,
+        transparent 100%
+    );
+}
+
 /* IMPORTANTE: Hemos eliminado el "border-color: transparent" */
 /* Ahora el borde original de la card se queda visible siempre */
+
+/* Parpadeo del icono del botón Demo en hover */
+.group\/demo:hover .demo-eye-blink {
+    animation: demo-eye-blink 650ms ease-in-out 1 forwards;
+    transform-origin: center;
+}
+
+@keyframes demo-eye-blink {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.05) scaleY(0.1);
+    }
+    60% {
+        transform: scale(1.05) scaleY(1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
+}

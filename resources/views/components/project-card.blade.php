@@ -15,23 +15,27 @@
     @endphp
 
     <!-- LLAMADA AL COMPONENTE CARRUSEL -->
-    <div class="relative overflow-hidden">
+    <div class="relative z-10 overflow-hidden rounded-t-2xl js-project-carousel-frame">
         <x-carousel :images="$images" />
+        <div class="project-carousel-border pointer-events-none absolute inset-0 rounded-t-2xl z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
     </div>
 
     <!-- Contenido -->
-    <div class="p-6 flex-grow flex flex-col relative z-10">
+    <div class="p-6 flex-grow flex flex-col relative z-10 overflow-hidden">
+        {{-- Resplandor localizado solo en el contenido (no sobre el carrusel) --}}
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-500 pointer-events-none z-0"></div>
+
         {{-- El título cambia de color cuando la tarjeta recibe hover --}}
-        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+        <h3 class="relative z-10 text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
             {{ $project->title }}
         </h3>
         
-        <p class="text-gray-600 dark:text-gray-400 text-sm mb-6 flex-grow leading-relaxed">
+        <p class="relative z-10 text-gray-600 dark:text-gray-400 text-sm mb-6 flex-grow leading-relaxed">
             {{ $project->description }}
         </p>
 
         <!-- BOTONES DE GITHUB Y DEMO -->
-        <div class="flex flex-wrap gap-3 mt-auto pt-5 border-t border-gray-100 dark:border-gray-700/50">
+        <div class="relative z-10 flex flex-wrap gap-3 mt-auto pt-5 border-t border-gray-100 dark:border-gray-700/50">
             
             @if($project->url_repo)
                 <!-- Botón GitHub -->
@@ -54,16 +58,16 @@
             @if($project->url_demo)
                 <!-- Botón Demo -->
                 <a href="{{ $project->url_demo }}" target="_blank" 
-                class="group/demo relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-gray-900/10 dark:hover:shadow-white/10 hover:border-gray-900 dark:hover:border-white">
+                class="group/demo relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 overflow-hidden bg-white/60 dark:bg-gray-900/45 backdrop-blur-sm transition-all duration-300 hover:bg-gray-900/[0.04] dark:hover:bg-white/[0.06] hover:border-gray-300 dark:hover:border-gray-500 hover:shadow-md hover:shadow-gray-900/5 dark:hover:shadow-white/5">
                     
-                    {{-- Capa de fondo animada (Entra desde la izquierda) --}}
-                    <span class="absolute inset-0 w-full h-full bg-gray-900 dark:bg-white -translate-x-full group-hover/demo:translate-x-0 transition-transform duration-300 ease-out z-0"></span>
+                    {{-- Cambio de fondo muy sutil al hover --}}
+                    <span class="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/0 via-indigo-500/0 to-cyan-500/0 group-hover/demo:from-indigo-500/[0.05] group-hover/demo:via-indigo-500/[0.02] group-hover/demo:to-cyan-500/[0.05] dark:group-hover/demo:from-indigo-300/[0.07] dark:group-hover/demo:via-indigo-300/[0.03] dark:group-hover/demo:to-cyan-300/[0.07] transition-colors duration-300 z-0"></span>
 
                     {{-- Icono --}}
-                    <x-icons.eye class="relative z-10 w-4 h-4 transition-all duration-300 group-hover/demo:text-white dark:group-hover/demo:text-gray-900 group-hover/demo:scale-110" />
+                    <x-icons.eye class="demo-eye-blink relative z-10 w-4 h-4 transition-all duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white group-hover/demo:scale-105" />
                     
                     {{-- Texto --}}
-                    <span class="relative z-10 transition-colors duration-300 group-hover/demo:text-white dark:group-hover/demo:text-gray-900">
+                    <span class="relative z-10 transition-colors duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white">
                         Demo
                     </span>
                 </a>
@@ -71,6 +75,4 @@
         </div>
     </div>
 
-    {{-- Efecto de resplandor sutil al fondo esquina inferior derecha --}}
-    <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-500"></div>
 </article>
