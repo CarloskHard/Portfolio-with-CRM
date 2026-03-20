@@ -15,9 +15,12 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center space-x-3 rtl:space-x-reverse group">
             <img src="{{ asset('img/logo.png') }}" class="h-10 w-10 rounded-full shadow-sm" alt="Logo">
-            <span class="js-footer-design-spotlight footer-design-wrapper self-center text-xl font-bold whitespace-nowrap text-gray-900 dark:text-indigo-400 inline-block cursor-default relative">
-                <span class="footer-design-base">Carlos Codex</span>
-                <span class="footer-design-reflection" aria-hidden="true">Carlos Codex</span>
+            <span class="js-footer-design-spotlight footer-design-wrapper navbar-brand-vfx self-center text-xl font-bold whitespace-nowrap text-gray-900 dark:text-indigo-400 inline-block cursor-default relative">
+                <span class="navbar-brand-stack">
+                    <span class="navbar-brand-shadow" aria-hidden="true">Carlos Codex</span>
+                    <span class="footer-design-base">Carlos Codex</span>
+                    <span class="footer-design-reflection" aria-hidden="true">Carlos Codex</span>
+                </span>
             </span>
         </a>
         
@@ -44,16 +47,10 @@
                 
                 <!-- SOBRE MÍ -->
                 <li>
-                    @if($isAboutPage)
-                        <span class="block py-2 px-3 text-indigo-600 dark:text-indigo-400 font-bold cursor-default">
-                            Sobre mí
-                        </span>
-                    @else
-                        <a @click="open = false" href="{{ $isHome ? '#about' : route('home') . '#about' }}" 
-                           class="block py-2 px-3 text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                           Sobre mí
-                        </a>
-                    @endif
+                    <a @click="open = false" href="{{ route('public.about') }}"
+                       class="block py-2 px-3 transition-colors {{ $isAboutPage ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400' }}">
+                       Sobre mí
+                    </a>
                 </li>
                 
                 <!-- HABILIDADES -->
