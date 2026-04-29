@@ -56,8 +56,8 @@
                     
                     <div class="profile-ring relative w-full h-full rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800">
                         <div class="absolute inset-0 rounded-full overflow-hidden">
-                            <img src="{{ asset('img/me-light.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 dark:opacity-0">
-                            <img src="{{ asset('img/me.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 dark:opacity-100">
+                            <img src="{{ asset('img/me-light.webp') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 dark:opacity-0">
+                            <img src="{{ asset('img/me.webp') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 dark:opacity-100">
                         </div>
                     </div>
 
