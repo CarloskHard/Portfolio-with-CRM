@@ -4,15 +4,15 @@
         <div class="order-2 md:order-1">
             <p class="text-sm font-light tracking-wide text-gray-500">
                 &copy; {{ date('Y') }}
-                <span class="js-footer-name-spotlight footer-name-wrapper mx-1 inline-block cursor-default relative text-indigo-400 font-medium">
+                <span class="js-footer-name-spotlight js-hero-wave footer-name-wrapper footer-magnetic-vfx mx-1 inline-block cursor-default relative text-indigo-400 font-medium">
                     <span class="footer-name-vfx-base">
                         @foreach(mb_str_split('Carlos Codex') as $i => $char)
-                        <span class="footer-name-char" style="--char-index: {{ $i }}">{{ $char }}</span>
+                        <span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>
                         @endforeach
                     </span>
                     <span class="footer-name-vfx-sweep" aria-hidden="true">
                         @foreach(mb_str_split('Carlos Codex') as $i => $char)
-                        <span class="footer-name-char" style="--char-index: {{ $i }}">{{ $char }}</span>
+                        <span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>
                         @endforeach
                     </span>
                 </span>

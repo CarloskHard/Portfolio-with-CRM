@@ -52,10 +52,11 @@
         .animate-floating { animation: float-natural 8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite; }
 
         /* Hero profile metallic sweep ring */
+        /* --profile-ring-sweep-start = rotación inicial del barrido (derivada del ratón al clic) */
         @keyframes profile-ring-sweep {
             0% {
                 opacity: 0.24;
-                transform: rotate(0deg);
+                transform: rotate(var(--profile-ring-sweep-start, 0deg));
                 filter: blur(0px);
             }
             18% {
@@ -69,7 +70,7 @@
             }
             100% {
                 opacity: 0;
-                transform: rotate(360deg);
+                transform: rotate(calc(var(--profile-ring-sweep-start, 0deg) + 360deg));
                 filter: blur(0.35px);
             }
         }
@@ -77,11 +78,57 @@
             isolation: isolate;
             transition: transform 620ms cubic-bezier(0.22, 0.8, 0.2, 1), box-shadow 680ms ease;
         }
+        /* Brillo = spotlight en el cursor, enmascarado solo al aro (PC la mueve el JS) */
         .profile-ring::before {
             content: "";
             position: absolute;
+            /* El contenedor absoluto parte del borde interno; lo desplazamos 4px
+               para alinear el brillo con el borde real (border-4) del retrato. */
             inset: -4px;
             border-radius: 9999px;
+            padding: 4px;
+            background:
+                radial-gradient(
+                    var(--profile-ring-spot-size, 86px) circle at var(--profile-ring-spot-x, 50%) var(--profile-ring-spot-y, 50%),
+                    rgba(236, 238, 255, calc(0.62 * var(--profile-ring-proximity, 0))) 0%,
+                    rgba(165, 175, 252, calc(0.36 * var(--profile-ring-proximity, 0))) 40%,
+                    rgba(129, 140, 248, calc(0.14 * var(--profile-ring-proximity, 0))) 62%,
+                    transparent 100%
+                );
+            opacity: 1;
+            pointer-events: none;
+            z-index: 2;
+            transition: opacity 260ms cubic-bezier(0.22, 0.8, 0.2, 1);
+            transform: rotate(0deg);
+            /* Mask igual que .spotlight: pinta solo el aro, no el interior */
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        /* Táctil / puntero grueso: barrido al hover como antes */
+        @media (pointer: coarse), (hover: none) {
+            .profile-ring:hover::before {
+                animation: profile-ring-sweep 1.15s cubic-bezier(0.22, 0.8, 0.2, 1) 1 both;
+            }
+        }
+        /* PC: brillo antes/durante acercamiento (sin depender solo de :hover), variable --profile-ring-proximity */
+        @media (hover: hover), (any-hover: hover) {
+            .profile-ring::before {
+                animation: none;
+                opacity: 1;
+                transition: opacity 220ms cubic-bezier(0.2, 0.75, 0.25, 1);
+            }
+            /* Tras clic: sin brillo hasta salir del retrato y volver */
+            .profile-ring.profile-ring--rim-holdoff::before {
+                opacity: 0;
+            }
+        }
+        /* Clic: barrido metálico (va después del bloque PC para ganar en cascada) */
+        .profile-ring.profile-ring--sweep::before,
+        .profile-ring.profile-ring--sweep:hover::before {
+            animation: profile-ring-sweep 1.15s cubic-bezier(0.22, 0.8, 0.2, 1) 1 both;
             background:
                 conic-gradient(
                     from 0deg,
@@ -90,17 +137,6 @@
                     rgba(129, 140, 248, 0.58) 346deg,
                     rgba(255, 255, 255, 0) 360deg
                 );
-            opacity: 0;
-            pointer-events: none;
-            z-index: 2;
-            transition: opacity 680ms cubic-bezier(0.22, 0.8, 0.2, 1);
-            /* mask only the ring area */
-            -webkit-mask:
-                radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 4px));
-            mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 4px));
-        }
-        .profile-ring:hover::before {
-            animation: profile-ring-sweep 1.15s cubic-bezier(0.22, 0.8, 0.2, 1) 1 both;
         }
         .profile-ring:hover {
             transform: scale(1.004);
@@ -284,6 +320,21 @@
                     var(--hero-shift-y, 0px)
                 );
             }
+            .footer-magnetic-vfx .footer-name-char {
+                animation: none !important;
+                transform: translate(
+                    var(--hero-shift-x, 0px),
+                    var(--hero-shift-y, 0px)
+                );
+                transition: transform 180ms cubic-bezier(0.22, 0.8, 0.2, 1);
+            }
+            .footer-magnetic-vfx:hover .footer-name-char {
+                animation: none !important;
+                transform: translate(
+                    var(--hero-shift-x, 0px),
+                    var(--hero-shift-y, 0px)
+                );
+            }
         }
         /* "Diseño & Desarrollo": mismo color, reflejo metálico que sigue al ratón */
         .footer-design-wrapper {
@@ -315,6 +366,86 @@
             color: transparent;
             opacity: var(--design-proximity, 0);
             transition: opacity 0.25s ease;
+        }
+
+        /* Navbar marca: relieve + spotlight centrado en el cursor (solo glifos) */
+        .navbar-brand-vfx {
+            width: max-content;
+        }
+        .navbar-brand-stack {
+            position: relative;
+            display: inline-block;
+            isolation: isolate;
+        }
+        .navbar-brand-vfx .navbar-brand-shadow {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 0;
+            pointer-events: none;
+            font-weight: inherit;
+            color: rgba(15, 23, 42, 0.32);
+            transform: translate(0.7px, 1.45px);
+        }
+        .dark .navbar-brand-vfx .navbar-brand-shadow {
+            color: rgba(0, 0, 0, 0.55);
+        }
+        .navbar-brand-vfx .footer-design-base {
+            position: relative;
+            z-index: 1;
+            /* Volumen tipo relieve: luz arriba-izq, sombra abajo-dcha (sin blur ancho) */
+            text-shadow:
+                0          1px   0 rgba(255, 255, 255, 0.38),
+                0         -1px   0 rgba(15, 23, 42, 0.06),
+                0.5px  0.75px   0 rgba(15, 23, 42, 0.1);
+        }
+        .dark .navbar-brand-vfx .footer-design-base {
+            text-shadow:
+                0    1px   0 rgba(255, 255, 255, 0.06),
+                0    2px   4px rgba(0, 0, 0, 0.55),
+                0   -1px   0 rgba(0, 0, 0, 0.35);
+        }
+        /*
+         * Spotlight en el cursor: núcleo brillante + halo amplio (sin anillo).
+         * El primero dibuja el foco; el segundo la luz ambiente sobre el texto.
+         */
+        .navbar-brand-vfx .footer-design-reflection {
+            z-index: 1;
+            background-color: transparent;
+            background-image:
+                radial-gradient(
+                    48px circle          at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(255, 255, 255, 0.95) 0%,
+                    rgba(255, 255, 255, 0.42) 45%,
+                    transparent             72%
+                ),
+                radial-gradient(
+                    175px circle         at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(255, 255, 255, 0.48) 0%,
+                    rgba(199, 210, 254, 0.18) 32%,
+                    rgba(129, 140, 248, 0.06) 52%,
+                    transparent              68%
+                );
+            background-repeat: no-repeat, no-repeat;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+        .dark .navbar-brand-vfx .footer-design-reflection {
+            background-image:
+                radial-gradient(
+                    56px circle          at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(238, 242, 255, 0.88) 0%,
+                    rgba(165, 180, 252, 0.38) 48%,
+                    transparent              76%
+                ),
+                radial-gradient(
+                    185px circle         at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(199, 210, 254, 0.32) 0%,
+                    rgba(99, 102, 241, 0.12) 38%,
+                    transparent              62%
+                );
         }
     </style>
 
@@ -516,6 +647,119 @@
             }
 
             heroWaveNodes.forEach(bindHeroWave);
+
+            // Hero foto perfil (PC): spotlight en el ratón solo visible en el aro; se apaga hacia el centro; clic = barrido conic
+            const profileRings = document.querySelectorAll('.js-profile-ring');
+            const canHoverProfileRing = window.matchMedia('(hover: hover), (any-hover: hover)');
+            let profileRingRaf = 0;
+            let profileRingMx = 0;
+            let profileRingMy = 0;
+
+            function profileRingSweepStartFromPointer(ring, clientX, clientY) {
+                const rect = ring.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = clientX - cx;
+                const dy = clientY - cy;
+                const jsDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+                const mouseAngleCss = ((jsDeg + 90) % 360 + 360) % 360;
+                const wedgeCenterLocal = 336;
+                const deg = ((mouseAngleCss - wedgeCenterLocal) % 360 + 360) % 360;
+                return deg.toFixed(2) + 'deg';
+            }
+
+            function updateProfileRingSpotlight(ring, clientX, clientY) {
+                if (ring.classList.contains('profile-ring--sweep')) return;
+
+                const rect = ring.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
+                const dx = clientX - cx;
+                const dy = clientY - cy;
+                const dist = Math.hypot(dx, dy);
+                const radius = Math.min(rect.width, rect.height) / 2;
+                const rimRadius = radius - 1;
+
+                if (ring.classList.contains('profile-ring--rim-holdoff')) {
+                    ring.style.setProperty('--profile-ring-proximity', '0');
+                    return;
+                }
+
+                // Centro del spotlight = posición real del ratón
+                const spotX = clientX - rect.left;
+                const spotY = clientY - rect.top;
+
+                const distToRim = Math.abs(dist - rimRadius);
+                const sigmaRim = Math.max(28, radius * 0.34);
+                const proximity = Math.exp(-(distToRim * distToRim) / (2 * sigmaRim * sigmaRim));
+                const insideFactor = dist < rimRadius ? (1 - (dist / rimRadius)) : 0;
+                const centerBoost = Math.pow(insideFactor, 0.62);
+                const diameter = (radius * 2) + 4;
+                const spotSize = 72 + (82 * proximity) + ((diameter - 56) * centerBoost);
+                const edgeIntensity = Math.pow(proximity, 1.6) * 0.5;
+                const centerIntensity = centerBoost * 0.44;
+                const visibleProximity = Math.min(1, Math.max(edgeIntensity, centerIntensity));
+
+                if (visibleProximity < 0.002) {
+                    ring.style.setProperty('--profile-ring-proximity', '0');
+                    ring.style.setProperty('--profile-ring-spot-size', '58px');
+                    return;
+                }
+
+                ring.style.setProperty('--profile-ring-spot-x', spotX.toFixed(2) + 'px');
+                ring.style.setProperty('--profile-ring-spot-y', spotY.toFixed(2) + 'px');
+                ring.style.setProperty('--profile-ring-proximity', visibleProximity.toFixed(4));
+                ring.style.setProperty('--profile-ring-spot-size', spotSize.toFixed(2) + 'px');
+            }
+
+            function flushProfileRingsFromPointer() {
+                profileRingRaf = 0;
+                profileRings.forEach((ring) => {
+                    updateProfileRingSpotlight(ring, profileRingMx, profileRingMy);
+                });
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                profileRingMx = e.clientX;
+                profileRingMy = e.clientY;
+                if (!profileRingRaf) {
+                    profileRingRaf = requestAnimationFrame(flushProfileRingsFromPointer);
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                profileRings.forEach((ring) => {
+                    ring.style.setProperty('--profile-ring-proximity', '0');
+                    ring.style.setProperty('--profile-ring-spot-size', '58px');
+                    ring.style.removeProperty('--profile-ring-spot-x');
+                    ring.style.removeProperty('--profile-ring-spot-y');
+                });
+            });
+
+            profileRings.forEach((ring) => {
+                ring.addEventListener('click', () => {
+                    ring.style.setProperty(
+                        '--profile-ring-sweep-start',
+                        profileRingSweepStartFromPointer(ring, profileRingMx, profileRingMy)
+                    );
+                    ring.classList.remove('profile-ring--sweep');
+                    void ring.offsetWidth;
+                    ring.classList.add('profile-ring--sweep');
+                });
+
+                ring.addEventListener('animationend', (e) => {
+                    if (e.animationName !== 'profile-ring-sweep') return;
+                    ring.classList.remove('profile-ring--sweep');
+                    ring.style.removeProperty('--profile-ring-sweep-start');
+                    if (canHoverProfileRing.matches) {
+                        ring.classList.add('profile-ring--rim-holdoff');
+                    }
+                });
+
+                ring.addEventListener('mouseleave', () => {
+                    ring.classList.remove('profile-ring--rim-holdoff');
+                });
+            });
         });
 
         // 3. Barra de Progreso Vertical

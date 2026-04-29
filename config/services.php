@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    'contact_alerts' => [
+        'channels' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('CONTACT_ALERT_CHANNELS', ''))
+        ))),
+    ],
+
+    'twilio_whatsapp' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_WHATSAPP_FROM'),
+        'to' => env('TWILIO_WHATSAPP_TO'),
+    ],
+
+    'callmebot_whatsapp' => [
+        'phone' => env('CALLMEBOT_WHATSAPP_PHONE'),
+        'api_key' => env('CALLMEBOT_WHATSAPP_APIKEY'),
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+    ],
+
 ];

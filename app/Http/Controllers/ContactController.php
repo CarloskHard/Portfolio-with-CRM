@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendNewContactAlert;
 use App\Models\Client;
 use App\Models\Contact;
 use App\Models\ContactMethod;
-use Illuminate\Http\Request;
 use App\Models\Message;
+use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
@@ -72,13 +73,18 @@ class ContactController extends Controller
 
         // 2. Crear el mensaje
         // No pasamos contact_id porque es un desconocido (null)
-        Message::create([
+        $message = Message::create([
             'sender_name' => $validated['name'],
             'sender_email' => $validated['email'],
             'subject' => 'Nuevo mensaje web de ' . $validated['name'],
             'content' => $validated['content'],
             'is_read' => false,
         ]);
+
+        $channels = config('services.contact_alerts.channels', []);
+        if (is_array($channels) && ! empty($channels)) {
+            SendNewContactAlert::dispatch($message);
+        }
 
         // 3. Respuesta Profesional
         // Si la petición viene de nuestro script Fetch (AJAX):
