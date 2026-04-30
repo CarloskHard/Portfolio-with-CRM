@@ -4,69 +4,266 @@
 
     <!--
     |------------------------------------------------------------------|
-    |  ##########               HERO SECTION               ##########  |                
+    |  ##########               HERO SECTION               ##########  |
+    |  Theme: HeroSoft — fluid WebGL background, Geist editorial type  |
     |------------------------------------------------------------------|
     -->
-    <section id="home" class="relative pt-32 pb-20 bg-white dark:bg-gray-900 overflow-hidden transition-colors duration-300">
-        <canvas id="code-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-[1] dark:opacity-[1]"></canvas>
+    <style>
+        /* ── Hero Soft design system ── */
+        .hero-soft-section {
+            min-height: 100svh;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        .dark .hero-soft-section {
+            background: #181a1f;
+        }
+        /* Highlight ink blocks */
+        .hero-hl {
+            display: inline-block;
+            background: #0a0a0a;
+            color: #ffffff;
+            padding: 0 0.19em 0.07em;
+            border-radius: 5px;
+            margin: 0 0.03em;
+            line-height: 0.92;
+            vertical-align: baseline;
+        }
+        .dark .hero-hl {
+            background: #f3f4f6;
+            color: #111827;
+        }
+        /* 3-column sub-grid */
+        .hero-sub-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: end;
+            gap: clamp(20px, 4vw, 72px);
+            max-width: 1200px;
+            margin-top: clamp(32px, 5vh, 60px);
+        }
+        /* Social rail */
+        .hero-socials-rail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .hero-social-link {
+            color: #0a0a0a;
+            display: block;
+            transition: opacity 0.2s;
+        }
+        .dark .hero-social-link {
+            color: #e5e7eb;
+        }
+        .hero-social-link:hover { opacity: 0.4; }
+        /* CTA buttons */
+        .hero-cta-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 24px 13px 13px;
+            border: 1.5px solid #0a0a0a;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(6px);
+            font-family: 'Geist', system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #0a0a0a;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .hero-cta-primary:hover { background: rgba(10,10,10,0.07); color: #0a0a0a; }
+        .dark .hero-cta-primary {
+            border-color: rgba(229, 231, 235, 0.6);
+            background: rgba(24, 26, 31, 0.6);
+            color: #f9fafb;
+        }
+        .dark .hero-cta-primary:hover {
+            background: rgba(229, 231, 235, 0.12);
+            color: #ffffff;
+        }
+        .hero-cta-secondary {
+            display: inline-flex;
+            align-items: center;
+            padding: 13px 24px;
+            border: 1.5px solid rgba(10,10,10,0.2);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(6px);
+            font-family: 'Geist', system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: #3a3a38;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .hero-cta-secondary:hover { background: rgba(10,10,10,0.05); color: #0a0a0a; }
+        .dark .hero-cta-secondary {
+            border-color: rgba(229, 231, 235, 0.25);
+            background: rgba(24, 26, 31, 0.5);
+            color: #d1d5db;
+        }
+        .dark .hero-cta-secondary:hover {
+            background: rgba(229, 231, 235, 0.08);
+            color: #ffffff;
+        }
+        .dark .hero-soft-section [data-hero-primary] { color: #f9fafb !important; }
+        .dark .hero-soft-section [data-hero-muted] { color: #9ca3af !important; }
+        .dark .hero-soft-section [data-hero-body] { color: #d1d5db !important; }
+        .dark .hero-soft-section [data-hero-divider] { background: rgba(229, 231, 235, 0.25) !important; }
+        .dark .hero-soft-section [data-hero-cta-icon] {
+            background: #f9fafb !important;
+            color: #181a1f !important;
+        }
+        /* Availability pulse dot */
+        .hero-dot-pulse {
+            display: inline-block;
+            width: 7px; height: 7px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 0 0 rgba(34,197,94,0.45);
+            animation: hero-dot-pulse 2.4s ease-in-out infinite;
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        @keyframes hero-dot-pulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+            50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+        }
+        /* Responsive collapse */
+        @media (max-width: 767px) {
+            .hero-sub-grid {
+                grid-template-columns: 1fr !important;
+                gap: 28px !important;
+            }
+            .hero-socials-rail {
+                flex-direction: row !important;
+                gap: 20px !important;
+            }
+            .hero-socials-handle {
+                writing-mode: horizontal-tb !important;
+                transform: none !important;
+            }
+            .hero-status-block { display: none !important; }
+        }
+        @media (max-width: 480px) {
+            .hero-eyebrow-row { display: none; }
+        }
+    </style>
 
-        <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 items-center">
-            
-            <div class="w-full text-center lg:text-left place-self-center lg:col-span-7 z-10 order-2 lg:order-1">
-                <span class="inline-block py-1 px-3 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4 animate-subtle-breath border border-indigo-200 dark:border-indigo-800/50">
-                    🚀 Disponible para nuevos proyectos
-                </span>
-                <h1 class="max-w-2xl mx-auto lg:mx-0 mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl text-gray-900 dark:text-white">
-                    Hola 👋🏼, soy <br>
-                    <span class="js-footer-name-spotlight js-hero-wave footer-name-wrapper hero-name-vfx inline-block cursor-default relative text-indigo-600 dark:text-indigo-400 font-extrabold">
-                        <span class="footer-name-vfx-base">
-                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
-                        </span>
-                        <span class="footer-name-vfx-sweep" aria-hidden="true">
-                            @foreach(mb_str_split('Carlos Codex') as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{!! $char === ' ' ? '&nbsp;' : e($char) !!}</span>@endforeach
-                        </span>
-                    </span>
-                </h1>
-                <p class="max-w-2xl mx-auto lg:mx-0 mb-8 font-light text-gray-600 dark:text-gray-400 lg:mb-8 md:text-lg lg:text-xl leading-relaxed">
-                    Desarrollador Full Stack web y móvil
-                </p>
-                
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                    <a href="#projects" class="inline-flex items-center justify-center px-5 py-3 proyecto-button-hero text-base font-medium text-center text-white rounded-lg bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition">
-                        Ver Proyectos
-                    </a>
-                    <a href="#contact" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100 dark:text-white dark:border-gray-600 dark:hover:bg-gray-800 transition">
-                        Contactar
-                    </a>
-                    
-                    <div class="w-full sm:w-auto h-0 sm:h-8 border-t sm:border-l border-gray-300 dark:border-gray-700 mx-0 sm:mx-2"></div>
+    <section id="home" class="hero-soft-section">
 
-                    <a href="{{ env('APP_GITHUB_URL') }}" target="_blank" class="group text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition" title="GitHub">
-                        <x-icons.github class="w-7 h-7" />
-                    </a>
-                    <a href="{{ env('APP_LINKEDIN_URL') }}" target="_blank" class="group text-gray-500 hover:text-[#0077b5] dark:text-gray-400 dark:hover:text-[#0077b5] transition" title="LinkedIn">
-                        <x-icons.linkedin class="w-7 h-7" />
-                    </a>
+        {{-- WebGL animated fluid canvas --}}
+        <canvas id="hero-fluid-canvas"
+                style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;"
+                aria-hidden="true"></canvas>
+
+        {{-- Content layer --}}
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;min-height:100svh;">
+
+            {{-- Spacer matching the fixed navbar height (~68px) --}}
+            <div style="flex-shrink:0;height:68px;"></div>
+
+            {{-- Vertically centred main body --}}
+            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;
+                        padding:0 clamp(20px,5.5vw,88px) clamp(28px,4vh,56px);">
+
+                {{-- Eyebrow: status pill --}}
+                <div class="hero-eyebrow-row"
+                     style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(22px,3.5vh,46px);">
+                    <span class="hero-dot-pulse"></span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;
+                                 letter-spacing:0.1em;text-transform:uppercase;
+                                 color:#0a0a0a;font-weight:600;" data-hero-primary>Disponible</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;
+                                 letter-spacing:0.1em;color:#7a7a76;" data-hero-muted>· Sevilla · UTC+1</span>
                 </div>
-            </div>
-            
-            <div class="flex justify-center lg:justify-end relative order-1 lg:order-2 lg:col-span-5 mb-10 lg:mb-0">
-                <div class="relative w-56 h-56 sm:w-64 sm:h-64 lg:w-80 lg:h-80">
-                    <div class="absolute top-0 right-0 w-48 h-48 sm:w-56 sm:h-56 lg:w-72 lg:h-72 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-3xl opacity-40"></div>
-                    
-                    <div class="js-profile-ring profile-ring relative w-full h-full rounded-full border-4 border-white dark:border-gray-800 shadow-xl bg-gray-100 dark:bg-gray-800 cursor-pointer">
-                        <div class="absolute inset-0 rounded-full overflow-hidden">
-                            <img src="{{ asset('img/me-light.webp') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-100 dark:opacity-0">
-                            <img src="{{ asset('img/me.webp') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos Codex" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-0 dark:opacity-100">
+
+                {{-- Big editorial headline --}}
+                <h1 style="font-family:'Geist',system-ui,sans-serif;
+                            font-weight:600;
+                            font-size:clamp(44px,8.5vw,124px);
+                            line-height:1.03;
+                            letter-spacing:-0.035em;
+                            color:#0a0a0a;
+                            margin:0;
+                            max-width:1200px;" data-hero-primary>
+                    <span style="display:block;">Software&nbsp;<span class="hero-hl">hecho a&nbsp;mano</span></span>
+                    <span style="display:block;">para la&nbsp;<span class="hero-hl">web real.</span></span>
+                </h1>
+
+                {{-- Sub-grid: socials rail | copy+CTA | status --}}
+                <div class="hero-sub-grid">
+
+                    {{-- Social icons (vertical rail) --}}
+                    <div class="hero-socials-rail">
+                        <a href="{{ env('APP_GITHUB_URL', '#') }}"
+                           target="_blank" rel="noopener noreferrer"
+                           class="hero-social-link" title="GitHub">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.69-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18.91-.25 1.89-.38 2.86-.38s1.95.13 2.86.38c2.18-1.49 3.14-1.18 3.14-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.26 5.68.41.36.78 1.06.78 2.15v3.18c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+                            </svg>
+                        </a>
+                        <a href="{{ env('APP_LINKEDIN_URL', '#') }}"
+                           target="_blank" rel="noopener noreferrer"
+                           class="hero-social-link" title="LinkedIn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.22 8.5h4.56V23H.22V8.5zM8.34 8.5h4.37v1.98h.06c.61-1.15 2.1-2.36 4.32-2.36 4.62 0 5.47 3.04 5.47 7v7.88h-4.56v-6.99c0-1.67-.03-3.82-2.33-3.82-2.33 0-2.69 1.82-2.69 3.7V23H8.34V8.5z"/>
+                            </svg>
+                        </a>
+                        <div style="width:1px;height:28px;background:rgba(10,10,10,0.15);" data-hero-divider></div>
+                        <span class="hero-socials-handle"
+                              style="font-family:'JetBrains Mono',monospace;font-size:10px;
+                                     letter-spacing:0.14em;color:#7a7a76;
+                                     writing-mode:vertical-rl;transform:rotate(180deg);
+                                     user-select:none;" data-hero-muted>@carlos.codex</span>
+                    </div>
+
+                    {{-- Description + call-to-action buttons --}}
+                    <div>
+                        <p style="font-size:clamp(15px,1.2vw,17px);line-height:1.65;
+                                  color:#3a3a38;max-width:460px;margin:0;
+                                  font-family:'Geist',system-ui,sans-serif;font-weight:400;" data-hero-body>
+                            Ingeniero full‑stack afincado en Sevilla. Construyo interfaces,
+                            sistemas y los pequeños detalles que hacen que un producto
+                            se sienta cuidado.
+                        </p>
+                        <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                            <a href="#projects" class="hero-cta-primary">
+                                <span style="width:34px;height:34px;border-radius:999px;
+                                             background:#0a0a0a;color:#fff;
+                                             display:inline-flex;align-items:center;
+                                             justify-content:center;font-size:16px;
+                                             flex-shrink:0;" data-hero-cta-icon>↗</span>
+                                Ver proyectos
+                            </a>
+                            <a href="#contact" class="hero-cta-secondary">Contactar</a>
                         </div>
                     </div>
 
-                    <div class="absolute bottom-2 left-0 sm:bottom-4 sm:left-0 bg-white dark:bg-gray-800 p-3 rounded-full shadow-lg border border-gray-100 dark:border-gray-700 text-indigo-600 dark:text-indigo-400 animate-floating">
-                        <x-icons.laptop class="w-6 h-6 sm:w-8 sm:h-8" />
+                    {{-- Right-aligned status metadata --}}
+                    <div class="hero-status-block"
+                         style="text-align:right;font-family:'JetBrains Mono',monospace;
+                                font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
+                                color:#7a7a76;line-height:2;" data-hero-muted>
+                        <div style="color:#0a0a0a;font-weight:600;display:flex;align-items:center;
+                                    justify-content:flex-end;gap:7px;margin-bottom:1px;" data-hero-primary>
+                            <span class="hero-dot-pulse"></span>Disponible · Q2 2026
+                        </div>
+                        <div>Sevilla · UTC+1</div>
+                        <div>Laravel · React · PostgreSQL</div>
                     </div>
-                </div>
-            </div>
-        </div>
+
+                </div>{{-- /hero-sub-grid --}}
+
+            </div>{{-- /main body --}}
+
+        </div>{{-- /content layer --}}
+
     </section>
 
     <!--
@@ -541,6 +738,138 @@
     |------------------------------------------------------------------|
 -->
 @push('scripts')
+<script>
+/* ================================================================
+   HERO FLUID BACKGROUND — WebGL domain-warped fluid field
+   Translated from hero-soft.jsx (FluidField component).
+   Palette: mint cyan → acid lime over white paper.
+   ================================================================ */
+(function () {
+    const canvas = document.getElementById('hero-fluid-canvas');
+    if (!canvas) return;
+
+    const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: true });
+    if (!gl) return;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+        canvas.width  = Math.floor(canvas.clientWidth  * dpr);
+        canvas.height = Math.floor(canvas.clientHeight * dpr);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    /* ── Shaders ── */
+    const vsSrc = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
+
+    const fsSrc = `
+        precision highp float;
+        uniform vec2  u_res;
+        uniform float u_time;
+        uniform float u_dark;
+
+        float noise(vec2 p) {
+            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        void main(){
+            vec2 uv    = gl_FragCoord.xy / u_res.xy;
+            float ratio = u_res.x / u_res.y;
+
+            vec2 p = uv;
+            p.x   *= ratio;
+
+            float t = u_time * 0.25;
+
+            /* Domain warp — liquid flow */
+            vec2 shift = p;
+            for (float i = 1.0; i < 3.0; i++) {
+                shift.x += 0.35 / i * sin(i * 1.8 * p.y + t);
+                shift.y += 0.30 / i * cos(i * 1.8 * p.x + t);
+            }
+
+            /* Diagonal band: top-right → bottom-left */
+            float diagonal = shift.x + shift.y * ratio;
+            float target   = ratio * 1.0;
+            float mask     = smoothstep(0.9, 0.0, abs(diagonal - target));
+
+            /* Colour drift along the band */
+            float mixer     = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
+            vec3  cA        = vec3(0.62, 0.96, 0.86);   /* mint cyan  */
+            vec3  cB        = vec3(0.74, 0.97, 0.42);   /* acid lime  */
+            vec3  fluid     = mix(cA, cB, mixer);
+
+            vec3  lightBg   = vec3(1.0, 1.0, 1.0);
+            vec3  darkBg    = vec3(0.0941, 0.1020, 0.1216);
+            vec3  bg        = mix(lightBg, darkBg, u_dark);
+            vec3  color     = mix(bg, fluid, mask * 0.95);
+
+            /* Subtle film grain */
+            float grain = (noise(uv + fract(u_time)) - 0.5) * 0.05;
+            color += grain;
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
+
+    function mkShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            console.warn('[hero-fluid] shader error:', gl.getShaderInfoLog(s));
+        }
+        return s;
+    }
+
+    const prog = gl.createProgram();
+    gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   vsSrc));
+    gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, fsSrc));
+    gl.linkProgram(prog);
+    gl.useProgram(prog);
+
+    /* Full-screen quad */
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1,-1,  1,-1,  -1, 1,
+        -1, 1,  1,-1,   1, 1,
+    ]), gl.STATIC_DRAW);
+    const aLoc = gl.getAttribLocation(prog, 'a');
+    gl.enableVertexAttribArray(aLoc);
+    gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes  = gl.getUniformLocation(prog, 'u_res');
+    const uTime = gl.getUniformLocation(prog, 'u_time');
+    const uDark = gl.getUniformLocation(prog, 'u_dark');
+
+    const t0    = performance.now();
+    const speed = 0.06;
+
+    /* Pause when tab is hidden to save GPU */
+    let paused = false;
+    document.addEventListener('visibilitychange', () => {
+        paused = document.hidden;
+        if (!paused) requestAnimationFrame(frame);
+    });
+
+    function frame() {
+        if (paused) return;
+        const t = (performance.now() - t0) / 1000 * speed * 8.0;
+        const isDark = document.documentElement.classList.contains('dark') ? 1 : 0;
+        gl.uniform2f(uRes,  canvas.width, canvas.height);
+        gl.uniform1f(uTime, t);
+        gl.uniform1f(uDark, isDark);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(frame);
+    }
+    frame();
+})();
+/* ================================================================ */
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('contactForm');

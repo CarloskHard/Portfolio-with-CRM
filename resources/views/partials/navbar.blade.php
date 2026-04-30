@@ -1,92 +1,139 @@
 {{-- COMPONENTE DE NAVEGACIÓN PÚBLICA --}}
 @php
     $currentRoute = Route::currentRouteName();
-    
     $isHome = $currentRoute === 'home';
-    $logoHref = auth()->check() ? route('dashboard') : route('home');
-    // Ajusta estos arrays con los nombres reales de tus rutas
-    $isAboutPage = in_array($currentRoute, ['public.about', 'about']); 
-    $isProjectsPage = in_array($currentRoute, ['public.projects', 'projects', 'projects.index']); 
 @endphp
 
-<!-- Añadido x-cloak para evitar parpadeos y @click.outside para cerrar al tocar fuera -->
-<nav x-data="{ open: false }" @click.outside="open = false" class="fixed w-full z-50 top-0 start-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 transition-colors duration-300">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        
-        <!-- Logo: dashboard si hay sesión; en público, inicio (recarga si ya estás en inicio) -->
-        <a href="{{ $logoHref }}"
-           @guest @if($isHome) onclick="event.preventDefault(); window.location.reload();" @endif @endguest
-           class="flex items-center space-x-3 rtl:space-x-reverse group">
-            <img src="{{ asset('img/logo.png') }}" class="h-10 w-10 rounded-full shadow-sm" alt="Logo">
-            <span class="js-footer-design-spotlight footer-design-wrapper navbar-brand-vfx self-center text-xl font-bold whitespace-nowrap text-gray-900 dark:text-indigo-400 inline-block cursor-default relative">
-                <span class="navbar-brand-stack">
-                    <span class="navbar-brand-shadow" aria-hidden="true">Carlos Codex</span>
-                    <span class="footer-design-base">Carlos Codex</span>
-                    <span class="footer-design-reflection" aria-hidden="true">Carlos Codex</span>
-                </span>
-            </span>
-        </a>
-        
-        <div class="flex items-center gap-4 md:order-2">
-            <x-theme-toggle />
-            
-            <!-- BOTÓN MÓVIL -->
-            <button @click="open = !open" type="button" 
-                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden focus:outline-none transition-colors"
-                :class="{
-                    'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-white': open, 
-                    'text-gray-500 dark:text-gray-400': !open
-                }"
-            >
-                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-                </svg>
-            </button>
-        </div>
+<nav
+    x-data="{ scrolled: false }"
+    x-init="scrolled = window.scrollY > 20; window.addEventListener('scroll', () => { scrolled = window.scrollY > 20 })"
+    class="fixed w-full z-50 top-0 start-0 px-3 md:px-5 pt-3 transition-all duration-300"
+>
+    <div class="w-full px-8 bg-white/80 dark:bg-[#0a0a0a]/85 backdrop-blur-xl border border-black/[0.07] dark:border-white/[0.07] rounded-[1.25rem] transition-all duration-300"
+         :class="scrolled ? 'py-3 shadow-sm' : 'py-5'">
+        <!-- Flex container: Logo | Nav links + Theme + CTA -->
+        <div class="flex items-center justify-between">
 
-        <!-- Menú Desplegable -->
-        <div :class="{'block': open, 'hidden': !open}" class="hidden w-full md:block md:w-auto" id="navbar-sticky">
-            <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0">
-                
-                <!-- SOBRE MÍ -->
-                <li>
-                    <a @click="open = false" href="{{ route('public.about') }}"
-                       class="block py-2 px-3 transition-colors {{ $isAboutPage ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400' }}">
-                       Sobre mí
-                    </a>
-                </li>
-                
-                <!-- HABILIDADES -->
-                <li>
-                    <a @click="open = false" href="{{ $isHome ? '#skills' : route('home') . '#skills' }}" 
-                       class="block py-2 px-3 text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                       Habilidades
-                    </a>
-                </li>
-                
-                <!-- PROYECTOS -->
-                <li>
-                    @if($isProjectsPage)
-                        <span class="block py-2 px-3 text-indigo-600 dark:text-indigo-400 font-bold cursor-default">
-                            Proyectos
-                        </span>
-                    @else
-                        <a @click="open = false" href="{{ $isHome ? '#projects' : route('home') . '#projects' }}" 
-                           class="block py-2 px-3 text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
+            <!-- LOGO - Izquierda -->
+            <a href="{{ route('home') }}"
+               class="shrink-0 hover:opacity-70 transition-opacity duration-200"
+               style="font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace; font-weight: 700; font-size: 19px; letter-spacing: 0.04em; text-decoration: none;">
+                <span class="text-gray-900 dark:text-gray-50">CARLOS</span><span class="text-gray-400 dark:text-gray-600">.CODEX</span>
+            </a>
+
+            <!-- MENÚ DERECHA (desktop) + Controles -->
+            <div x-data="{ open: false }" @click.outside="open = false" class="flex items-center gap-6">
+
+                <!-- DESKTOP: Nav links -->
+                <ul class="hidden md:flex items-center gap-8"
+                    style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 16px; font-weight: 500; list-style: none; margin: 0; padding: 0;">
+                    <li>
+                        <a href="{{ route('public.about') }}"
+                           @click="open = false"
+                           class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                           style="text-decoration: none;">
+                           Sobre mí
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
+                           @click="open = false"
+                           class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                           style="text-decoration: none;">
                            Proyectos
                         </a>
-                    @endif
-                </li>
-                
-                <!-- CONTACTO -->
-                <li>
-                    <a @click="open = false" href="{{ $isHome ? '#contact' : route('home') . '#contact' }}" 
-                       class="block py-2 px-3 text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400 transition-colors">
-                       Contacto
-                    </a>
-                </li>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}"
+                           @click="open = false"
+                           class="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                           style="text-decoration: none;">
+                           Habilidades
+                        </a>
+                    </li>
+                </ul>
 
-            </ul>
+                <!-- SEPARADOR visual (desktop) -->
+                <!--<div class="hidden md:block w-px h-5 bg-black/10 dark:bg-white/10"></div>-->
+
+                <!-- THEME TOGGLE -->
+                <x-theme-toggle />
+
+                <!-- HABLEMOS CTA (desktop) -->
+                <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
+                   @click="open = false"
+                   class="group hidden md:inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-200"
+                   style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;">
+                    <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0 group-hover:bg-white dark:group-hover:bg-gray-900 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200"
+                          style="font-size: 12px;">→</span>
+                    Hablemos
+                </a>
+
+                <!-- MOBILE BUTTON -->
+                <button @click="open = !open" type="button"
+                    class="md:hidden inline-flex items-center p-2 w-9 h-9 justify-center rounded-lg transition-colors"
+                    :class="{
+                        'bg-gray-900/10 dark:bg-white/10 text-gray-900 dark:text-white': open,
+                        'text-gray-500 dark:text-gray-400': !open
+                    }"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              x-show="!open" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              x-show="open" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <!-- MOBILE MENU (dropdown) -->
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 -translate-y-2"
+                     class="md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-black/[0.07] dark:border-white/[0.07]"
+                     style="display: none;">
+                    <ul class="flex flex-col gap-0 py-2 px-6"
+                        style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 16px; font-weight: 500; list-style: none; margin: 0; padding-top: 12px; padding-bottom: 16px;">
+                        <li>
+                            <a href="{{ route('public.about') }}"
+                               @click="open = false"
+                               class="block py-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                               style="text-decoration: none;">
+                               Sobre mí
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
+                               @click="open = false"
+                               class="block py-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                               style="text-decoration: none;">
+                               Proyectos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}"
+                               @click="open = false"
+                               class="block py-2.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                               style="text-decoration: none;">
+                               Habilidades
+                            </a>
+                        </li>
+                        <li class="pt-3 pb-1">
+                            <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
+                               @click="open = false"
+                               class="group inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white"
+                               style="font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;">
+                                <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0"
+                                      style="font-size: 12px;">→</span>
+                                Hablemos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </nav>

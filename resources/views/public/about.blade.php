@@ -164,7 +164,7 @@
                     <div class="text-3xl">🖥️</div>
                     <div>
                         <h3 class="font-bold text-gray-900 dark:text-white">Desarrollo de Aplicaciones Web (DAW)</h3>
-                        <p class="text-sm text-gray-500 mt-1">2025 - 2026</p>
+                        <p class="text-sm text-gray-500 mt-1">Sep 2025 - Ene 2026</p>
                     </div>
                 </div>
 
@@ -173,7 +173,7 @@
                     <div class="text-3xl">📱</div>
                     <div>
                         <h3 class="font-bold text-gray-900 dark:text-white">Desarrollo de Aplicaciones Multiplataforma (DAM)</h3>
-                        <p class="text-sm text-gray-500 mt-1">2021 - 2023</p>
+                        <p class="text-sm text-gray-500 mt-1">Ago 2021 - Jun 2023</p>
                     </div>
                 </div>
 
