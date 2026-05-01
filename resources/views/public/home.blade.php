@@ -11,10 +11,12 @@
     <style>
         /* ── Hero Soft design system ── */
         .hero-soft-section {
-            min-height: 100svh;
+            /* ~82svh: alto hero con un poco de la siguiente sección visible al cargar */
+            min-height: 82svh;
             background: #ffffff;
             position: relative;
-            overflow: hidden;
+            overflow-x: clip;   /* evita scrollbar horizontal */
+            overflow-y: visible; /* permite que la imagen se asoma por abajo */
         }
         .dark .hero-soft-section {
             background: #181a1f;
@@ -74,9 +76,15 @@
             font-weight: 500;
             color: #0a0a0a;
             text-decoration: none;
-            transition: background 0.2s;
+            transition:
+                background 0.2s ease,
+                transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .hero-cta-primary:hover { background: rgba(10,10,10,0.07); color: #0a0a0a; }
+        .hero-cta-primary:hover {
+            background: rgba(10,10,10,0.07);
+            color: #0a0a0a;
+            transform: scale(1.045);
+        }
         .dark .hero-cta-primary {
             border-color: rgba(229, 231, 235, 0.6);
             background: rgba(24, 26, 31, 0.6);
@@ -85,6 +93,7 @@
         .dark .hero-cta-primary:hover {
             background: rgba(229, 231, 235, 0.12);
             color: #ffffff;
+            transform: scale(1.045);
         }
         .hero-cta-secondary {
             display: inline-flex;
@@ -99,9 +108,15 @@
             font-weight: 500;
             color: #3a3a38;
             text-decoration: none;
-            transition: background 0.2s;
+            transition:
+                background 0.2s ease,
+                transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .hero-cta-secondary:hover { background: rgba(10,10,10,0.05); color: #0a0a0a; }
+        .hero-cta-secondary:hover {
+            background: rgba(10,10,10,0.05);
+            color: #0a0a0a;
+            transform: scale(1.045);
+        }
         .dark .hero-cta-secondary {
             border-color: rgba(229, 231, 235, 0.25);
             background: rgba(24, 26, 31, 0.5);
@@ -110,6 +125,7 @@
         .dark .hero-cta-secondary:hover {
             background: rgba(229, 231, 235, 0.08);
             color: #ffffff;
+            transform: scale(1.045);
         }
         .dark .hero-soft-section [data-hero-primary] { color: #f9fafb !important; }
         .dark .hero-soft-section [data-hero-muted] { color: #9ca3af !important; }
@@ -134,7 +150,60 @@
             0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
             50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
         }
+        /* Two-column hero layout */
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: clamp(32px, 4vw, 64px);
+        }
+        .hero-image-col {
+            /* Desde un poco bajo el header fijo hasta el borde inferior (card servicios).
+               El containing block es el div content-layer (position:relative). */
+            position: absolute;
+            top: clamp(72px, 5.25rem, 92px);
+            bottom: -2px;
+            right: clamp(20px, 5.5vw, 88px);
+            width: min(62vw, 1000px);
+            z-index: 2;
+            display: block;
+            pointer-events: none;
+        }
+
+        .hero-profile-img {
+            display: block;
+            height: 100%;
+            width: auto;
+            max-width: 100%;
+            margin-left: auto;
+            object-fit: contain;
+            object-position: bottom center;
+
+            /* ── Integración ambiental sin distorsión de color ──
+               mix-blend-mode sobre overlays externos tiñe el fondo en zonas
+               transparentes. hue-rotate con ángulos grandes (>30°) distorsiona
+               los tonos piel. La integración correcta viene del mask-image fade
+               + el shader de fondo: solo necesitamos reducir la saturación y el
+               contraste para que la imagen "retroceda" hacia el entorno. */
+            filter: saturate(0.88) brightness(0.97);
+
+            /* ── Fade: radial en esquina inferior-izquierda ── */
+            mask-image: radial-gradient(ellipse 150% 100% at 0% 100%, transparent 0%, black 55%);
+            -webkit-mask-image: radial-gradient(ellipse 150% 100% at 0% 100%, transparent 0%, black 55%);
+
+            transition: filter 0.3s ease;
+        }
+        .dark .hero-profile-img {
+            /* En dark mode oscurecemos para integrarnos con el fondo #181a1f */
+            filter: saturate(0.82) brightness(0.80) contrast(1.05);
+        }
         /* Responsive collapse */
+        @media (max-width: 900px) {
+            .hero-layout {
+                grid-template-columns: 1fr;
+            }
+            .hero-image-col { display: none; }
+        }
         @media (max-width: 767px) {
             .hero-sub-grid {
                 grid-template-columns: 1fr !important;
@@ -163,7 +232,7 @@
                 aria-hidden="true"></canvas>
 
         {{-- Content layer --}}
-        <div style="position:relative;z-index:2;display:flex;flex-direction:column;min-height:100svh;">
+        <div style="position:relative;z-index:2;display:flex;flex-direction:column;min-height:82svh;">
 
             {{-- Spacer matching the fixed navbar height (~68px) --}}
             <div style="flex-shrink:0;height:68px;"></div>
@@ -171,6 +240,11 @@
             {{-- Vertically centred main body --}}
             <div style="flex:1;display:flex;flex-direction:column;justify-content:center;
                         padding:0 clamp(20px,5.5vw,88px) clamp(28px,4vh,56px);">
+
+                <div class="hero-layout">
+
+                {{-- LEFT: text content --}}
+                <div>
 
                 {{-- Eyebrow: status pill --}}
                 <div class="hero-eyebrow-row"
@@ -190,8 +264,7 @@
                             line-height:1.03;
                             letter-spacing:-0.035em;
                             color:#0a0a0a;
-                            margin:0;
-                            max-width:1200px;" data-hero-primary>
+                            margin:0;" data-hero-primary>
                     <span style="display:block;">Software&nbsp;<span class="hero-hl">hecho a&nbsp;mano</span></span>
                     <span style="display:block;">para la&nbsp;<span class="hero-hl">web real.</span></span>
                 </h1>
@@ -260,6 +333,20 @@
 
                 </div>{{-- /hero-sub-grid --}}
 
+                </div>{{-- /LEFT text content --}}
+
+                {{-- RIGHT: profile image --}}
+                <div class="hero-image-col">
+                    <img src="{{ asset('img/me-noBg.webp') }}"
+                         alt="Carlos — Fullstack Developer"
+                         class="hero-profile-img"
+                         width="720" height="900"
+                         loading="eager"
+                         decoding="async">
+                </div>{{-- /hero-image-col --}}
+
+                </div>{{-- /hero-layout --}}
+
             </div>{{-- /main body --}}
 
         </div>{{-- /content layer --}}
@@ -271,7 +358,7 @@
     |  ##########             SERVICIOS SECTION            ##########  |                
     |------------------------------------------------------------------|
     -->
-    <section id="services" class="relative py-24 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
+    <section id="services" class="relative z-10 py-24 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800">
         <!-- Decoración de fondo suave -->
         <div class="absolute top-0 left-0 -ml-20 -mt-20 w-72 h-72 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
 

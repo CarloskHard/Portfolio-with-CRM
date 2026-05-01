@@ -9,7 +9,7 @@
     x-init="scrolled = window.scrollY > 20; window.addEventListener('scroll', () => { scrolled = window.scrollY > 20 })"
     class="fixed w-full z-50 top-0 start-0 px-3 md:px-5 pt-3 transition-all duration-300"
 >
-    <div class="w-full px-8 bg-white/80 dark:bg-[#0a0a0a]/85 backdrop-blur-xl border border-black/[0.07] dark:border-white/[0.07] rounded-[1.25rem] transition-all duration-300"
+    <div class="w-full px-8 bg-white/38 dark:bg-[#0a0a0a]/46 backdrop-blur-3xl backdrop-saturate-150 border border-white/45 dark:border-white/[0.16] shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.28)] rounded-[1.25rem] transition-all duration-300"
          :class="scrolled ? 'py-3 shadow-sm' : 'py-5'">
         <!-- Flex container: Logo | Nav links + Theme + CTA -->
         <div class="flex items-center justify-between">
@@ -62,7 +62,7 @@
                 <!-- HABLEMOS CTA (desktop) -->
                 <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
                    @click="open = false"
-                   class="group hidden md:inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-200"
+                   class="group hidden md:inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-[220ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.045]"
                    style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;">
                     <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0 group-hover:bg-white dark:group-hover:bg-gray-900 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200"
                           style="font-size: 12px;">→</span>
@@ -93,7 +93,7 @@
                      x-transition:leave="transition ease-in duration-150"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 -translate-y-2"
-                     class="md:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-black/[0.07] dark:border-white/[0.07]"
+                     class="md:hidden absolute top-full left-0 right-0 bg-white/50 dark:bg-[#0a0a0a]/58 backdrop-blur-3xl backdrop-saturate-150 border-b border-white/40 dark:border-white/[0.14] shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
                      style="display: none;">
                     <ul class="flex flex-col gap-0 py-2 px-6"
                         style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 16px; font-weight: 500; list-style: none; margin: 0; padding-top: 12px; padding-bottom: 16px;">
@@ -124,9 +124,9 @@
                         <li class="pt-3 pb-1">
                             <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
                                @click="open = false"
-                               class="group inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white"
+                               class="group inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-[220ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.045]"
                                style="font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;">
-                                <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0"
+                                <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0 group-hover:bg-white dark:group-hover:bg-gray-900 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200"
                                       style="font-size: 12px;">→</span>
                                 Hablemos
                             </a>
