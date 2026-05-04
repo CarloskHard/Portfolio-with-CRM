@@ -175,7 +175,7 @@
         .dark .hero-soft-section [data-hero-muted] { color: #9ca3af !important; }
         /*
          * Más intensidad sólo en el tinte del glifo (+ halo muy suave), sin fondo propio:
-         * el mint/lime del shader queda más atrás contra un gris casi tinta / blanco papel.
+         * el mint/índigo del shader queda más atrás contra un gris casi tinta / blanco papel.
          */
         .hero-soft-section [data-hero-body] {
             font-weight: 400;
@@ -1039,7 +1039,7 @@
 /* ================================================================
    HERO FLUID BACKGROUND — WebGL domain-warped fluid field
    Translated from hero-soft.jsx (FluidField component).
-   Palette: mint cyan → acid lime over white paper.
+   Palette: --color-primary (mint) → --color-secondary (indigo).
    ================================================================ */
 (function () {
     const canvas = document.getElementById('hero-fluid-canvas');
@@ -1126,8 +1126,8 @@
 
             /* Colour drift along the band */
             float mixer     = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
-            vec3  cA        = vec3(0.62, 0.96, 0.86);   /* mint cyan  */
-            vec3  cB        = vec3(0.74, 0.97, 0.25);   /* acid lime  */
+            vec3  cA        = vec3(0.604, 0.820, 0.824);   /* --color-primary   #9ad1d2 */
+            vec3  cB        = vec3(0.388, 0.400, 0.945);   /* --color-secondary #6366f1 */
             vec3  fluid     = mix(cA, cB, mixer);
 
             vec3  lightBg   = vec3(1.0, 1.0, 1.0);

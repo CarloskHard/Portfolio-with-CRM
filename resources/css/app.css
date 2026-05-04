@@ -3,13 +3,61 @@
 @tailwind utilities;
 
 /*
- * Brand accent (reuse across public site — hero, CTAs, highlights).
+ * ══════════════════════════════════════════════════════
+ *  DESIGN TOKENS — single source of truth for all colors
+ *  Reference these variables throughout the codebase.
+ *  Dark-mode overrides live in html.dark below.
+ * ══════════════════════════════════════════════════════
  */
 @layer base {
     :root {
-        --color-brand-mint: #9ad1d2;
+        /* ── Primary (mint / teal) ── */
+        --color-primary:             #9ad1d2;
+        --color-primary-rgb:         154, 209, 210;
+        --color-primary-light:       #c8e9ea;
+        --color-primary-dark:        #5bbcbe;
+        --color-brand-mint:          #9ad1d2;   /* alias — backward compat */
+
+        /* ── Secondary (indigo) ── */
+        --color-secondary:           #6366f1;
+        --color-secondary-rgb:       99, 102, 241;
+        --color-secondary-light:     #818cf8;
+        --color-secondary-light-rgb: 129, 140, 248;
+        --color-secondary-dark:      #4f46e5;
+
+        /* ── Background & Surface ── */
+        --color-bg:                  #f9fafb;
+        --color-surface:             #ffffff;
+        --color-surface-muted:       rgba(244, 245, 248, 0.88);
+
+        /* ── Text ── */
+        --color-text:                #0a0a0a;
+        --color-text-muted:          #7a7a76;
+
+        /* ── Border ── */
+        --color-border:              rgba(15, 23, 42, 0.11);
+
+        /* ── Semantic ── */
+        --color-success:             #22c55e;
+        --color-success-rgb:         34, 197, 94;
+        --color-error:               #ef4444;
+        --color-error-rgb:           239, 68, 68;
+        --color-warning:             #f59e0b;
+        --color-info:                #3b82f6;
+
+        /* ── Textures ── */
         /* Grain shared by section panels + hero highlights (SVG noise tile) */
         --section-matte-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
+    }
+
+    /* ── Dark mode overrides ── */
+    html.dark {
+        --color-bg:                  #111827;
+        --color-surface:             #181a1f;
+        --color-surface-muted:       rgba(26, 28, 33, 0.86);
+        --color-text:                #f9fafb;
+        --color-text-muted:          #9ca3af;
+        --color-border:              rgba(226, 232, 240, 0.14);
     }
 
     /*
@@ -18,7 +66,7 @@
      * default public body theme so gaps are not bare white.
      */
     html {
-        background-color: #f9fafb;
+        background-color: var(--color-bg);
         min-height: 100%;
         min-height: -webkit-fill-available;
         min-height: 100vh;
@@ -26,7 +74,7 @@
     }
 
     html.dark {
-        background-color: #111827;
+        background-color: var(--color-bg);
     }
 
     html:has(body.about-ai-dots-page) {
@@ -53,13 +101,13 @@ html.dark body.about-ai-dots-page {
 body.about-ai-dots-page .ai-dots-bg-stack {
     --ai-dots-canvas-bg: #f9fafb;
     --ai-dots-mask-bg: #f9fafb;
-    --ai-dots-dot: 79, 70, 229;
+    --ai-dots-dot: var(--color-secondary-rgb);  /* 99, 102, 241 */
 }
 
 html.dark body.about-ai-dots-page .ai-dots-bg-stack {
     --ai-dots-canvas-bg: #111827;
     --ai-dots-mask-bg: #111827;
-    --ai-dots-dot: 165, 180, 252;
+    --ai-dots-dot: var(--color-secondary-light-rgb);  /* 129, 140, 248 */
     /* Ribbons + cursor glow: valores claros + lighten quedaban blancos sobre fondo oscuro */
     --ai-dots-wave-wide: #334155;
     --ai-dots-wave-mid: #1e293b;

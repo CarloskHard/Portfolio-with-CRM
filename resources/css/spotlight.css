@@ -1,4 +1,9 @@
 /* resources/css/spotlight.css */
+/*
+ * Colors reference design tokens from app.css:
+ *   --color-secondary-light-rgb  (129, 140, 248) — spotlight glow light mode
+ *   --color-secondary-rgb        (99, 102, 241)  — spotlight glow dark mode
+ */
 
 .skill-card {
     position: relative;
@@ -12,7 +17,7 @@
     inset: 0;
     border-radius: inherit;
     background:
-        radial-gradient(circle at 0% 0%, rgba(129, 140, 248, 0.16), transparent 55%),
+        radial-gradient(circle at 0% 0%, rgba(var(--color-secondary-light-rgb), 0.16), transparent 55%),
         radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.18), transparent 55%);
     opacity: 0;
     transform: scale(1.08);
@@ -33,7 +38,7 @@
     position: relative;
     z-index: 1; /* La tarjeta base */
     border: 1px solid rgba(0, 0, 0, 0.1);
-    background-color: white; 
+    background-color: white;
     transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
@@ -46,27 +51,27 @@
 .js-spotlight-card::before, .js-project-card::before {
     content: "";
     position: absolute;
-    inset: -1px; 
+    inset: -1px;
     border-radius: inherit;
-    padding: 2px; 
-    
+    padding: 2px;
+
     /* Subimos el z-index para que la luz se "apoye" sobre el borde real */
-    z-index: 2; 
-    
+    z-index: 2;
+
     /* Modo claro: halo suave y más ligero */
     background: radial-gradient(
-        140px circle at var(--mouse-x) var(--mouse-y), 
-        rgba(129, 140, 248, 0.45) 0%, 
-        rgba(129, 140, 248, 0.15) 45%,
+        140px circle at var(--mouse-x) var(--mouse-y),
+        rgba(var(--color-secondary-light-rgb), 0.45) 0%,
+        rgba(var(--color-secondary-light-rgb), 0.15) 45%,
         transparent 100%
     );
 
-    -webkit-mask: 
-        linear-gradient(#ffffffcd 0 0) content-box, 
+    -webkit-mask:
+        linear-gradient(#ffffffcd 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
-    
+
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -74,9 +79,9 @@
 
 .dark .js-spotlight-card::before, .dark .js-project-card::before {
     background: radial-gradient(
-        120px circle at var(--mouse-x) var(--mouse-y), 
-        rgb(112, 126, 251) 0%, 
-        rgba(115, 128, 252, 0.5) 50%,
+        120px circle at var(--mouse-x) var(--mouse-y),
+        rgba(var(--color-secondary-rgb), 1.0) 0%,
+        rgba(var(--color-secondary-rgb), 0.5) 50%,
         transparent 100%
     );
 }
@@ -92,8 +97,8 @@
     padding: 1px;
     background: radial-gradient(
         140px circle at var(--mouse-x) var(--mouse-y),
-        rgba(129, 140, 248, 0.55) 0%,
-        rgba(129, 140, 248, 0.2) 48%,
+        rgba(var(--color-secondary-light-rgb), 0.55) 0%,
+        rgba(var(--color-secondary-light-rgb), 0.2) 48%,
         transparent 100%
     );
     -webkit-mask:
@@ -106,8 +111,8 @@
 .dark .project-carousel-border {
     background: radial-gradient(
         120px circle at var(--mouse-x) var(--mouse-y),
-        rgba(112, 126, 251, 0.9) 0%,
-        rgba(115, 128, 252, 0.45) 50%,
+        rgba(var(--color-secondary-rgb), 0.9) 0%,
+        rgba(var(--color-secondary-rgb), 0.45) 50%,
         transparent 100%
     );
 }
@@ -126,8 +131,8 @@
     z-index: 0;
     background: radial-gradient(
         240px circle at var(--mouse-x, 50%) var(--mouse-y, 0%),
-        rgb(112, 126, 251) 0%,
-        rgba(115, 128, 252, 0.5) 50%,
+        rgba(var(--color-secondary-rgb), 1.0) 0%,
+        rgba(var(--color-secondary-rgb), 0.5) 50%,
         transparent 100%
     );
     -webkit-mask:
