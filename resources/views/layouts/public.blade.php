@@ -2,7 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Carlos Codex | Full Stack Developer</title>
     <meta name="description" content="Desarrollo de aplicaciones y webs para particulares y empresas. +7 años desarrollando software. Cuéntame tu idea y te devolveré un producto real."> <!-- Snippet en búsqueda de Google -->
     <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/png">
@@ -39,10 +39,11 @@
         .group:hover .icon-github { color: #3CCF91; }
         .group:hover .icon-email { color: #818cf8; }
 
-        html { scrollbar-width: none; -ms-overflow-style: none; }
+        /* Evita scroll horizontal global (decoraciones blur con márgenes negativos, flex min-width:auto, etc.) */
+        html { overflow-x: clip; scrollbar-width: none; -ms-overflow-style: none; }
         html::-webkit-scrollbar { display: none; }
 
-        #scroll-progress-container { position: fixed; right: 0; top: 0; width: 4px; height: 100%; background-color: rgba(229, 231, 235, 0.3); z-index: 100; }
+        #scroll-progress-container { position: fixed; right: 0; top: 0; width: 4px; height: 100vh; height: 100lvh; background-color: rgba(229, 231, 235, 0.3); z-index: 100; }
         .dark #scroll-progress-container { background-color: rgba(55, 65, 81, 0.3); }
         #scroll-progress-bar { width: 100%; height: 0%; background: linear-gradient(to bottom, #818cf8, #4f46e5); box-shadow: 0 0 8px rgba(79, 70, 229, 0.5); transition: height 0.1s ease-out; }
 
@@ -460,7 +461,7 @@
         }
     </script>
 </head>
-<body class="@yield('body-class','antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen transition-colors duration-300')">
+<body class="@yield('body-class','antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-dynamic transition-colors duration-300')">
     
     <div id="scroll-progress-container"><div id="scroll-progress-bar"></div></div>
 
@@ -468,7 +469,7 @@
     @include('partials.navbar')
 
     <!-- AQUÍ SE INYECTARÁ EL CONTENIDO DE LA VISTA -->
-    <main class="flex-grow">
+    <main class="relative z-10 flex-grow min-w-0">
         @yield('content')
     </main>
 
@@ -484,12 +485,13 @@
 
     <!-- Scripts Generales de la Interfaz -->
     <script>
-        // 1. Scroll to Top
+        // 1. Scroll to Top (solo en scroll/resize — evita requestAnimationFrame infinito en móvil)
         const scrollBtn = document.getElementById('scrollToTopBtn');
         const footer = document.getElementById('main-footer');
-        let isVisible = false;
 
-        window.addEventListener('scroll', () => {
+        function syncScrollToTopFab() {
+            if (!scrollBtn) return;
+
             if (window.scrollY > 300) {
                 scrollBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
                 scrollBtn.classList.add('opacity-100', 'translate-y-0');
@@ -497,33 +499,26 @@
                 scrollBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10');
                 scrollBtn.classList.remove('opacity-100', 'translate-y-0');
             }
-        });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!scrollBtn || !footer) return;
             const baseBottom = 32;
-            scrollBtn.style.transition = "opacity 0.4s ease, transform 0.4s ease";
-            function updateButton() {
+            if (footer) {
                 const footerRect = footer.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-                const scrollY = window.scrollY;
-
-                if (scrollY > 300 && !isVisible) {
-                    isVisible = true; scrollBtn.style.opacity = "1"; scrollBtn.style.pointerEvents = "auto"; scrollBtn.style.transform = "translateY(0)";
-                } else if (scrollY <= 300 && isVisible) {
-                    isVisible = false; scrollBtn.style.opacity = "0"; scrollBtn.style.pointerEvents = "none"; scrollBtn.style.transform = "translateY(20px)";
-                }
-
                 if (footerRect.top < windowHeight) {
                     const overlap = windowHeight - footerRect.top;
-                    scrollBtn.style.bottom = (baseBottom + overlap) + "px";
+                    scrollBtn.style.bottom = (baseBottom + overlap) + 'px';
                 } else {
-                    scrollBtn.style.bottom = baseBottom + "px";
+                    scrollBtn.style.bottom = baseBottom + 'px';
                 }
-                requestAnimationFrame(updateButton);
             }
-            requestAnimationFrame(updateButton);
-        }); 
+        }
+
+        if (scrollBtn) {
+            scrollBtn.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            window.addEventListener('scroll', syncScrollToTopFab, { passive: true });
+            window.addEventListener('resize', syncScrollToTopFab);
+            syncScrollToTopFab();
+        }
 
         // 2. Seguimiento del ratón (Tarjetas + textos con efectos)
         document.addEventListener('DOMContentLoaded', () => {

@@ -27,6 +27,10 @@
       --divider:    #e8e4de;
       --serif:      'DM Serif Display', serif;
       --sans:       'DM Sans', sans-serif;
+      --scrollbar-track:      var(--accent-bg);
+      --scrollbar-track-edge: rgba(199, 93, 44, 0.12);
+      --scrollbar-thumb-hover: #b85528;
+      --scrollbar-arrow:       var(--accent);
     }
 
     body {
@@ -39,16 +43,189 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Document scrollbar: slim track, accent thumb, top/bottom step buttons (WebKit/Blink).
+       Firefox gets colored thumb/track via scrollbar-color — no separate arrow glyphs. */
+    html {
+      scrollbar-gutter: stable;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) var(--scrollbar-track);
+    }
+
+    html::-webkit-scrollbar {
+      width: 14px;
+    }
+
+    html::-webkit-scrollbar-corner {
+      background: var(--scrollbar-track);
+      border-left: 1px solid var(--scrollbar-track-edge);
+      border-top: 1px solid var(--scrollbar-track-edge);
+    }
+
+    html::-webkit-scrollbar-track {
+      background: linear-gradient(
+        90deg,
+        rgba(254, 246, 241, 0.55),
+        rgba(243, 230, 220, 0.35),
+        rgba(254, 246, 241, 0.55)
+      );
+      border-left: 1px solid var(--scrollbar-track-edge);
+    }
+
+    html::-webkit-scrollbar-thumb {
+      background: linear-gradient(175deg, var(--accent-soft) 0%, var(--accent) 42%, var(--scrollbar-thumb-hover) 100%);
+      border-radius: 999px;
+      border: 3px solid var(--scrollbar-track);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    html::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(175deg, #f08258 0%, var(--accent) 46%, var(--scrollbar-thumb-hover) 100%);
+    }
+
+    html::-webkit-scrollbar-thumb:active {
+      background: linear-gradient(175deg, var(--accent) 0%, #a34a21 100%);
+    }
+
+    /* Step buttons — modern minimal chevrons, same accent family as body text highlights */
+    html::-webkit-scrollbar-button:vertical:start:decrement,
+    html::-webkit-scrollbar-button:single-button:vertical:decrement {
+      height: 15px;
+      width: 14px;
+      display: block;
+      background-color: var(--scrollbar-track);
+      border-left: 1px solid var(--scrollbar-track-edge);
+      border-bottom: 1px solid var(--scrollbar-track-edge);
+      background-repeat: no-repeat;
+      background-position: center calc(50% + 1px);
+      background-size: 11px 11px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c75d2c' d='m12 7.5 6.5 8.5h-13z'/%3E%3C/svg%3E");
+    }
+
+    html::-webkit-scrollbar-button:vertical:end:increment,
+    html::-webkit-scrollbar-button:single-button:vertical:increment {
+      height: 15px;
+      width: 14px;
+      display: block;
+      background-color: var(--scrollbar-track);
+      border-left: 1px solid var(--scrollbar-track-edge);
+      border-top: 1px solid var(--scrollbar-track-edge);
+      background-repeat: no-repeat;
+      background-position: center calc(50% + 1px);
+      background-size: 11px 11px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c75d2c' d='M12 16.5 5.5 8h13z'/%3E%3C/svg%3E");
+    }
+
+    html::-webkit-scrollbar-button:vertical:start:decrement:hover,
+    html::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+      background-color: rgba(199, 93, 44, 0.08);
+    }
+
+    html::-webkit-scrollbar-button:vertical:end:increment:hover,
+    html::-webkit-scrollbar-button:single-button:vertical:increment:hover {
+      background-color: rgba(199, 93, 44, 0.08);
+    }
+
+    html::-webkit-scrollbar-button:vertical:start:decrement:active,
+    html::-webkit-scrollbar-button:single-button:vertical:decrement:active,
+    html::-webkit-scrollbar-button:vertical:end:increment:active,
+    html::-webkit-scrollbar-button:single-button:vertical:increment:active {
+      background-color: rgba(199, 93, 44, 0.16);
+    }
+
+    html::-webkit-scrollbar-button:horizontal {
+      display: none;
+      height: 0;
+      width: 0;
+    }
+
     /* ── PÁGINA ── */
     .page {
       display: grid;
       grid-template-columns: 260px 1fr;
-      max-width: 920px;
+      width: 100%;
+      max-width: min(920px, 100%);
       margin: 40px auto;
       background: var(--bg-card);
       box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 12px 48px rgba(0,0,0,.08);
       border-radius: 4px;
       overflow: hidden;
+    }
+
+    /*
+      Escritorio al 100%: margen vertical mínimo para evitar el scrollbar fantasma de unos píxeles.
+      Si el usuario usa zoom del navegador o activa "Ampliar", el documento vuelve a scrollear normal.
+    */
+    .cv-viewport {
+      width: 100%;
+      max-width: 100%;
+      margin-inline: auto;
+      box-sizing: border-box;
+    }
+
+    @media screen and (min-width: 721px) {
+      html {
+        overflow-x: hidden;
+      }
+      body {
+        overflow-x: hidden;
+        margin-block: 0;
+      }
+      .cv-viewport {
+        overflow: visible;
+      }
+      .page {
+        --cv-page-vm: clamp(2px, 0.6vmin, 6px);
+        margin: var(--cv-page-vm) auto;
+        max-height: none;
+        overflow: hidden;
+        zoom: 1;
+        transform: translateZ(0) scale(1);
+        transform-origin: top center;
+        will-change: transform, max-width, margin, zoom;
+        transition:
+          transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          max-width 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          margin 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          zoom 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      html.cv-expanded {
+        overflow-y: auto;
+      }
+      html.cv-expanded .page {
+        max-width: min(1120px, calc((100% - 24px) / 1.28));
+        margin: 20px auto 48px;
+        zoom: 1.28;
+        transform: translateZ(0) scale(1.035);
+      }
+
+      /*
+        WebKit/Blink: scrollbar “slides” from the right by animating the scrollbar slot width (0 ↔ 14px).
+        Collapse keeps overflow-y:auto until the width finishes animating so the bar can retract smoothly.
+      */
+      html.cv-expanded::-webkit-scrollbar {
+        width: 14px;
+        transition: width 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+      }
+      html.cv-expanded.cv-scrollbar-slim::-webkit-scrollbar {
+        width: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) and (min-width: 721px) {
+      .page {
+        transition-duration: 0.01ms !important;
+      }
+      html.cv-expanded::-webkit-scrollbar {
+        transition: none !important;
+      }
+    }
+
+    /* Let grid tracks shrink below min-content (avoids horizontal overflow before mobile stack). */
+    .left,
+    .right {
+      min-width: 0;
     }
 
     /* ══════════════════════════════
@@ -72,6 +249,11 @@
       overflow: hidden;
       border: 2px solid rgba(244, 156, 113, 0.55);
       box-shadow: 0 4px 18px rgba(244, 156, 113, 0.22), 0 2px 8px rgba(0,0,0,.08);
+      background: linear-gradient(
+        180deg,
+rgb(221, 207, 197) 0%,
+rgb(235, 230, 221) 100%
+      );
     }
     .photo-wrap img {
       width: 100%;
@@ -400,25 +582,160 @@
       margin-top: 2px;
     }
 
+    /* Narrow viewports: two fixed columns leave almost no room for the main column → overflow + crop. */
+    @media screen and (max-width: 720px) {
+      body {
+        overflow-x: clip;
+      }
+      .page {
+        grid-template-columns: 1fr;
+        margin: 12px auto 24px;
+        max-width: calc(100% - 24px);
+        border-radius: 6px;
+        overflow: visible;
+      }
+      .left {
+        border-right: none;
+        border-bottom: 1px solid var(--divider);
+        padding: 28px 20px 32px;
+      }
+      .right {
+        padding: 28px 20px 36px;
+      }
+      .t-date,
+      .minor-entry .me-date {
+        white-space: normal;
+      }
+      .contact-list a {
+        word-break: break-word;
+      }
+    }
+
     @media print {
+      html {
+        overflow: visible !important;
+        scrollbar-gutter: auto !important;
+        scrollbar-width: unset;
+        scrollbar-color: unset;
+      }
       body { background: #fff; }
-      .page { box-shadow: none; margin: 0; max-width: 100%; border-radius: 0; }
+      .page {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        border-radius: 0;
+        max-height: none !important;
+        zoom: 1 !important;
+        transform: none !important;
+        overflow: visible !important;
+        transition: none !important;
+      }
       .skill-tag { border: 1px solid #ccc; color: #444; background: #f8f8f8; }
-      .cv-actions,
+      .cv-toolbar,
+      .cv-toolbar-spacer,
       .cv-toast,
       .ai-dots-bg-stack { display: none !important; }
     }
 @endverbatim
   </style>
   <style>
-    .cv-actions {
+    /*
+      Ancho (>720): botones flotantes en esquinas (sin barra única ni espaciador) — mismo criterio que .page pasando a 1 columna.
+      Estrecho (≤720): barra cristal única + ocultación al hacer scroll en JS para no tapar el CV.
+      Cristal tipo home/navbar: bg-white/38, blur-3xl, saturate-150.
+    */
+    .cv-toolbar {
+      font-family: 'DM Sans', sans-serif;
+      box-sizing: border-box;
       position: fixed;
-      top: 14px;
-      right: 14px;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
+      margin: 0;
+      pointer-events: none;
+      background: transparent;
+      transform: translateY(0);
+    }
+    .cv-toolbar-spacer {
+      width: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      flex-shrink: 0;
+    }
+    /* Grupo de controles envuelto en cristal solo en escritorio */
+    .cv-toolbar__chrome {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      gap: 8px;
+      box-sizing: border-box;
+    }
+    .cv-toolbar__cluster {
       display: flex;
       gap: 8px;
-      font-family: 'DM Sans', sans-serif;
+      align-items: center;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      pointer-events: auto;
+      padding: 8px 12px;
+      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.38);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      -webkit-backdrop-filter: blur(64px) saturate(1.5);
+      backdrop-filter: blur(64px) saturate(1.5);
+    }
+    .cv-toolbar__cluster--end {
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+
+    /* Escritorio: esquinas, sin ocupar alto del documento */
+    @media screen and (min-width: 721px) {
+      .cv-toolbar {
+        padding: calc(14px + env(safe-area-inset-top, 0px)) 14px;
+      }
+      .cv-toolbar-spacer {
+        height: 0 !important;
+        min-height: 0;
+      }
+    }
+
+    /* Móvil: una sola cápsula — cristal en el chrome, clusters transparentes */
+    @media screen and (max-width: 720px) {
+      .cv-toolbar {
+        padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 10px;
+        transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: transform;
+      }
+      .cv-toolbar.cv-toolbar--hidden {
+        transform: translateY(calc(-100% - 8px));
+      }
+      .cv-toolbar__chrome {
+        pointer-events: auto;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: 1.25rem;
+        background: rgba(255, 255, 255, 0.38);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        -webkit-backdrop-filter: blur(64px) saturate(1.5);
+        backdrop-filter: blur(64px) saturate(1.5);
+      }
+      .cv-toolbar__cluster {
+        pointer-events: auto;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        padding: 0 !important;
+      }
+      .cv-toolbar__cluster--end {
+        margin-left: 0;
+      }
     }
     .cv-btn {
       display: inline-flex;
@@ -442,16 +759,71 @@
       border-color: #c75d2c;
       color: #c75d2c;
     }
+    .cv-btn.cv-btn--pressed {
+      background: #fef6f1;
+      border-color: #c75d2c;
+      color: #c75d2c;
+    }
     .cv-btn svg {
       width: 14px;
       height: 14px;
       flex-shrink: 0;
     }
+    .cv-expand-icon-wrap {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .cv-expand-btn .cv-expand-icon,
+    .cv-expand-btn .cv-reduce-icon {
+      display: block;
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: auto;
+      transform-origin: 50% 50%;
+      transition:
+        transform 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .cv-expand-btn .cv-expand-icon {
+      opacity: 1;
+      transform: rotate(0deg);
+    }
+    .cv-expand-btn .cv-reduce-icon {
+      opacity: 0;
+      transform: rotate(-180deg);
+      pointer-events: none;
+    }
+    .cv-expand-btn.cv-btn--pressed .cv-expand-icon {
+      opacity: 0;
+      transform: rotate(180deg);
+      pointer-events: none;
+    }
+    .cv-expand-btn.cv-btn--pressed .cv-reduce-icon {
+      opacity: 1;
+      transform: rotate(0deg);
+      pointer-events: auto;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cv-expand-btn .cv-expand-icon,
+      .cv-expand-btn .cv-reduce-icon {
+        transition-duration: 0.01ms;
+      }
+    }
+    /* Debajo del botón Compartir: JS alinea borde derecho del cartel con el del botón. */
     .cv-toast {
       position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(8px);
+      top: 72px;
+      right: 14px;
+      left: auto;
+      transform: translateY(8px);
+      max-width: min(340px, calc(100vw - 24px));
+      text-align: left;
       z-index: 101;
       padding: 10px 18px;
       font-family: 'DM Sans', sans-serif;
@@ -468,7 +840,31 @@
     }
     .cv-toast.cv-toast--visible {
       opacity: 1;
-      transform: translateX(-50%) translateY(0);
+      transform: translateY(0);
+    }
+
+    @media screen and (max-width: 720px) {
+      .cv-expand-btn {
+        display: none;
+      }
+      .cv-toolbar .cv-btn {
+        padding: 7px 10px;
+        font-size: 11px;
+      }
+      .cv-toolbar .cv-btn svg {
+        width: 13px;
+        height: 13px;
+      }
+      .cv-toolbar .cv-btn .cv-expand-icon-wrap {
+        width: 13px;
+        height: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) and (max-width: 720px) {
+      .cv-toolbar {
+        transition-duration: 0.01ms;
+      }
     }
   </style>
 </head>
@@ -477,25 +873,47 @@
     <x-ai-dots-background variant="viewport" />
 @endif
 @if(empty($downloadMode ?? false))
-<div class="cv-actions">
-  <a href="{{ route('public.cv.download') }}" class="cv-btn" download>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Descargar
-  </a>
-  <button type="button" class="cv-btn" id="cv-share-btn" aria-label="Copiar enlace al portapapeles">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-    Compartir
-  </button>
-</div>
+<header class="cv-toolbar" role="banner">
+  <div class="cv-toolbar__chrome">
+    <div class="cv-toolbar__cluster cv-toolbar__cluster--start">
+      <a href="{{ route('home') }}" class="cv-btn" aria-label="Volver al inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Inicio
+      </a>
+    </div>
+    <div class="cv-toolbar__cluster cv-toolbar__cluster--end">
+      <button type="button" class="cv-btn cv-expand-btn" id="cv-expand-toggle" aria-label="Alternar vista ampliada del CV" aria-pressed="false">
+        <span class="cv-expand-icon-wrap" aria-hidden="true">
+          <svg class="cv-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M9 21H3v-6"/><path d="M14 10L3 21"/></svg>
+          <svg class="cv-reduce-icon" viewBox="2.5 2.5 19 19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.1429 10H14M14 10V4.85714M14 10L20 4"/><path d="M4.99996 14H9.99996M9.99996 14V19M9.99996 14L4 20"/></svg>
+        </span>
+        <span class="cv-expand-label">Ampliar</span>
+      </button>
+      <a href="{{ route('public.cv.download') }}" class="cv-btn" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Descargar
+      </a>
+      <button type="button" class="cv-btn" id="cv-share-btn" aria-label="Copiar enlace al portapapeles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Compartir
+      </button>
+    </div>
+  </div>
+</header>
+<div class="cv-toolbar-spacer" id="cv-toolbar-spacer" aria-hidden="true"></div>
 <div class="cv-toast" id="cv-toast" role="status" aria-live="polite">Enlace copiado al portapapeles</div>
+@endif
+@if(empty($downloadMode ?? false))
+<div class="cv-viewport" id="cv-viewport">
 @endif
 <div class="page">
 
   <!-- ════════ IZQUIERDA ════════ -->
   <aside class="left">
 
+    <!-- Foto Perfil -->
     <div class="photo-wrap">
-      <img src="{{ asset('img/me-noBg.webp') }}" alt="Carlos Burgos Távora" />
+      <img src="{{ asset('img/me-noBg-cropped-light.webp') }}" alt="Carlos Burgos Távora" />
     </div>
 
     <div class="name-block">
@@ -740,6 +1158,9 @@
 
   </main>
 </div>
+@if(empty($downloadMode ?? false))
+</div>{{-- .cv-viewport --}}
+@endif
 @stack('scripts')
 @if(empty($downloadMode ?? false))
 <script>
@@ -748,10 +1169,38 @@
   var toast = document.getElementById('cv-toast');
   if (!btn || !toast) return;
   var hideTimer;
+  function positionToastBelowShare() {
+    var gap = 8;
+    var margin = 10;
+    var r = btn.getBoundingClientRect();
+    toast.style.right = 'auto';
+    toast.style.top = Math.round(r.bottom + gap) + 'px';
+    toast.style.transform = '';
+    var vw =
+      typeof window.visualViewport !== 'undefined'
+        ? window.visualViewport.width
+        : window.innerWidth;
+    var tw = toast.offsetWidth;
+    var leftPx = Math.round(r.right - tw);
+    if (leftPx < margin) {
+      leftPx = margin;
+    }
+    if (leftPx + tw > vw - margin) {
+      leftPx = Math.max(margin, Math.round(vw - margin - tw));
+    }
+    toast.style.left = leftPx + 'px';
+  }
   function showToast() {
+    positionToastBelowShare();
     toast.classList.add('cv-toast--visible');
     clearTimeout(hideTimer);
     hideTimer = setTimeout(function () { toast.classList.remove('cv-toast--visible'); }, 2200);
+  }
+  window.addEventListener('resize', positionToastBelowShare, { passive: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', positionToastBelowShare);
+  } else {
+    positionToastBelowShare();
   }
   btn.addEventListener('click', function () {
     var url = window.location.href.replace(/#.*$/, '');
@@ -777,6 +1226,206 @@
       } catch (e) {}
     }
   });
+})();
+
+(function () {
+  var toolbar = document.querySelector('.cv-toolbar');
+  var spacer = document.getElementById('cv-toolbar-spacer');
+  if (!toolbar || !spacer) return;
+
+  /* Coherente con el CV apilándose (.page una columna) — ahí los botones chocarían sin barra retráctil */
+  var mqNarrow = window.matchMedia('(max-width: 720px)');
+
+  var lastScrollY = window.scrollY || window.pageYOffset || 0;
+  var hidden = false;
+  var rafQueued = false;
+  var TOP_REVEAL_PX = 56;
+  var DELTA_HIDE = 14;
+  var DELTA_SHOW = 12;
+  var lockUntil = 0;
+  var LOCK_MS = 180;
+
+  function measureSpacer() {
+    if (!mqNarrow.matches) {
+      spacer.style.removeProperty('height');
+    } else {
+      spacer.style.height = toolbar.offsetHeight + 'px';
+    }
+    document.documentElement.style.setProperty('--cv-toolbar-spacer-h', (spacer.offsetHeight || 0) + 'px');
+  }
+
+  function commitHidden(next, force) {
+    if (next === hidden) {
+      return;
+    }
+    var now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    if (!force && now < lockUntil) {
+      return;
+    }
+    hidden = next;
+    toolbar.classList.toggle('cv-toolbar--hidden', hidden);
+    lockUntil = force ? 0 : now + LOCK_MS;
+  }
+
+  function syncState() {
+    rafQueued = false;
+    if (!mqNarrow.matches) {
+      return;
+    }
+    var now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    var y = window.scrollY || window.pageYOffset || 0;
+    var delta = y - lastScrollY;
+    lastScrollY = y;
+
+    if (y <= TOP_REVEAL_PX) {
+      commitHidden(false, true);
+    } else if (now >= lockUntil) {
+      if (delta > DELTA_HIDE) {
+        commitHidden(true);
+      } else if (delta < -DELTA_SHOW) {
+        commitHidden(false);
+      }
+    }
+  }
+
+  function requestSync() {
+    if (!mqNarrow.matches) {
+      return;
+    }
+    if (!rafQueued) {
+      rafQueued = true;
+      window.requestAnimationFrame(syncState);
+    }
+  }
+
+  function applyLayoutForBreakpoint() {
+    measureSpacer();
+    lastScrollY = window.scrollY || window.pageYOffset || 0;
+    lockUntil = 0;
+
+    if (!mqNarrow.matches) {
+      hidden = false;
+      toolbar.classList.remove('cv-toolbar--hidden');
+      return;
+    }
+
+    var y = lastScrollY;
+    if (y > TOP_REVEAL_PX + 48) {
+      hidden = true;
+      toolbar.classList.add('cv-toolbar--hidden');
+    } else {
+      hidden = false;
+      toolbar.classList.remove('cv-toolbar--hidden');
+    }
+  }
+
+  window.addEventListener('scroll', requestSync, { passive: true });
+  window.addEventListener('resize', measureSpacer, { passive: true });
+  window.addEventListener('load', measureSpacer, { passive: true });
+
+  function onMqChange() {
+    applyLayoutForBreakpoint();
+  }
+  if (mqNarrow.addEventListener) {
+    mqNarrow.addEventListener('change', onMqChange);
+  } else if (mqNarrow.addListener) {
+    mqNarrow.addListener(onMqChange);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyLayoutForBreakpoint);
+  } else {
+    applyLayoutForBreakpoint();
+  }
+})();
+
+(function () {
+  var btn = document.getElementById('cv-expand-toggle');
+  if (!btn) return;
+
+  var root = document.documentElement;
+  var labelEl = btn.querySelector('.cv-expand-label');
+  var collapseTimer = null;
+  var SB_SLIDE_MS = 420;
+  var mqDesk = window.matchMedia('(min-width: 721px)');
+
+  function motionOk() {
+    return !(typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function scrollbarSlideOk() {
+    return mqDesk.matches && motionOk();
+  }
+
+  function scheduleScrollbarSlideIn() {
+    root.classList.add('cv-scrollbar-slim');
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () {
+        root.classList.remove('cv-scrollbar-slim');
+      });
+    });
+  }
+
+  function applyExpandUi(enabled) {
+    btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+    btn.classList.toggle('cv-btn--pressed', enabled);
+    if (labelEl) {
+      labelEl.textContent = enabled ? 'Reducir' : 'Ampliar';
+    }
+  }
+
+  function setExpanded(enabled) {
+    if (collapseTimer) {
+      clearTimeout(collapseTimer);
+      collapseTimer = null;
+    }
+
+    if (!scrollbarSlideOk()) {
+      root.classList.remove('cv-scrollbar-slim');
+      root.classList.toggle('cv-expanded', enabled);
+      applyExpandUi(enabled);
+      return;
+    }
+
+    if (enabled) {
+      root.classList.add('cv-expanded');
+      applyExpandUi(true);
+      scheduleScrollbarSlideIn();
+      return;
+    }
+
+    if (!root.classList.contains('cv-expanded')) {
+      root.classList.remove('cv-scrollbar-slim');
+      applyExpandUi(false);
+      return;
+    }
+
+    root.classList.add('cv-scrollbar-slim');
+    applyExpandUi(false);
+    collapseTimer = setTimeout(function () {
+      root.classList.remove('cv-expanded', 'cv-scrollbar-slim');
+      collapseTimer = null;
+    }, SB_SLIDE_MS);
+  }
+
+  btn.addEventListener('click', function () {
+    if (collapseTimer) {
+      clearTimeout(collapseTimer);
+      collapseTimer = null;
+      root.classList.remove('cv-scrollbar-slim');
+      applyExpandUi(true);
+      return;
+    }
+    var isExpanded = root.classList.contains('cv-expanded');
+    setExpanded(!isExpanded);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { setExpanded(false); });
+  } else {
+    setExpanded(false);
+  }
 })();
 </script>
 @endif

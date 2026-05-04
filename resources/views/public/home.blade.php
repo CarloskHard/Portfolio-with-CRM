@@ -9,7 +9,7 @@
          │  seamlessly continuous across the entire page.               │
          └──────────────────────────────────────────────────────────────┘ --}}
     <canvas id="hero-fluid-canvas"
-            style="position:fixed;inset:0;width:100%;height:100%;display:block;z-index:-1;pointer-events:none;"
+            style="position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0;pointer-events:none;transform:translateZ(0);-webkit-transform:translateZ(0);"
             aria-hidden="true"></canvas>
 
     <!--
@@ -22,6 +22,9 @@
         /* ── Hero Soft design system ── */
         /* Full-page shader background: body must be transparent */
         body { background: transparent !important; }
+        /* Same base as the shader light/dark clear colour — fills root gaps on mobile compositing */
+        html { background-color: #ffffff; }
+        html.dark { background-color: #111827; }
 
         .hero-soft-section {
             /* ~82svh: alto hero con un poco de la siguiente sección visible al cargar */
@@ -674,7 +677,8 @@
     |  ##########             SOBRE MI SECTION             ##########  |
     |------------------------------------------------------------------|
     -->
-    <section id="about" class="relative py-24 bg-transparent transition-colors duration-300">
+    {{-- overflow-x-clip: el halo top-right usa -mr-20 y sobresale; sin clip el documento amplía scrollWidth en móvil --}}
+    <section id="about" class="relative py-24 bg-transparent transition-colors duration-300 overflow-x-clip">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/18 rounded-full blur-3xl pointer-events-none hidden md:block"></div>
 
@@ -1047,16 +1051,39 @@
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    /* Canvas is position:fixed and fills the full viewport — track window size,
-       not element size. ResizeObserver on a fixed element is redundant and
-       slightly wasteful (fires for layout reasons unrelated to viewport change). */
-    function resize() {
-        canvas.width  = Math.floor(window.innerWidth  * dpr);
-        canvas.height = Math.floor(window.innerHeight * dpr);
-        gl.viewport(0, 0, canvas.width, canvas.height);
+    /** Altura estable para normalizar el scroll del shader sin jitter al mostrar/ocultar UI del navegador. */
+    function layoutViewportCssHeight() {
+        return Math.max(1, document.documentElement.clientHeight || window.innerHeight);
     }
+
+    let resizeRaf = 0;
+    function resize() {
+        const rect = canvas.getBoundingClientRect();
+        const cssW = Math.max(1, rect.width || window.innerWidth);
+        const cssH = Math.max(1, rect.height || window.innerHeight);
+
+        const bufW = Math.max(1, Math.floor(cssW * dpr));
+        const bufH = Math.max(1, Math.floor(cssH * dpr));
+        if (canvas.width !== bufW || canvas.height !== bufH) {
+            canvas.width = bufW;
+            canvas.height = bufH;
+        }
+        gl.viewport(0, 0, bufW, bufH);
+    }
+
+    function scheduleResize() {
+        if (resizeRaf) return;
+        resizeRaf = requestAnimationFrame(() => {
+            resizeRaf = 0;
+            resize();
+        });
+    }
+
     resize();
-    window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('resize', scheduleResize, { passive: true });
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', scheduleResize, { passive: true });
+    }
 
     /* ── Shaders ── */
     const vsSrc = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
@@ -1165,7 +1192,7 @@
         const isDark = document.documentElement.classList.contains('dark') ? 1 : 0;
         /* Normalize by innerHeight so one viewport-scroll = +1 in shader space.
            Reading scrollY inside rAF is non-blocking — no layout reflow. */
-        const scroll = window.scrollY / window.innerHeight;
+        const scroll = window.scrollY / Math.max(1, layoutViewportCssHeight());
         gl.uniform2f(uRes,    canvas.width, canvas.height);
         gl.uniform1f(uTime,   t);
         gl.uniform1f(uDark,   isDark);

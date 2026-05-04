@@ -4,11 +4,11 @@
 
 @section('content')
 <!-- Añadido pt-28 (y lg:pt-36) para evitar que el header fijo tape el contenido -->
-<div class="max-w-screen-xl px-4 mx-auto pt-28 pb-16 lg:pt-36 min-h-screen">
+<div class="max-w-screen-xl px-4 mx-auto pt-28 pb-16 lg:pt-36 min-h-dynamic">
     
     <div class="text-center mb-16">
-        <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Portfolio Completo</h1>
-        <p class="mt-4 text-lg text-gray-500 dark:text-gray-400">Explora todos mis trabajos, experimentos y desarrollos.</p>
+            <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">Echa un vistazo a mis trabajos</h1>
+        <p class="mt-4 text-lg text-gray-500 dark:text-gray-400">Explora algunos de mis trabajos y desarrollos.</p>
         <div class="w-24 h-1 bg-indigo-600 mx-auto mt-6 rounded"></div>
     </div>
 

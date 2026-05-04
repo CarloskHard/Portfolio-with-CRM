@@ -11,6 +11,31 @@
         /* Grain shared by section panels + hero highlights (SVG noise tile) */
         --section-matte-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
     }
+
+    /*
+     * Mobile Safari / Chrome: during rubber-band overscroll and while touch-scrolling,
+     * the root layer can show through before body/canvas repaints. Match html to the
+     * default public body theme so gaps are not bare white.
+     */
+    html {
+        background-color: #f9fafb;
+        min-height: 100%;
+        min-height: -webkit-fill-available;
+        min-height: 100vh;
+        min-height: 100lvh;
+    }
+
+    html.dark {
+        background-color: #111827;
+    }
+
+    html:has(body.about-ai-dots-page) {
+        background-color: rgb(245, 245, 240);
+    }
+
+    html.dark:has(body.about-ai-dots-page) {
+        background-color: #111827;
+    }
 }
 
 /* Sobre mí (/sobre-mi): fondo alineado con el canvas de puntos del componente x-ai-dots-background */
@@ -19,4 +44,12 @@ body.about-ai-dots-page {
 }
 html.dark body.about-ai-dots-page {
     background-color: #111827 !important;
+}
+
+/* Público: sustituye min-h-screen (100vh) para seguir la barra de direcciones al ocultarse */
+@layer utilities {
+    .min-h-dynamic {
+        min-height: 100vh;
+        min-height: 100lvh;
+    }
 }
