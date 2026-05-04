@@ -34,6 +34,10 @@ Route::post('/contact', [ContactController::class, 'storePublicMessage'])->name(
 // Ruta para "Sobre mí / Historia"
 Route::get('/sobre-mi',[PortfolioController::class, 'about'])->name('public.about');
 
+// CV (solo por enlace directo, sin entrada en el menú público)
+Route::get('/cv', [PortfolioController::class, 'cv'])->name('public.cv');
+Route::get('/cv/descargar', [PortfolioController::class, 'cvDownload'])->name('public.cv.download');
+
 /*
 |--------------------------------------------------------------------------
 | Rutas Web PRIVADAS  (Backend / Admin)

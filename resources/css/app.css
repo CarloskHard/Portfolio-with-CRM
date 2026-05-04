@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Brand accent (reuse across public site — hero, CTAs, highlights).
+ */
+@layer base {
+    :root {
+        --color-brand-mint: #9ad1d2;
+        /* Grain shared by section panels + hero highlights (SVG noise tile) */
+        --section-matte-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.16'/%3E%3C/svg%3E");
+    }
+}
+
+/* Sobre mí (/sobre-mi): fondo alineado con el canvas de puntos del componente x-ai-dots-background */
+body.about-ai-dots-page {
+    background-color: rgb(245, 245, 240) !important;
+}
+html.dark body.about-ai-dots-page {
+    background-color: #111827 !important;
+}

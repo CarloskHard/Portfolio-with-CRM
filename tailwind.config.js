@@ -12,6 +12,11 @@ export default {
 
     theme: {
         extend: {
+            colors: {
+                brand: {
+                    mint: '#9ad1d2',
+                },
+            },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },

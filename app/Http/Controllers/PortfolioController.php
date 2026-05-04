@@ -42,4 +42,17 @@ class PortfolioController extends Controller
     {
         return view('public.about');
     }
+
+    public function cv()
+    {
+        return view('public.cv');
+    }
+
+    public function cvDownload()
+    {
+        return response()
+            ->view('public.cv', ['downloadMode' => true], 200)
+            ->header('Content-Type', 'text/html; charset=UTF-8')
+            ->header('Content-Disposition', 'attachment; filename="carlos-burgos-tavora-cv.html"');
+    }
 }

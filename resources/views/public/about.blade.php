@@ -2,11 +2,13 @@
 
 @section('title', 'Sobre Mí')
 
+@section('body-class', 'antialiased font-sans flex flex-col min-h-screen transition-colors duration-300 text-gray-900 dark:text-gray-100 about-ai-dots-page')
+
 @section('content')
-<div class="bg-white dark:bg-gray-900 transition-colors duration-300 min-h-screen">
-    
+<div class="relative min-h-screen overflow-x-hidden bg-transparent dark:bg-transparent">
+    <x-ai-dots-background variant="viewport" class="dark:hidden" />
     <!-- CONTENEDOR PRINCIPAL -->
-    <div class="max-w-4xl mx-auto px-6 lg:px-8 pt-28 pb-12 lg:pt-32 lg:pb-20">
+    <div class="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 pt-28 pb-12 lg:pt-32 lg:pb-20">
 
         <!-- 1. SECCIÓN INTRODUCCIÓN (NARRATIVA) -->
         <section class="mb-20">

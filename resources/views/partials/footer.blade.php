@@ -1,48 +1,142 @@
-<footer id="main-footer" class="bg-[#0b0f1a] text-gray-400 py-10 border-t border-gray-800/50">
-    <div class="max-w-7xl mx-auto px-8 md:px-12 flex flex-col md:flex-row justify-between items-center gap-8">
-        
-        <div class="order-2 md:order-1">
-            <p class="text-sm font-light tracking-wide text-gray-500">
-                &copy; {{ date('Y') }}
-                <span class="js-footer-name-spotlight js-hero-wave footer-name-wrapper footer-magnetic-vfx mx-1 inline-block cursor-default relative text-indigo-400 font-medium">
-                    <span class="footer-name-vfx-base">
-                        @foreach(mb_str_split('Carlos Codex') as $i => $char)
-                        <span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>
-                        @endforeach
-                    </span>
-                    <span class="footer-name-vfx-sweep" aria-hidden="true">
-                        @foreach(mb_str_split('Carlos Codex') as $i => $char)
-                        <span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>
-                        @endforeach
-                    </span>
-                </span>
-                <span class="hidden md:inline-block mx-2 text-gray-700">|</span>
-                <span class="js-footer-design-spotlight footer-design-wrapper inline-block cursor-default relative">
-                    <span class="footer-design-base text-gray-500">Diseño & Desarrollo</span>
-                    <span class="footer-design-reflection" aria-hidden="true">Diseño & Desarrollo</span>
-                </span>
-            </p>
-        </div>
+{{-- Footer: por encima de main (capas blur/transform en algunas vistas) --}}
+@php
+    $isHome = request()->routeIs('home');
+    $brandMain = config('app.name', 'Portfolio');
+    $mail = trim((string) env('APP_CONTACT_EMAIL', ''));
+    $gh = trim((string) env('APP_GITHUB_URL', ''));
+    $li = trim((string) env('APP_LINKEDIN_URL', ''));
+    $tel = trim((string) env('APP_CONTACT_PHONE', ''));
+    $loc = trim((string) env('APP_CONTACT_LOCATION', ''));
+    $hasFooterContact = $mail !== '' || $gh !== '' || $li !== '' || $tel !== '' || $loc !== '';
+@endphp
 
-        <div class="flex flex-wrap items-center justify-center md:justify-end gap-6 order-1 md:order-2">
-            <a href="{{ env('APP_LINKEDIN_URL') }}" target="_blank" class="group">
-                <button type="button" class="footer-btn group-hover:border-[#0077b5] group-hover:text-white">
-                    <x-icons.linkedin class="w-5 h-5 transition-colors duration-300" /> 
-                    <span class="text-sm font-medium">LinkedIn</span>
-                </button>
-            </a>
-            <a href="{{ env('APP_GITHUB_URL') }}" target="_blank" class="group">
-                <button type="button" class="footer-btn group-hover:border-[#3CCF91] group-hover:text-white">
-                    <x-icons.github class="w-5 h-5 transition-colors duration-300" />
-                    <span class="text-sm font-medium">GitHub</span>
-                </button>
-            </a>
-            <a href="mailto:{{ env('APP_CONTACT_EMAIL') }}" class="group">
-                <button type="button" class="footer-btn border-l border-gray-800 pl-6 ml-2 group-hover:text-white">
-                    <x-icons.email class="w-5 h-5 transition-colors duration-300" />
-                    <span class="text-sm font-medium">Email</span>
-                </button>
-            </a>
+<div class="page-entry-reveal relative z-20 mt-auto min-w-0 w-full">
+    <footer
+        id="main-footer"
+        class="site-footer relative z-0 overflow-hidden rounded-t-[2.25rem] bg-slate-950 sm:rounded-t-[2.75rem] lg:rounded-t-[3rem] text-gray-300 shadow-[0_-20px_60px_-25px_rgba(2,6,23,0.45)] ring-1 ring-white/[0.07]"
+    >
+        <div class="relative z-[1] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
+            <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+                {{-- Marca --}}
+                <div>
+                    <a href="{{ route('home') }}" class="flex flex-col leading-tight cursor-pointer">
+                        {{-- hero-name-vfx: quita el ::after rectangular (halo detrás del texto) que con overflow-hidden del footer se recorta feo; sin espacios entre <span> para no separar letras --}}
+                        <span class="js-footer-name-spotlight js-hero-wave hero-name-vfx footer-name-wrapper footer-magnetic-vfx relative inline-block text-2xl font-bold text-white tracking-tight whitespace-nowrap">
+                            <span class="footer-name-vfx-base">@foreach (mb_str_split($brandMain) as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
+                            <span class="footer-name-vfx-sweep" aria-hidden="true">@foreach (mb_str_split($brandMain) as $i => $char)<span class="footer-name-char hero-wave-char" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
+                        </span>
+                        <span class="mt-1 text-sm font-semibold text-teal-200">
+                            <span class="js-footer-design-spotlight footer-design-wrapper relative inline-block">
+                                <span class="footer-design-base">Full Stack Developer</span>
+                                <span class="footer-design-reflection" aria-hidden="true">Full Stack Developer</span>
+                            </span>
+                        </span>
+                    </a>
+                    <p class="mt-4 text-sm leading-relaxed text-gray-400">
+                        Desarrollo de aplicaciones y webs para particulares y empresas. Cuéntame tu idea y la convertimos en producto.
+                    </p>
+                </div>
+
+                {{-- Navegación --}}
+                <div>
+                    <h4 class="text-white font-bold mb-4">Navegación</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li>
+                            <a href="{{ route('home') }}" class="hover:text-teal-400 transition">Inicio</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('public.about') }}" class="hover:text-teal-400 transition">Sobre mí</a>
+                        </li>
+                        <li>
+                            <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}" class="hover:text-teal-400 transition">Proyectos</a>
+                        </li>
+                        <li>
+                            <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}" class="hover:text-teal-400 transition">Tecnologías</a>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- Contacto --}}
+                <div>
+                    <h4 class="text-white font-bold mb-4">Contacto</h4>
+                    <ul class="space-y-3 text-sm">
+                        @if ($loc !== '')
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-teal-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="whitespace-pre-line">{{ $loc }}</span>
+                            </li>
+                        @endif
+                        @if ($tel !== '')
+                            <li class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.964 3.852a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                                </svg>
+                                <a href="tel:{{ preg_replace('/\s+/', '', $tel) }}" class="hover:text-teal-400 transition">{{ $tel }}</a>
+                            </li>
+                        @endif
+                        @if ($mail !== '')
+                            <li class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                </svg>
+                                <a href="mailto:{{ $mail }}" class="hover:text-teal-400 transition">{{ $mail }}</a>
+                            </li>
+                        @endif
+                        @if ($gh !== '')
+                            <li class="flex items-center gap-3">
+                                <x-icons.github class="h-5 w-5 shrink-0 text-teal-400" />
+                                <a href="{{ $gh }}" target="_blank" rel="noopener noreferrer" class="hover:text-teal-400 transition">GitHub</a>
+                            </li>
+                        @endif
+                        @if ($li !== '')
+                            <li class="flex items-center gap-3">
+                                <x-icons.linkedin class="h-5 w-5 shrink-0 text-teal-400" />
+                                <a href="{{ $li }}" target="_blank" rel="noopener noreferrer" class="hover:text-teal-400 transition">LinkedIn</a>
+                            </li>
+                        @endif
+                        @unless ($hasFooterContact)
+                            <li>
+                                <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}" class="inline-flex items-center gap-2 text-teal-200 hover:text-teal-400 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                                    </svg>
+                                    Formulario de contacto
+                                </a>
+                            </li>
+                        @endunless
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-12 border-t border-white/[0.06] pt-8">
+                <div class="flex flex-col items-center gap-4 text-center sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-3 sm:text-left">
+                    <p class="text-xs text-gray-500 sm:max-w-xs">
+                        &copy; {{ date('Y') }} {{ $brandMain }}. Todos los derechos reservados.
+                    </p>
+                    @if ($gh !== '' || $li !== '' || $mail !== '')
+                        <nav class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] leading-snug text-gray-500/75 sm:justify-end" aria-label="Enlaces externos">
+                            @if ($gh !== '')
+                                <a href="{{ $gh }}" target="_blank" rel="noopener noreferrer" class="underline decoration-white/10 underline-offset-2 transition hover:text-teal-400/90 hover:decoration-teal-400/40">GitHub</a>
+                            @endif
+                            @if ($gh !== '' && $li !== '')
+                                <span class="text-gray-600/80 select-none" aria-hidden="true">·</span>
+                            @endif
+                            @if ($li !== '')
+                                <a href="{{ $li }}" target="_blank" rel="noopener noreferrer" class="underline decoration-white/10 underline-offset-2 transition hover:text-teal-400/90 hover:decoration-teal-400/40">LinkedIn</a>
+                            @endif
+                            @if ($mail !== '' && ($gh !== '' || $li !== ''))
+                                <span class="text-gray-600/80 select-none" aria-hidden="true">·</span>
+                            @endif
+                            @if ($mail !== '')
+                                <a href="mailto:{{ $mail }}" class="underline decoration-white/10 underline-offset-2 transition hover:text-teal-400/90 hover:decoration-teal-400/40">Email</a>
+                            @endif
+                        </nav>
+                    @endif
+                </div>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
+</div>

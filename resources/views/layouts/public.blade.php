@@ -460,7 +460,7 @@
         }
     </script>
 </head>
-<body class="antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen transition-colors duration-300">
+<body class="@yield('body-class','antialiased bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen transition-colors duration-300')">
     
     <div id="scroll-progress-container"><div id="scroll-progress-bar"></div></div>
 

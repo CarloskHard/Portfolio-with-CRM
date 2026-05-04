@@ -2,6 +2,16 @@
 
 @section('content')
 
+    {{-- ┌──────────────────────────────────────────────────────────────┐
+         │  WebGL fluid canvas — fixed full-page background             │
+         │  Always renders exactly the visible viewport (100vw×100vh),  │
+         │  never more. Sections scroll over it; the pattern appears    │
+         │  seamlessly continuous across the entire page.               │
+         └──────────────────────────────────────────────────────────────┘ --}}
+    <canvas id="hero-fluid-canvas"
+            style="position:fixed;inset:0;width:100%;height:100%;display:block;z-index:-1;pointer-events:none;"
+            aria-hidden="true"></canvas>
+
     <!--
     |------------------------------------------------------------------|
     |  ##########               HERO SECTION               ##########  |
@@ -10,31 +20,62 @@
     -->
     <style>
         /* ── Hero Soft design system ── */
+        /* Full-page shader background: body must be transparent */
+        body { background: transparent !important; }
+
         .hero-soft-section {
             /* ~82svh: alto hero con un poco de la siguiente sección visible al cargar */
             min-height: 82svh;
-            background: #ffffff;
+            background: transparent;
             position: relative;
             overflow-x: clip;   /* evita scrollbar horizontal */
             overflow-y: visible; /* permite que la imagen se asoma por abajo */
         }
         .dark .hero-soft-section {
-            background: #181a1f;
+            background: transparent;
         }
-        /* Highlight ink blocks */
+        /* Primera palabra del titular — acento de marca (también: text-brand-mint / var(--color-brand-mint)) */
+        .hero-title-accent {
+            color: var(--color-brand-mint);
+        }
+        /* Una línea del H1 editorial: hueco entre cajas resaltadas arriba/abajo */
+        .hero-headline-line {
+            display: block;
+        }
+        .hero-headline-line:not(:last-child) {
+            margin-bottom: clamp(0.12em, 2.2vmin, 0.34em);
+        }
+        /* Highlight blocks: mismo material que tarjetas #services (mate + grano SVG) */
         .hero-hl {
             display: inline-block;
-            background: #0a0a0a;
-            color: #ffffff;
-            padding: 0 0.19em 0.07em;
-            border-radius: 5px;
+            background-color: rgba(236, 240, 248, 0.93);
+            background-image: var(--section-matte-grain);
+            background-size: 144px 144px;
+            background-blend-mode: overlay;
+            color: #0f172a;
+            border: 2px solid rgba(100, 116, 139, 0.24);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.82),
+                inset 0 -1px 0 rgba(71, 85, 105, 0.06),
+                0 1px 2px rgba(51, 65, 85, 0.05),
+                0 6px 18px rgba(51, 65, 85, 0.07);
+            padding: 0 0.1em 0.02em;
+            border-radius: 10px;
             margin: 0 0.03em;
             line-height: 0.92;
             vertical-align: baseline;
         }
         .dark .hero-hl {
-            background: #f3f4f6;
-            color: #111827;
+            background-color: rgba(44, 47, 54, 0.9);
+            background-image: var(--section-matte-grain);
+            background-blend-mode: soft-light;
+            color: #f1f5f9;
+            border: 2px solid rgba(148, 163, 184, 0.2);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.07),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+                0 2px 4px rgba(0, 0, 0, 0.16),
+                0 8px 22px rgba(0, 0, 0, 0.24);
         }
         /* 3-column sub-grid */
         .hero-sub-grid {
@@ -129,7 +170,23 @@
         }
         .dark .hero-soft-section [data-hero-primary] { color: #f9fafb !important; }
         .dark .hero-soft-section [data-hero-muted] { color: #9ca3af !important; }
-        .dark .hero-soft-section [data-hero-body] { color: #d1d5db !important; }
+        /*
+         * Más intensidad sólo en el tinte del glifo (+ halo muy suave), sin fondo propio:
+         * el mint/lime del shader queda más atrás contra un gris casi tinta / blanco papel.
+         */
+        .hero-soft-section [data-hero-body] {
+            font-weight: 400;
+            color: #1a1b19 !important;
+            text-shadow:
+                0 0 14px rgba(255, 255, 255, 0.52),
+                0 0 32px rgba(255, 255, 255, 0.22);
+        }
+        .dark .hero-soft-section [data-hero-body] {
+            color: #eef0f4 !important;
+            text-shadow:
+                0 0 14px rgba(12, 14, 18, 0.45),
+                0 0 28px rgba(0, 0, 0, 0.2);
+        }
         .dark .hero-soft-section [data-hero-divider] { background: rgba(229, 231, 235, 0.25) !important; }
         .dark .hero-soft-section [data-hero-cta-icon] {
             background: #f9fafb !important;
@@ -170,12 +227,53 @@
             pointer-events: none;
         }
 
+        /* Mismo ancho/caja que la foto: el tinte no “ensucia” el hueco del column */
+        .hero-profile-wrap {
+            height: 100%;
+            width: fit-content;
+            max-width: 100%;
+            margin-left: auto;
+            position: relative;
+            pointer-events: none;
+            /* isolation: isolate crea un grupo de composición aislado: los blend-modes
+               de ::before/::after operan contra los píxeles internos del grupo (la imagen),
+               no contra el fondo de la página. Donde el PNG tiene alpha=0, la salida del
+               grupo también es transparente → sin tinte sobre el fondo. */
+            isolation: isolate;
+            /* Elipse original; transición más “fuerte” al arrancar desde la esquina (paradas intermedias) */
+            --hero-img-fade: radial-gradient(
+                ellipse 150% 100% at 0% 100%,
+                transparent 0%,
+                transparent 3%,
+                rgba(0, 0, 0, 0.48) 13%,
+                rgba(0, 0, 0, 0.9) 24%,
+                black 52%
+            );
+        }
+
+        .dark .hero-profile-wrap {
+            --hero-img-fade: radial-gradient(
+                ellipse 150% 100% at 0% 100%,
+                transparent 0%,
+                transparent 3%,
+                rgba(0, 0, 0, 0.52) 12%,
+                rgba(0, 0, 0, 0.94) 22%,
+                black 50%
+            );
+        }
+
+        /* Pseudo-elementos de tinte eliminados: el mask-image geométrico no puede
+           seguir el alpha channel del WebP sin causar artefactos (halo, sangrado).
+           La integración visual viene del mask-image fade en la propia imagen
+           + filter: saturate/brightness + el shader WebGL de fondo. */
+
         .hero-profile-img {
             display: block;
             height: 100%;
             width: auto;
             max-width: 100%;
-            margin-left: auto;
+            position: relative;
+            z-index: 0;
             object-fit: contain;
             object-position: bottom center;
 
@@ -187,9 +285,8 @@
                contraste para que la imagen "retroceda" hacia el entorno. */
             filter: saturate(0.88) brightness(0.97);
 
-            /* ── Fade: radial en esquina inferior-izquierda ── */
-            mask-image: radial-gradient(ellipse 150% 100% at 0% 100%, transparent 0%, black 55%);
-            -webkit-mask-image: radial-gradient(ellipse 150% 100% at 0% 100%, transparent 0%, black 55%);
+            mask-image: var(--hero-img-fade);
+            -webkit-mask-image: var(--hero-img-fade);
 
             transition: filter 0.3s ease;
         }
@@ -222,14 +319,122 @@
         @media (max-width: 480px) {
             .hero-eyebrow-row { display: none; }
         }
+
+        /*
+         * Paneles de sección: material mate semitransparente + grano SVG (sin blur / sin “cristal”).
+         */
+        .section-glass-panel {
+            /* Grano: --section-matte-grain en resources/css/app.css (:root) */
+            background-color: rgba(244, 245, 248, 0.88);
+            background-image: var(--section-matte-grain);
+            background-size: 160px 160px;
+            background-blend-mode: overlay;
+            border: 2px solid rgba(15, 23, 42, 0.11);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.65),
+                inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+                0 2px 4px rgba(15, 23, 42, 0.04),
+                0 10px 32px rgba(15, 23, 42, 0.08);
+        }
+        .dark .section-glass-panel {
+            background-color: rgba(26, 28, 33, 0.86);
+            background-image: var(--section-matte-grain);
+            background-blend-mode: soft-light;
+            border: 2px solid rgba(226, 232, 240, 0.14);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.09),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+                0 4px 6px rgba(0, 0, 0, 0.2),
+                0 14px 40px rgba(0, 0, 0, 0.28);
+        }
+        /* Mayor especificidad que spotlight.css (.js-spotlight-card) */
+        .js-spotlight-card.section-inner-card,
+        .skill-card.section-inner-card {
+            background-color: rgba(250, 250, 252, 0.9) !important;
+            background-image: var(--section-matte-grain) !important;
+            background-size: 144px 144px !important;
+            background-blend-mode: overlay !important;
+            border: 2px solid rgba(15, 23, 42, 0.1) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.75),
+                inset 0 -1px 0 rgba(15, 23, 42, 0.04),
+                0 1px 2px rgba(15, 23, 42, 0.05),
+                0 6px 18px rgba(15, 23, 42, 0.06);
+        }
+        .dark .js-spotlight-card.section-inner-card,
+        .dark .skill-card.section-inner-card {
+            background-color: rgba(34, 36, 41, 0.9) !important;
+            background-image: var(--section-matte-grain) !important;
+            background-blend-mode: soft-light !important;
+            border: 2px solid rgba(226, 232, 240, 0.12) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.18),
+                0 8px 22px rgba(0, 0, 0, 0.22);
+        }
+        .js-spotlight-card.section-inner-card:hover,
+        .skill-card.section-inner-card:hover {
+            border-color: rgba(15, 23, 42, 0.18) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.85),
+                inset 0 -1px 0 rgba(15, 23, 42, 0.05),
+                0 2px 3px rgba(15, 23, 42, 0.06),
+                0 10px 28px rgba(15, 23, 42, 0.1);
+        }
+        .dark .js-spotlight-card.section-inner-card:hover,
+        .dark .skill-card.section-inner-card:hover {
+            border-color: rgba(226, 232, 240, 0.2) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+                0 4px 8px rgba(0, 0, 0, 0.22),
+                0 12px 36px rgba(0, 0, 0, 0.34);
+        }
+        /* Servicios: panel y tarjetas algo más fríos/grisáceos (solo esta sección) */
+        #services.section-glass-panel {
+            background-color: rgba(228, 231, 236, 0.9);
+        }
+        .dark #services.section-glass-panel {
+            background-color: rgba(40, 42, 48, 0.88);
+        }
+        #services .js-spotlight-card.section-inner-card {
+            background-color: rgba(236, 240, 248, 0.93) !important;
+            border: 2px solid rgba(100, 116, 139, 0.24) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.82),
+                inset 0 -1px 0 rgba(71, 85, 105, 0.06),
+                0 1px 2px rgba(51, 65, 85, 0.05),
+                0 6px 18px rgba(51, 65, 85, 0.07);
+        }
+        .dark #services .js-spotlight-card.section-inner-card {
+            background-color: rgba(44, 47, 54, 0.9) !important;
+            border: 2px solid rgba(148, 163, 184, 0.2) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.07),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+                0 2px 4px rgba(0, 0, 0, 0.16),
+                0 8px 22px rgba(0, 0, 0, 0.24);
+        }
+        #services .js-spotlight-card.section-inner-card:hover {
+            border-color: rgba(71, 85, 105, 0.38) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.92),
+                inset 0 -1px 0 rgba(71, 85, 105, 0.08),
+                0 2px 4px rgba(51, 65, 85, 0.07),
+                0 10px 30px rgba(51, 65, 85, 0.12);
+        }
+        .dark #services .js-spotlight-card.section-inner-card:hover {
+            border-color: rgba(148, 163, 184, 0.32) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.09),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.48),
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                0 12px 38px rgba(0, 0, 0, 0.4);
+        }
     </style>
 
     <section id="home" class="hero-soft-section">
-
-        {{-- WebGL animated fluid canvas --}}
-        <canvas id="hero-fluid-canvas"
-                style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;"
-                aria-hidden="true"></canvas>
 
         {{-- Content layer --}}
         <div style="position:relative;z-index:2;display:flex;flex-direction:column;min-height:82svh;">
@@ -265,8 +470,8 @@
                             letter-spacing:-0.035em;
                             color:#0a0a0a;
                             margin:0;" data-hero-primary>
-                    <span style="display:block;">Software&nbsp;<span class="hero-hl">hecho a&nbsp;mano</span></span>
-                    <span style="display:block;">para la&nbsp;<span class="hero-hl">web real.</span></span>
+                    <span class="hero-headline-line"><span class="hero-title-accent">Dando</span>&nbsp;<span class="hero-hl">vida</span></span>
+                    <span class="hero-headline-line">a &nbsp;<span class="hero-hl">tus ideas</span></span>
                 </h1>
 
                 {{-- Sub-grid: socials rail | copy+CTA | status --}}
@@ -299,11 +504,11 @@
                     {{-- Description + call-to-action buttons --}}
                     <div>
                         <p style="font-size:clamp(15px,1.2vw,17px);line-height:1.65;
-                                  color:#3a3a38;max-width:460px;margin:0;
-                                  font-family:'Geist',system-ui,sans-serif;font-weight:400;" data-hero-body>
-                            Ingeniero full‑stack afincado en Sevilla. Construyo interfaces,
-                            sistemas y los pequeños detalles que hacen que un producto
-                            se sienta cuidado.
+                                  max-width:460px;margin:0;
+                                  font-family:'Geist',system-ui,sans-serif;" data-hero-body>
+                            Ingeniero full‑stack:<br>
+                            Construyo aplicaciones web y móvil, sistemas y los pequeños detalles
+                            que hacen que un producto se sienta cuidado.
                         </p>
                         <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
                             <a href="#projects" class="hero-cta-primary">
@@ -337,12 +542,14 @@
 
                 {{-- RIGHT: profile image --}}
                 <div class="hero-image-col">
-                    <img src="{{ asset('img/me-noBg.webp') }}"
-                         alt="Carlos — Fullstack Developer"
-                         class="hero-profile-img"
-                         width="720" height="900"
-                         loading="eager"
-                         decoding="async">
+                    <div class="hero-profile-wrap">
+                        <img src="{{ asset('img/me-noBg-dark.webp') }}"
+                             alt="Carlos — Fullstack Developer"
+                             class="hero-profile-img"
+                             width="720" height="900"
+                             loading="eager"
+                             decoding="async">
+                    </div>
                 </div>{{-- /hero-image-col --}}
 
                 </div>{{-- /hero-layout --}}
@@ -358,7 +565,7 @@
     |  ##########             SERVICIOS SECTION            ##########  |                
     |------------------------------------------------------------------|
     -->
-    <section id="services" class="relative z-10 py-24 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800">
+    <section id="services" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mb-8">
         <!-- Decoración de fondo suave -->
         <div class="absolute top-0 left-0 -ml-20 -mt-20 w-72 h-72 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -388,7 +595,7 @@
             <!-- Grid de Servicios -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
                 <!-- Servicio 1: Portfolio -->
-                <div class="js-spotlight-card group !bg-gray-50 dark:!bg-gray-800/40 p-8 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
                     </div>
@@ -401,7 +608,7 @@
                 </div>
 
                 <!-- Servicio 2: ERP & CRM -->
-                <div class="js-spotlight-card group !bg-gray-50 dark:!bg-gray-800/40 group bg-gray-50 dark:bg-gray-800/40 p-8 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
@@ -414,7 +621,7 @@
                 </div>
 
                 <!-- Servicio 3: Apps Móviles -->
-                <div class="js-spotlight-card group !bg-gray-50 dark:!bg-gray-800/40 group bg-gray-50 dark:bg-gray-800/40 p-8 rounded-2xl border border-gray-100 dark:border-gray-700/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                     </div>
@@ -464,10 +671,10 @@
 
     <!--
     |------------------------------------------------------------------|
-    |  ##########             SOBRE MI SECTION             ##########  |                
+    |  ##########             SOBRE MI SECTION             ##########  |
     |------------------------------------------------------------------|
     -->
-    <section id="about" class="relative py-24 bg-gray-50 dark:bg-gray-800/30 transition-colors duration-300 overflow-hidden">
+    <section id="about" class="relative py-24 bg-transparent transition-colors duration-300">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/18 rounded-full blur-3xl pointer-events-none hidden md:block"></div>
 
@@ -542,11 +749,11 @@
 
     <!--
     |------------------------------------------------------------------|
-    |  ##########              SKILLS SECTION              ##########  |                
+    |  ##########              SKILLS SECTION              ##########  |
     |------------------------------------------------------------------|
     -->
 
-    <section id="skills" x-data="skillsComponent()" class="py-20 bg-gray-50 dark:bg-gray-800 border-y border-gray-100 dark:border-gray-700 transition-colors duration-300">
+    <section id="skills" x-data="skillsComponent()" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mt-8 mb-8">
         <div class="max-w-screen-xl px-4 mx-auto relative">
             <div class="mb-12">
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Stack Tecnológico</h2>
@@ -559,7 +766,7 @@
             <!-- Grid Principal (6 Tarjetas) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <template x-for="(skill, key) in skillsData" :key="key">
-                    <div @click="openModal(key)" class="skill-card js-spotlight-card group cursor-pointer bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-indigo-500/10 hover:shadow-lg hover:border-indigo-400 dark:hover:border-indigo-500 hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
+                    <div @click="openModal(key)" class="skill-card js-spotlight-card section-inner-card group cursor-pointer rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col h-full relative overflow-hidden">
                         <div class="flex items-center gap-4 mb-5 relative z-10">
                             <div :class="`p-3 rounded-xl ${skill.bg} ${skill.color} transition-transform group-hover:scale-110`">
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -680,10 +887,10 @@
 
     <!--
     |------------------------------------------------------------------|
-    |  ##########             PROJECTS SECTION             ##########  |                
+    |  ##########             PROJECTS SECTION             ##########  |
     |------------------------------------------------------------------|
     -->
-    <section id="projects" class="relative py-24 bg-white dark:bg-gray-900 transition-colors duration-300 overflow-hidden">
+    <section id="projects" class="relative py-24 bg-transparent transition-colors duration-300">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/18 rounded-full blur-3xl pointer-events-none hidden lg:block"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/18 rounded-full blur-3xl pointer-events-none hidden md:block"></div>
         <div class="max-w-screen-xl px-4 mx-auto relative z-10">
@@ -715,11 +922,11 @@
 
     <!--
     |------------------------------------------------------------------|
-    |  ##########             CONTACT SECTION              ##########  |                
+    |  ##########             CONTACT SECTION              ##########  |
     |------------------------------------------------------------------|
     -->
-    <section id="contact" class="py-20 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 transition-colors duration-300">
-        <div class="max-w-screen-md mx-auto px-4">
+    <section id="contact" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mt-8 mb-8">
+        <div class="max-w-screen-md mx-auto px-4 relative z-10">
             
             <!-- Cabecera de la sección -->
             <div class="text-center mb-12">
@@ -760,7 +967,7 @@
             </div>
 
             <!-- Tarjeta del Formulario -->
-            <div class="bg-white dark:bg-gray-900 p-6 sm:p-10 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+            <div class="relative overflow-hidden">
                 
                 <form id="contactForm" action="{{ route('contact.store') }}" method="POST" class="space-y-6 relative z-10" novalidate>
                     @csrf
@@ -840,14 +1047,16 @@
 
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+    /* Canvas is position:fixed and fills the full viewport — track window size,
+       not element size. ResizeObserver on a fixed element is redundant and
+       slightly wasteful (fires for layout reasons unrelated to viewport change). */
     function resize() {
-        canvas.width  = Math.floor(canvas.clientWidth  * dpr);
-        canvas.height = Math.floor(canvas.clientHeight * dpr);
+        canvas.width  = Math.floor(window.innerWidth  * dpr);
+        canvas.height = Math.floor(window.innerHeight * dpr);
         gl.viewport(0, 0, canvas.width, canvas.height);
     }
     resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
+    window.addEventListener('resize', resize, { passive: true });
 
     /* ── Shaders ── */
     const vsSrc = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
@@ -857,6 +1066,7 @@
         uniform vec2  u_res;
         uniform float u_time;
         uniform float u_dark;
+        uniform float u_scroll; /* scrollY / innerHeight — pans the field vertically */
 
         float noise(vec2 p) {
             return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
@@ -866,8 +1076,13 @@
             vec2 uv    = gl_FragCoord.xy / u_res.xy;
             float ratio = u_res.x / u_res.y;
 
+            /* Offset vertical coordinate by scroll so the pattern pans with the page.
+               WebGL's y-axis runs bottom→top (opposite to CSS), so we subtract:
+               scrolling down increases scrollY → decreases p.y → samples lower
+               in the virtual field → pattern moves up, matching page content. */
             vec2 p = uv;
             p.x   *= ratio;
+            p.y   -= u_scroll;
 
             float t = u_time * 0.25;
 
@@ -886,7 +1101,7 @@
             /* Colour drift along the band */
             float mixer     = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
             vec3  cA        = vec3(0.62, 0.96, 0.86);   /* mint cyan  */
-            vec3  cB        = vec3(0.74, 0.97, 0.42);   /* acid lime  */
+            vec3  cB        = vec3(0.74, 0.97, 0.25);   /* acid lime  */
             vec3  fluid     = mix(cA, cB, mixer);
 
             vec3  lightBg   = vec3(1.0, 1.0, 1.0);
@@ -929,9 +1144,10 @@
     gl.enableVertexAttribArray(aLoc);
     gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
 
-    const uRes  = gl.getUniformLocation(prog, 'u_res');
-    const uTime = gl.getUniformLocation(prog, 'u_time');
-    const uDark = gl.getUniformLocation(prog, 'u_dark');
+    const uRes    = gl.getUniformLocation(prog, 'u_res');
+    const uTime   = gl.getUniformLocation(prog, 'u_time');
+    const uDark   = gl.getUniformLocation(prog, 'u_dark');
+    const uScroll = gl.getUniformLocation(prog, 'u_scroll');
 
     const t0    = performance.now();
     const speed = 0.06;
@@ -945,11 +1161,15 @@
 
     function frame() {
         if (paused) return;
-        const t = (performance.now() - t0) / 1000 * speed * 8.0;
+        const t      = (performance.now() - t0) / 1000 * speed * 8.0;
         const isDark = document.documentElement.classList.contains('dark') ? 1 : 0;
-        gl.uniform2f(uRes,  canvas.width, canvas.height);
-        gl.uniform1f(uTime, t);
-        gl.uniform1f(uDark, isDark);
+        /* Normalize by innerHeight so one viewport-scroll = +1 in shader space.
+           Reading scrollY inside rAF is non-blocking — no layout reflow. */
+        const scroll = window.scrollY / window.innerHeight;
+        gl.uniform2f(uRes,    canvas.width, canvas.height);
+        gl.uniform1f(uTime,   t);
+        gl.uniform1f(uDark,   isDark);
+        gl.uniform1f(uScroll, scroll);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         requestAnimationFrame(frame);
     }
