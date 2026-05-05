@@ -31,8 +31,7 @@
             min-height: 82svh;
             background: transparent;
             position: relative;
-            overflow-x: clip;   /* evita scrollbar horizontal */
-            overflow-y: visible; /* permite que la imagen se asoma por abajo */
+            overflow: hidden;   /* clip ambos ejes de forma consistente; overflow-x:clip + overflow-y:visible viola la spec CSS (visible se convierte en auto, creando scroll container que recorta la imagen) */
         }
         .dark .hero-soft-section {
             background: transparent;
@@ -227,13 +226,13 @@
             gap: clamp(32px, 4vw, 64px);
         }
         .hero-image-col {
-            /* Desde un poco bajo el header fijo hasta el borde inferior (card servicios).
+            /* Desde un poco bajo el header fijo hasta el borde inferior de la sección.
                El containing block es el div content-layer (position:relative). */
             position: absolute;
             top: clamp(72px, 5.25rem, 92px);
-            bottom: -2px;
+            bottom: 0;
             right: clamp(20px, 5.5vw, 88px);
-            width: min(62vw, 1000px);
+            width: min(52vw, 820px);
             z-index: 2;
             display: block;
             pointer-events: none;
@@ -311,6 +310,20 @@
             .hero-layout {
                 grid-template-columns: 1fr;
             }
+            .hero-image-col { display: none; }
+        }
+        /*
+         * Ocultar imagen en orientación portrait, independientemente del ancho del viewport.
+         * Esto cubre el caso de "modo ordenador/desktop" en móvil: el navegador simula
+         * un viewport ancho (>900px) pero la pantalla física sigue siendo portrait.
+         * Limit a max-width:1200px para no afectar monitores de escritorio en portrait.
+         * También ocultar cuando el viewport es demasiado bajo (landscape en móvil pequeño).
+         */
+        @media (orientation: portrait) and (max-width: 1200px) {
+            .hero-layout { grid-template-columns: 1fr; }
+            .hero-image-col { display: none; }
+        }
+        @media (max-height: 520px) {
             .hero-image-col { display: none; }
         }
         @media (max-width: 767px) {
