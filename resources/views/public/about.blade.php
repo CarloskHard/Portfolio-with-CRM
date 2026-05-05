@@ -89,7 +89,7 @@
                     </span>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Desarrollador de Apps Web y Móvil</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Freelancer</p>
-                    <p class="text-gray-600 dark:text-gray-400">Creación de apps web de gestión de empresa y portfolios. Desarrollo de apps móviles: Desde la red social "Platorama" hasta apps de entretenimiento.</p>
+                    <p class="text-gray-600 dark:text-gray-400">Creación de apps web de gestión de empresa y portfolios (ERP, CRM, CMS) y desarrollo de apps móviles.</p>
                 </div>
 
                 <!-- Item 1 -->
@@ -98,11 +98,11 @@
                     <div class="absolute -left-[10px] top-1 w-5 h-5 bg-gray-300 dark:bg-gray-600 rounded-full border-4 border-white dark:border-gray-900 transition-colors duration-300"></div>
                     
                     <span class="inline-block py-1 px-3 mb-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
-                        2023 - 2024
+                        2023 (prácticas) - 2024 (Contratación por Proyecto)
                     </span>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Programador Web Fullstack</h3>
                     <p class="text-indigo-600 dark:text-indigo-400 font-medium mb-2">Al Rescate Asistencia Informática</p>
-                    <p class="text-gray-600 dark:text-gray-400">Desarrollo de aplicaciones web ERP y CRM fullstack. Despliegue y mantenimiento de servidores.</p>
+                    <p class="text-gray-600 dark:text-gray-400">Desarrollo de aplicaciones web ERP y CRM fullstack. Desarrollo, despliegue y mantenimiento.</p>
                 </div>
 
                 <!-- Item 2 -->
