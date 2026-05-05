@@ -37,9 +37,18 @@
         .dark .hero-soft-section {
             background: transparent;
         }
-        /* Primera palabra del titular — acento de marca (también: text-brand-mint / var(--color-brand-mint)) */
+        /* Primera palabra del titular — tono más oscuro que cA del shader para no fundirse */
         .hero-title-accent {
-            color: var(--color-brand-mint);
+            color: #0d9488; /* teal-600 — contrasta sobre el shader claro */
+            text-shadow:
+                0 0 18px rgba(255, 255, 255, 0.55),
+                0 0 36px rgba(255, 255, 255, 0.22);
+        }
+        .dark .hero-title-accent {
+            color: #5eead4; /* teal-300 — luminoso sobre fondo oscuro */
+            text-shadow:
+                0 0 16px rgba(15, 118, 110, 0.45),
+                0 0 32px rgba(0, 0, 0, 0.3);
         }
         /* Una línea del H1 editorial: hueco entre cajas resaltadas arriba/abajo */
         .hero-headline-line {
