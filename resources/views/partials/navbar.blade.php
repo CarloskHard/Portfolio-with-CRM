@@ -1,29 +1,299 @@
-{{-- COMPONENTE DE NAVEGACIÓN PÚBLICA --}}
 @php
     $currentRoute = Route::currentRouteName();
     $isHome = $currentRoute === 'home';
     $isAbout = $currentRoute === 'public.about';
-    $isProjectsListing = $currentRoute === 'public.projects';
-
-    $navInactive = 'border-l-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white';
-    $navActive = 'border-l-indigo-600 dark:border-l-indigo-400 text-gray-900 dark:text-white';
-    $navInactiveDesktop = 'border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white';
-    $navActiveDesktop = 'border-b-2 border-indigo-600 dark:border-indigo-400 text-gray-900 dark:text-white';
-    $navInactiveMobile = 'border-l-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent';
-    $navActiveMobile = 'border-l-indigo-600 dark:border-l-indigo-400 text-gray-900 dark:text-white bg-gray-100/80 dark:bg-white/5';
+    $navLogo = 'CARLOS.CODEX';
 @endphp
 
+<style>
+  #site-redesign-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    padding: 14px 18px;
+    pointer-events: none;
+  }
+  /* Cristal tipo main (GitHub): bg-white/38 · dark #0a0a0a/46 · blur-3xl · saturate-150 */
+  #site-redesign-nav .srn-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    pointer-events: all;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 1.25rem;
+    background: rgba(10, 10, 10, 0.46);
+    backdrop-filter: blur(64px) saturate(150%);
+    -webkit-backdrop-filter: blur(64px) saturate(150%);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+    padding-top: 14px;
+    padding-bottom: 14px;
+    transition: padding .22s ease, background .22s ease, border-color .22s ease, box-shadow .22s ease;
+  }
+  #site-redesign-nav .srn-shell.is-scrolled {
+    padding-top: 0;
+    padding-bottom: 0;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  #site-redesign-nav .srn-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding: 18px 24px;
+    transition: padding .22s ease;
+  }
+  #site-redesign-nav .srn-shell.is-scrolled .srn-row {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  #site-redesign-nav .srn-left {
+    justify-self: start;
+  }
+  #site-redesign-nav .srn-center {
+    justify-self: center;
+  }
+  #site-redesign-nav .srn-right {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  /* Logo: colores por glifo (.navbar-logo-char-*) en public.blade.php; sin color heredado aquí */
+  #site-redesign-nav .srn-brand {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  #site-redesign-nav .srn-links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  #site-redesign-nav .srn-link {
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #9aa0ad;
+    text-decoration: none;
+    padding: 6px 2px;
+    border-bottom: 2px solid transparent;
+    transition: color .2s ease, border-color .2s ease;
+    white-space: nowrap;
+  }
+  #site-redesign-nav .srn-link:hover {
+    color: #e8ecf2;
+  }
+  #site-redesign-nav .srn-link.is-active {
+    color: #e8ecf2;
+    border-bottom-color: #818cf8;
+  }
+  #site-redesign-nav #theme-toggle {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: transparent !important;
+    color: #9aa0ad !important;
+    transition:
+      color .22s ease,
+      border-color .22s ease,
+      background .22s ease,
+      transform .28s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow .28s ease !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  #site-redesign-nav #theme-toggle:hover {
+    color: #e8ecf2 !important;
+    border-color: rgba(129, 140, 248, 0.45) !important;
+    background: rgba(129, 140, 248, 0.12) !important;
+    transform: scale(1.08) rotate(-4deg) !important;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.28) !important;
+  }
+  #site-redesign-nav .srn-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px 8px 12px;
+    border-radius: 999px;
+    border: 1px solid #818cf8;
+    color: #f5f6fa;
+    text-decoration: none;
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition:
+      background .22s ease,
+      border-color .22s ease,
+      color .22s ease,
+      transform .28s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow .28s ease;
+  }
+  #site-redesign-nav .srn-cta:hover {
+    background: #6366f1;
+    border-color: #6366f1;
+    transform: translateY(-2px) scale(1.045);
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.38);
+  }
+  #site-redesign-nav .srn-cta svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  #site-redesign-nav .srn-cta:hover svg {
+    transform: translateX(3px);
+  }
+  /* ── Light theme (html sin .dark): contrast vs shell claro — !important evita utilidades Tailwind en hijos ── */
+  html:not(.dark) #site-redesign-nav .srn-shell {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.38);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+  html:not(.dark) #site-redesign-nav .srn-shell.is-scrolled {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+  html:not(.dark) #site-redesign-nav .srn-link {
+    color: #475569 !important;
+  }
+  html:not(.dark) #site-redesign-nav .srn-link:hover,
+  html:not(.dark) #site-redesign-nav .srn-link.is-active {
+    color: #0f172a !important;
+    border-bottom-color: #6366f1;
+  }
+  /* CTA «Hablemos»: antes color #f5f6fa → invisible sobre fondo claro */
+  html:not(.dark) #site-redesign-nav .srn-cta {
+    color: #0f172a !important;
+    border-color: #6366f1 !important;
+  }
+  html:not(.dark) #site-redesign-nav .srn-cta:hover {
+    color: #ffffff !important;
+    background: #6366f1 !important;
+    border-color: #6366f1 !important;
+    transform: translateY(-2px) scale(1.045) !important;
+    box-shadow: 0 10px 28px rgba(99, 102, 241, 0.35) !important;
+  }
+  html:not(.dark) #site-redesign-nav #theme-toggle {
+    border-color: rgba(15, 23, 42, 0.12) !important;
+    color: #64748b !important;
+  }
+  html:not(.dark) #site-redesign-nav #theme-toggle:hover {
+    color: #3730a3 !important;
+    border-color: rgba(79, 70, 229, 0.35) !important;
+    background: rgba(99, 102, 241, 0.1) !important;
+    transform: scale(1.08) rotate(-4deg) !important;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.22) !important;
+  }
+  html:not(.dark) #site-redesign-nav .srn-mobile-btn {
+    border-color: rgba(15, 23, 42, 0.12);
+    color: #475569 !important;
+  }
+  html:not(.dark) #site-redesign-nav .srn-mobile-links {
+    border-top-color: rgba(255, 255, 255, 0.45);
+  }
+  html:not(.dark) #site-redesign-nav .srn-mobile-link {
+    color: #475569 !important;
+  }
+  html:not(.dark) #site-redesign-nav .srn-mobile-link:hover {
+    color: #0f172a !important;
+    background: rgba(15, 23, 42, 0.04);
+  }
+  html:not(.dark) #site-redesign-nav .srn-mobile-link.is-active {
+    color: #0f172a !important;
+    border-left-color: #6366f1;
+    background: rgba(99, 102, 241, 0.08);
+  }
+
+  #site-redesign-nav .srn-mobile-btn {
+    display: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #9aa0ad;
+    background: transparent;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  #site-redesign-nav .srn-mobile-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  #site-redesign-nav .srn-mobile {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #site-redesign-nav .srn-mobile.is-open {
+    grid-template-rows: 1fr;
+  }
+  #site-redesign-nav .srn-mobile > div {
+    overflow: hidden;
+  }
+  #site-redesign-nav .srn-mobile-links {
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    margin: 0;
+    margin-top: 8px;
+    padding: 8px 0 2px;
+    list-style: none;
+  }
+  #site-redesign-nav .srn-mobile-link {
+    display: block;
+    font-family: 'Geist', system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #9aa0ad;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-left: 3px solid transparent;
+    border-radius: 10px;
+    transition: color .2s ease, border-color .2s ease, background .2s ease;
+  }
+  #site-redesign-nav .srn-mobile-link:hover {
+    color: #e8ecf2;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  #site-redesign-nav .srn-mobile-link.is-active {
+    color: #e8ecf2;
+    border-left-color: #818cf8;
+    background: rgba(99, 102, 241, 0.1);
+  }
+  @media (max-width: 900px) {
+    #site-redesign-nav .srn-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 16px;
+    }
+    #site-redesign-nav .srn-shell.is-scrolled .srn-row {
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    #site-redesign-nav .srn-center,
+    #site-redesign-nav .srn-right .srn-cta {
+      display: none;
+    }
+    #site-redesign-nav .srn-mobile-btn {
+      display: inline-flex;
+    }
+  }
+</style>
+
 <nav
+    id="site-redesign-nav"
     x-data="{
         scrolled: typeof window !== 'undefined' && window.scrollY > 20,
-        navTransitionEnabled: false,
         open: false,
         isHome: @json($isHome),
         isAboutPage: @json($isAbout),
-        isProjectsPage: @json($isProjectsListing),
         activeHomeSection: null,
-        navScrollActiveDesktop: '!border-b-indigo-600 dark:!border-b-indigo-400 !text-gray-900 dark:!text-white',
-        navScrollActiveMobile: '!border-l-indigo-600 dark:!border-l-indigo-400 !text-gray-900 dark:!text-white !bg-gray-100/80 dark:!bg-white/5',
         init() {
             const syncScroll = () => {
                 this.scrolled = window.scrollY > 20;
@@ -32,210 +302,118 @@
             window.addEventListener('scroll', syncScroll, { passive: true });
             window.addEventListener('resize', syncScroll, { passive: true });
             syncScroll();
-            requestAnimationFrame(() => {
-                syncScroll();
-                requestAnimationFrame(() => {
-                    syncScroll();
-                    this.navTransitionEnabled = true;
-                });
-            });
         },
         updateHomeSection() {
             if (!this.isHome) {
                 this.activeHomeSection = null;
                 return;
             }
-            const skills = document.getElementById('skills');
-            const projects = document.getElementById('projects');
-            const contact = document.getElementById('contact');
-            if (!skills || !projects || !contact) {
-                this.activeHomeSection = null;
-                return;
-            }
-            /* Punto de lectura: centro vertical del viewport (coordenadas de vista). */
+            const trackedIds = ['services', 'projects', 'about', 'contact'];
+            const tracked = trackedIds
+                .map((id) => ({ id, el: document.getElementById(id) }))
+                .filter((item) => item.el);
             const refY = window.innerHeight * 0.5;
-            const tracked = [
-                { id: 'skills', el: skills },
-                { id: 'projects', el: projects },
-                { id: 'contact', el: contact },
-            ];
-            for (let i = 0; i < tracked.length; i++) {
-                const r = tracked[i].el.getBoundingClientRect();
+            for (const item of tracked) {
+                const r = item.el.getBoundingClientRect();
                 if (refY >= r.top && refY <= r.bottom) {
-                    this.activeHomeSection = tracked[i].id;
+                    this.activeHomeSection = item.id;
                     return;
                 }
             }
-            const skillsR = skills.getBoundingClientRect();
-            const contactR = contact.getBoundingClientRect();
-            if (refY < skillsR.top) {
-                this.activeHomeSection = null;
-                return;
-            }
-            if (refY > contactR.bottom) {
-                this.activeHomeSection = 'contact';
-                return;
-            }
-            let bestId = 'skills';
-            let bestDist = Infinity;
-            for (let j = 0; j < tracked.length; j++) {
-                const r = tracked[j].el.getBoundingClientRect();
-                let d = 0;
-                if (refY < r.top) d = r.top - refY;
-                else if (refY > r.bottom) d = refY - r.bottom;
-                if (d < bestDist) {
-                    bestDist = d;
-                    bestId = tracked[j].id;
-                }
-            }
-            this.activeHomeSection = bestId;
+            this.activeHomeSection = null;
         },
     }"
-    class="fixed w-full z-50 top-0 start-0 px-3 md:px-5 pt-3 transition-all duration-300"
+    @click.outside="open = false"
 >
-    <div class="relative w-full px-8 py-5 bg-white/38 dark:bg-[#0a0a0a]/46 backdrop-blur-3xl backdrop-saturate-150 border border-white/45 dark:border-white/[0.16] shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.28)] rounded-[1.25rem]"
-         @click.outside="open = false"
-         :class="[
-            scrolled ? '!py-3 shadow-sm' : '',
-            navTransitionEnabled ? 'transition-all duration-300' : 'transition-none',
-         ]">
-        <!-- Flex container: Logo | Nav links + Theme + CTA -->
-        <div class="flex items-center justify-between">
-
-            {{-- Logo: ola magnética (base) + brillo metálico del footer (capa absoluta); colores vía .navbar-logo-char-* + html.dark --}}
-            @php
-                $navLogo = 'CARLOS.CODEX';
-            @endphp
-            <a href="{{ route('home') }}"
-               class="shrink-0 inline-flex items-center"
-               style="font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace; font-weight: 700; font-size: 19px; letter-spacing: 0.04em; text-decoration: none;">
-                <span class="js-footer-design-spotlight footer-design-wrapper navbar-brand-vfx relative inline-block whitespace-nowrap leading-none">
-                    <span class="js-footer-name-spotlight js-hero-wave hero-name-vfx footer-name-wrapper footer-magnetic-vfx navbar-logo-wave relative inline-block leading-none">
-                        <span class="footer-name-vfx-base">@foreach (mb_str_split($navLogo) as $i => $char)<span class="footer-name-char hero-wave-char {{ $i < 6 ? 'navbar-logo-char-main' : 'navbar-logo-char-muted' }}" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
-                        <span class="footer-design-reflection navbar-brand-metallic-overlay" aria-hidden="true">@foreach (mb_str_split($navLogo) as $i => $char)<span class="footer-name-char hero-wave-char navbar-brand-metallic-char" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
+    <div class="srn-shell" :class="{ 'is-scrolled': scrolled }">
+        <div class="srn-row">
+            <div class="srn-left">
+                {{-- Misma marca interactiva que en main: ola magnética + brillo al cursor (layout public.blade.php) --}}
+                <a href="{{ route('home') }}" class="srn-brand leading-none">
+                    <span class="js-footer-design-spotlight footer-design-wrapper navbar-brand-vfx relative inline-block whitespace-nowrap">
+                        <span class="js-footer-name-spotlight js-hero-wave hero-name-vfx footer-name-wrapper footer-magnetic-vfx navbar-logo-wave relative inline-block leading-none">
+                            <span class="footer-name-vfx-base">@foreach (mb_str_split($navLogo) as $i => $char)<span class="footer-name-char hero-wave-char {{ $i < 6 ? 'navbar-logo-char-main' : 'navbar-logo-char-muted' }}" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
+                            <span class="footer-design-reflection navbar-brand-metallic-overlay" aria-hidden="true">@foreach (mb_str_split($navLogo) as $i => $char)<span class="footer-name-char hero-wave-char navbar-brand-metallic-char" style="--char-index: {{ $i }}">{{ $char }}</span>@endforeach</span>
+                        </span>
                     </span>
-                </span>
-            </a>
+                </a>
+            </div>
 
-            <!-- MENÚ DERECHA (desktop) + Controles -->
-            <div class="flex items-center gap-6">
-
-                <!-- DESKTOP -->
-                <ul class="hidden md:flex items-center gap-8"
-                    style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 16px; font-weight: 500; list-style: none; margin: 0; padding: 0;">
+            <div class="srn-center">
+                <ul class="srn-links">
                     <li>
-                        <a href="{{ route('public.about') }}"
-                           @click="open = false; if (isAboutPage) $event.preventDefault()"
-                           class="inline-block pb-0.5 transition-[color,border-color] duration-300 ease-out {{ $isAbout ? $navActiveDesktop : $navInactiveDesktop }}"
-                           style="text-decoration: none;"
-                           @if($isAbout) aria-current="page" @endif>
-                           Sobre mí
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}"
-                           @click="open = false"
-                           class="inline-block pb-0.5 transition-[color,border-color] duration-300 ease-out {{ $navInactiveDesktop }}"
-                           style="text-decoration: none;"
-                           :class="(isHome && activeHomeSection === 'skills') ? navScrollActiveDesktop : ''">
-                           Habilidades
-                        </a>
+                        <a href="{{ $isHome ? '#services' : route('home') . '#services' }}"
+                           class="srn-link"
+                           :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
                     </li>
                     <li>
                         <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
-                           @click="open = false"
-                           class="inline-block pb-0.5 transition-[color,border-color] duration-300 ease-out {{ $isProjectsListing ? $navActiveDesktop : $navInactiveDesktop }}"
-                           style="text-decoration: none;"
-                           @if($isProjectsListing) aria-current="page" @endif
-                           :aria-current="(isProjectsPage || (isHome && activeHomeSection === 'projects')) ? 'page' : null"
-                           :class="(isHome && activeHomeSection === 'projects' && !isProjectsPage) ? navScrollActiveDesktop : ''">
-                           Proyectos
-                        </a>
+                           class="srn-link"
+                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.about') }}"
+                           class="srn-link {{ $isAbout ? 'is-active' : '' }}"
+                           :class="(isHome && activeHomeSection === 'about') ? 'is-active' : ''"
+                           @if($isAbout) aria-current="page" @endif>Sobre mí</a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
+                           class="srn-link"
+                           :class="(isHome && activeHomeSection === 'contact') ? 'is-active' : ''">Contacto</a>
                     </li>
                 </ul>
+            </div>
 
-                <!-- THEME TOGGLE -->
+            <div class="srn-right">
                 <x-theme-toggle />
-
-                <!-- HABLEMOS CTA (desktop) -->
-                <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
-                   @click="open = false"
-                   class="group hidden md:inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-[220ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.045]"
-                   style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;"
-                   :class="(isHome && activeHomeSection === 'contact') ? '!border-indigo-600 dark:!border-indigo-400 ring-2 ring-indigo-600/25 dark:ring-indigo-400/30' : ''">
-                    <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0 group-hover:bg-white dark:group-hover:bg-gray-900 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200"
-                          style="font-size: 12px;">→</span>
+                <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}" class="srn-cta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     Hablemos
                 </a>
-
-                <!-- MOBILE BUTTON -->
-                <button @click="open = !open" type="button"
-                    class="md:hidden inline-flex items-center p-2 w-9 h-9 justify-center rounded-lg transition-colors"
-                    :class="{
-                        'bg-gray-900/10 dark:bg-white/10 text-gray-900 dark:text-white': open,
-                        'text-gray-500 dark:text-gray-400': !open
-                    }"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              x-show="!open" d="M4 6h16M4 12h16M4 18h16"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              x-show="open" style="display: none" d="M6 18L18 6M6 6l12 12"></path>
+                <button @click="open = !open" type="button" class="srn-mobile-btn" aria-label="Menú">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path x-show="!open" d="M4 6h16M4 12h16M4 18h16"></path>
+                        <path x-show="open" style="display:none" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
         </div>
 
-        <!-- MOBILE -->
-        <div class="md:hidden grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none"
-             style="grid-template-rows: 0fr"
-             :style="{ gridTemplateRows: open ? '1fr' : '0fr' }">
-            <div class="min-h-0 overflow-hidden">
-                <div class="border-t border-white/45 dark:border-white/[0.16] mt-3 pt-1 -mx-8 px-8">
-                    <ul class="flex flex-col gap-0 pb-1"
-                        style="font-family: 'Geist', 'Inter', system-ui, sans-serif; font-size: 16px; font-weight: 500; list-style: none; margin: 0; padding-top: 8px; padding-bottom: 8px;">
-                        <li>
-                            <a href="{{ route('public.about') }}"
-                               @click="open = false; if (isAboutPage) $event.preventDefault()"
-                               class="block py-2.5 pl-3 pr-2 rounded-md border-l-4 transition-[color,border-color,background-color] duration-300 ease-out {{ $isAbout ? $navActiveMobile : $navInactiveMobile }}"
-                               style="text-decoration: none;"
-                               @if($isAbout) aria-current="page" @endif>
-                               Sobre mí
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}"
-                               @click="open = false"
-                               class="block py-2.5 pl-3 pr-2 rounded-md border-l-4 transition-[color,border-color,background-color] duration-300 ease-out {{ $navInactiveMobile }}"
-                               style="text-decoration: none;"
-                               :class="(isHome && activeHomeSection === 'skills') ? navScrollActiveMobile : ''">
-                               Habilidades
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
-                               @click="open = false"
-                               class="block py-2.5 pl-3 pr-2 rounded-md border-l-4 transition-[color,border-color,background-color] duration-300 ease-out {{ $isProjectsListing ? $navActiveMobile : $navInactiveMobile }}"
-                               style="text-decoration: none;"
-                               @if($isProjectsListing) aria-current="page" @endif
-                               :aria-current="(isProjectsPage || (isHome && activeHomeSection === 'projects')) ? 'page' : null"
-                               :class="(isHome && activeHomeSection === 'projects' && !isProjectsPage) ? navScrollActiveMobile : ''">
-                               Proyectos
-                            </a>
-                        </li>
-                        <li class="pt-3 pb-1">
-                            <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
-                               @click="open = false"
-                               class="group inline-flex items-center gap-2.5 border border-gray-900 dark:border-white/80 rounded-full text-gray-900 dark:text-white hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-gray-900 transition-all duration-[220ms] ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:scale-[1.045]"
-                               style="font-size: 15px; font-weight: 500; padding: 8px 18px 8px 10px; text-decoration: none;"
-                               :class="(isHome && activeHomeSection === 'contact') ? '!border-indigo-600 dark:!border-indigo-400 ring-2 ring-indigo-600/25 dark:ring-indigo-400/30' : ''">
-                                <span class="w-[22px] h-[22px] rounded-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 inline-flex items-center justify-center flex-shrink-0 group-hover:bg-white dark:group-hover:bg-gray-900 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-200"
-                                      style="font-size: 12px;">→</span>
-                                Hablemos
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+        <div class="srn-mobile" :class="{ 'is-open': open }">
+            <div>
+                <ul class="srn-mobile-links">
+                    <li>
+                        <a href="{{ $isHome ? '#services' : route('home') . '#services' }}"
+                           @click="open = false"
+                           class="srn-mobile-link"
+                           :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
+                           @click="open = false"
+                           class="srn-mobile-link"
+                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('public.about') }}"
+                           @click="open = false"
+                           class="srn-mobile-link {{ $isAbout ? 'is-active' : '' }}"
+                           :class="(isHome && activeHomeSection === 'about') ? 'is-active' : ''">Sobre mí</a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
+                           @click="open = false"
+                           class="srn-mobile-link"
+                           :class="(isHome && activeHomeSection === 'contact') ? 'is-active' : ''">Contacto</a>
+                    </li>
+                    <li style="padding: 8px 12px 10px;">
+                        <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}" @click="open = false" class="srn-cta">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                            Hablemos
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>

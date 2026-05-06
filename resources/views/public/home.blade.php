@@ -2,720 +2,1152 @@
 
 @section('content')
 
-    {{-- ┌──────────────────────────────────────────────────────────────┐
-         │  WebGL fluid canvas — fixed full-page background             │
-         │  Always renders exactly the visible viewport (100vw×100vh),  │
-         │  never more. Sections scroll over it; the pattern appears    │
-         │  seamlessly continuous across the entire page.               │
-         └──────────────────────────────────────────────────────────────┘ --}}
-    <canvas id="hero-fluid-canvas"
-            style="position:fixed;inset:0;width:100vw;height:100vh;height:100lvh;display:block;z-index:0;pointer-events:none;transform:translateZ(0);-webkit-transform:translateZ(0);"
-            aria-hidden="true"></canvas>
-
     <!--
     |------------------------------------------------------------------|
-    |  ##########               HERO SECTION               ##########  |
-    |  Theme: HeroSoft — fluid WebGL background, Geist editorial type  |
+    |  ################       HERO REDESIGN        ################    |
+    |  Dark card design · WebGL shader · AI dots · Portrait           |
     |------------------------------------------------------------------|
     -->
     <style>
-        /* ── Hero Soft design system ── */
-        /* Full-page shader background: body must be transparent */
-        body { background: transparent !important; }
-        /* Same base as the shader light/dark clear colour — fills root gaps on mobile compositing */
-        html { background-color: #ffffff; }
-        html.dark { background-color: #111827; }
+        /* ═══════════════════════════════════════════════════════════════
+           THEME TOKENS (home) — edit only these two blocks to retune color
+           ① LIGHT  default (no .dark on <html>)  ② DARK  html.dark      */
+        html {
+          color-scheme: light;
+          --hr-shader-intensity: 0.52;
+          /* WebGL: 1 = pastel luminous stripe (light); 0 = multiply-dark band (dark theme) */
+          --hr-shader-pastel: 1;
+          /* WebGL: min brightness from diagonal vignette (higher = less “shadow”) */
+          --hr-shader-vign-floor: 0.97;
+          /* Unused: WebGL hero uses transparent framebuffer (page bg shows through) */
+          --hr-shader-bg: 255, 255, 255;
+          --hr-shader-fluid-mix: 0.58;
+          --hr-dots-dot: 99, 102, 241;
+          --hr-portrait-shadow: 0 22px 48px rgba(15, 23, 42, 0.14);
+          --hr-bg-html: #e8edf3;
+          --hr-bg-base: #f1f5f9;
+          --hr-bg-card: #ffffff;
+          --hr-bg-card-alt: #f8fafc;
+          --hr-bg-services-inset: #f8fafc;
+          --hr-bg-services-grid: #eef2f7;
+          --hr-border: rgba(15, 23, 42, 0.09);
+          --hr-border-strong: rgba(15, 23, 42, 0.14);
+          --hr-border-grid: rgba(15, 23, 42, 0.1);
+          --hr-text: #0f172a;
+          --hr-text-muted: #475569;
+          --hr-text-faint: #64748b;
+          --hr-heading: #0f172a;
+          --hr-accent: #4f46e5;
+          --hr-accent-2: #6366f1;
+          --hr-accent-soft: #7c83f7;
+          --hr-available: #15803d;
+          --hr-dots-fade-w: 19%;
+          --hr-idea-card-bg: rgba(255, 255, 255, 0.92);
+          --hr-vig-mid: rgba(241, 245, 249, 0.5);
+          --hr-vig-edge: rgba(241, 245, 249, 0.9);
+          --hr-btn-ghost: rgba(15, 23, 42, 0.04);
+          --hr-btn-ghost-hover: rgba(15, 23, 42, 0.08);
+          --hr-idea-arrow-hover: rgba(15, 23, 42, 0.06);
+          --hr-pill-hover-bg: rgba(15, 23, 42, 0.04);
+          --hr-pill-hover-border: rgba(15, 23, 42, 0.18);
+          --hr-pill-arrow-bg: rgba(15, 23, 42, 0.08);
+          --hr-grid-inset-line: rgba(15, 23, 42, 0.06);
+          /* Hero tech rail: AWS wordmark (“AWS” glyphs), orange smile unchanged */
+          --tech-aws-letters-fill: #000000;
+        }
+        html.dark {
+          color-scheme: dark;
+          --hr-shader-intensity: 0.36;
+          --hr-shader-pastel: 0;
+          --hr-shader-vign-floor: 0.85;
+          /* Near-black lifted with accent (indigo undertone) */
+          --hr-shader-bg: 10, 11, 24;
+          --hr-shader-fluid-mix: 0.55;
+          --hr-dots-dot: 165, 180, 252;
+          --hr-portrait-shadow: 0 24px 48px rgba(0, 0, 0, 0.72);
+          --hr-bg-html: #050507;
+          --hr-bg-base: #07070a;
+          --hr-bg-card: #0e0f14;
+          --hr-bg-card-alt: #11131a;
+          --hr-bg-services-inset: #151821;
+          --hr-bg-services-grid: #1e212c;
+          --hr-border: rgba(255, 255, 255, 0.08);
+          --hr-border-strong: rgba(255, 255, 255, 0.14);
+          --hr-border-grid: rgba(255, 255, 255, 0.12);
+          --hr-text: #e8ecf2;
+          --hr-text-muted: #9aa0ad;
+          --hr-text-faint: #6b7180;
+          --hr-heading: #f5f6fa;
+          --hr-accent: #6366f1;
+          --hr-accent-2: #818cf8;
+          --hr-accent-soft: #a5b4fc;
+          --hr-available: #22c55e;
+          --hr-dots-fade-w: 19%;
+          --hr-idea-card-bg: rgba(20, 22, 30, 0.82);
+          --hr-vig-mid: rgba(5, 5, 7, 0.55);
+          --hr-vig-edge: rgba(5, 5, 7, 0.85);
+          --hr-btn-ghost: rgba(255, 255, 255, 0.03);
+          --hr-btn-ghost-hover: rgba(255, 255, 255, 0.06);
+          --hr-idea-arrow-hover: rgba(255, 255, 255, 0.06);
+          --hr-pill-hover-bg: rgba(255, 255, 255, 0.04);
+          --hr-pill-hover-border: rgba(255, 255, 255, 0.22);
+          --hr-pill-arrow-bg: rgba(255, 255, 255, 0.08);
+          --hr-grid-inset-line: rgba(255, 255, 255, 0.04);
+          --tech-aws-letters-fill: #ffffff;
+        }
 
-        .hero-soft-section {
-            /* ~82svh: alto hero con un poco de la siguiente sección visible al cargar */
-            min-height: 82svh;
-            background: transparent;
-            position: relative;
-            overflow: hidden;   /* clip ambos ejes de forma consistente; overflow-x:clip + overflow-y:visible viola la spec CSS (visible se convierte en auto, creando scroll container que recorta la imagen) */
+        body { background-color: var(--hr-bg-base) !important; }
+        html { background-color: var(--hr-bg-html) !important; }
+
+        /* ── Centered content wrapper ──────────────────────────────── */
+        .hr-page {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 18px 60px;
+          position: relative;
+          z-index: 2;
         }
-        .dark .hero-soft-section {
-            background: transparent;
+
+        /* ── Stats: sibling below hero; pulled up so portrait meets / sits behind strip ─ */
+        .hr-stats-wrapper {
+          max-width: 1280px;
+          margin: -40px auto 0;
+          padding: 0 18px;
+          position: relative;
+          z-index: 6;
         }
-        /* Primera palabra del titular — tono más oscuro que cA del shader para no fundirse */
-        .hero-title-accent {
-            color: #0d9488; /* teal-600 — contrasta sobre el shader claro */
-            text-shadow:
-                0 0 18px rgba(255, 255, 255, 0.55),
-                0 0 36px rgba(255, 255, 255, 0.22);
+
+        /* ═══════════════════════════════════════════════════════════
+           SERVICES SECTION — dark card design
+           ═══════════════════════════════════════════════════════════ */
+        .hr-services-section {
+          padding: 80px 0 64px;
         }
-        .dark .hero-title-accent {
-            color: #5eead4; /* teal-300 — luminoso sobre fondo oscuro */
-            text-shadow:
-                0 0 16px rgba(15, 118, 110, 0.45),
-                0 0 32px rgba(0, 0, 0, 0.3);
+        .hr-section-head {
+          margin-bottom: 48px;
         }
-        /* Una línea del H1 editorial: hueco entre cajas resaltadas arriba/abajo */
-        .hero-headline-line {
-            display: block;
+        .hr-section-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--hr-accent-2);
+          margin-bottom: 20px;
         }
-        .hero-headline-line:not(:last-child) {
-            margin-bottom: clamp(0.12em, 2.2vmin, 0.34em);
+        .hr-section-label .hr-status-dot {
+          background: var(--hr-accent);
+          box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+          animation: hr-pulse-indigo 2.4s ease-in-out infinite;
         }
-        /* Highlight blocks: mismo material que tarjetas #services (mate + grano SVG) */
-        .hero-hl {
-            display: inline-block;
-            background-color: rgba(236, 240, 248, 0.93);
-            background-image: var(--section-matte-grain);
-            background-size: 144px 144px;
-            background-blend-mode: overlay;
-            color: #0f172a;
-            border: 2px solid rgba(100, 116, 139, 0.24);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.82),
-                inset 0 -1px 0 rgba(71, 85, 105, 0.06),
-                0 1px 2px rgba(51, 65, 85, 0.05),
-                0 6px 18px rgba(51, 65, 85, 0.07);
-            padding: 0 0.1em 0.02em;
-            border-radius: 10px;
-            margin: 0 0.03em;
-            line-height: 0.92;
-            vertical-align: baseline;
+        @keyframes hr-pulse-indigo {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+          50%       { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
         }
-        .dark .hero-hl {
-            background-color: rgba(44, 47, 54, 0.9);
-            background-image: var(--section-matte-grain);
-            background-blend-mode: soft-light;
-            color: #f1f5f9;
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.07),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.38),
-                0 2px 4px rgba(0, 0, 0, 0.16),
-                0 8px 22px rgba(0, 0, 0, 0.24);
+        .hr-section-title {
+          font-family: 'Geist', system-ui, sans-serif;
+          font-weight: 700;
+          font-size: clamp(30px, 3.2vw, 46px);
+          line-height: 1.1;
+          letter-spacing: -0.02em;
+          color: var(--hr-heading);
+          margin: 0 0 14px;
         }
-        /* 3-column sub-grid */
-        .hero-sub-grid {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: end;
-            gap: clamp(20px, 4vw, 72px);
-            max-width: 1200px;
-            margin-top: clamp(32px, 5vh, 60px);
+        .hr-section-sub {
+          color: var(--hr-text-muted);
+          font-size: 16px;
+          line-height: 1.65;
+          max-width: 560px;
+          margin: 0;
         }
-        /* Social rail */
-        .hero-socials-rail {
+        .hr-services-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          margin-bottom: 20px;
+        }
+        .hr-service-card {
+          background: var(--hr-bg-card);
+          border: 1px solid var(--hr-border);
+          border-radius: 20px;
+          padding: 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          transition: border-color 0.22s, background 0.22s, transform 0.22s;
+          cursor: default;
+        }
+        .hr-service-card:hover {
+          border-color: rgba(99, 102, 241, 0.35);
+          background: var(--hr-bg-card-alt);
+          transform: translateY(-2px);
+        }
+        .hr-service-icon {
+          width: 46px;
+          height: 46px;
+          border-radius: 13px;
+          background: rgba(99, 102, 241, 0.12);
+          color: var(--hr-accent-2);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .hr-service-icon svg { width: 20px; height: 20px; }
+        .hr-service-card h3 {
+          font-family: 'Geist', system-ui, sans-serif;
+          font-size: 17px;
+          font-weight: 600;
+          color: var(--hr-text);
+          margin: 0;
+          line-height: 1.3;
+        }
+        .hr-service-card p {
+          font-size: 14px;
+          line-height: 1.7;
+          color: var(--hr-text-muted);
+          margin: 0;
+          flex-grow: 1;
+        }
+        .hr-service-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--hr-accent-2);
+          text-decoration: none;
+          margin-top: 4px;
+          transition: gap 0.18s ease, color 0.18s;
+        }
+        .hr-service-link:hover { gap: 10px; color: var(--hr-accent-soft); }
+        .hr-service-link svg { width: 14px; height: 14px; }
+
+        /* ── Services CTA banner ─────────────────────────────────── */
+        .hr-cta-banner {
+          position: relative;
+          border: 1px solid var(--hr-border-strong);
+          background: linear-gradient(135deg,
+            rgba(99, 102, 241, 0.09) 0%,
+            rgba(14, 15, 20, 0) 55%
+          );
+          border-radius: 20px;
+          padding: 36px 44px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 32px;
+          overflow: hidden;
+        }
+        .hr-cta-banner::before {
+          content: "";
+          position: absolute;
+          top: -60px;
+          right: -60px;
+          width: 220px;
+          height: 220px;
+          background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 60%);
+          pointer-events: none;
+        }
+        .hr-cta-banner-label {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--hr-accent-2);
+          background: rgba(99,102,241,0.1);
+          border: 1px solid rgba(99,102,241,0.22);
+          padding: 4px 12px;
+          border-radius: 999px;
+          margin-bottom: 12px;
+        }
+        .hr-cta-banner h3 {
+          font-family: 'Geist', system-ui, sans-serif;
+          font-size: 22px;
+          font-weight: 700;
+          color: var(--hr-heading);
+          margin: 0 0 8px;
+          line-height: 1.2;
+        }
+        .hr-cta-banner p {
+          font-size: 14.5px;
+          line-height: 1.65;
+          color: var(--hr-text-muted);
+          margin: 0;
+          max-width: 540px;
+        }
+        .hr-cta-banner p strong { color: var(--hr-text); font-weight: 600; }
+        .hr-cta-banner-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .hr-cta-banner-actions span {
+          font-size: 12px;
+          color: var(--hr-text-faint);
+          white-space: nowrap;
+        }
+
+        /* ── Services responsive ─────────────────────────────────── */
+        @media (max-width: 960px) {
+          .hr-services-grid { grid-template-columns: 1fr; }
+          .hr-cta-banner { flex-direction: column; align-items: flex-start; }
+          .hr-cta-banner-actions { align-items: flex-start; }
+        }
+        @media (max-width: 600px) {
+          .hr-services-section { padding: 56px 0 48px; }
+          .hr-cta-banner { padding: 28px 24px; }
+        }
+
+        /* ── Shared section card shell (services, skills, contact) ──── */
+        .hr-section-card {
+          border: 1px solid var(--hr-border);
+          background: var(--hr-bg-card);
+          border-radius: 22px;
+          padding: 32px;
+          position: relative;
+        }
+        /* ── Services styles used by "Hero Redesign.html" markup ────── */
+        .services {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 36px;
+        }
+        /* Services: slightly brighter surface + clearer edge (only this block) */
+        #services .hr-section-card {
+          border-color: var(--hr-border-grid);
+          background: var(--hr-bg-services-inset);
+        }
+        .services-head .eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11.5px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--hr-accent-2);
+          font-weight: 600;
+          margin-bottom: 14px;
+        }
+        .services-head .eyebrow .dot {
+          width: 7px;
+          height: 7px;
+          background: var(--hr-accent-2);
+          border-radius: 999px;
+        }
+        .services-head h2 {
+          font-family: 'Geist', system-ui, sans-serif;
+          font-size: 30px;
+          line-height: 1.15;
+          letter-spacing: -0.02em;
+          font-weight: 700;
+          margin: 0 0 16px;
+          color: var(--hr-heading);
+        }
+        .services-head h2 .accent { color: var(--hr-accent-2); }
+        .services-head p {
+          color: var(--hr-text-muted);
+          font-size: 14px;
+          line-height: 1.6;
+          margin: 0 0 24px;
+          max-width: 280px;
+        }
+        .services-head .pill-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 9px 16px 9px 18px;
+          border-radius: 999px;
+          border: 1px solid var(--hr-border-strong);
+          color: var(--hr-text);
+          font-size: 13.5px;
+          font-weight: 500;
+          transition: background .2s, border-color .2s;
+        }
+        .services-head .pill-cta:hover {
+          background: var(--hr-pill-hover-bg);
+          border-color: var(--hr-pill-hover-border);
+        }
+        .services-head .pill-cta .arrow {
+          width: 22px;
+          height: 22px;
+          border-radius: 999px;
+          background: var(--hr-pill-arrow-bg);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+        }
+        /* Nested card: services columns + vertical rules (horizontal when stacked) */
+        .services-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 0;
+          align-items: stretch;
+          border: 1px solid var(--hr-border-grid);
+          /* Inset panel: slightly different from .hr-section-card */
+          background: var(--hr-bg-services-grid);
+          border-radius: 18px;
+          padding: 24px 28px;
+          box-shadow: inset 0 1px 0 var(--hr-grid-inset-line);
+        }
+        .services-grid .svc {
+          padding: 0 22px;
+        }
+        .services-grid .svc:first-child {
+          padding-left: 0;
+        }
+        .services-grid .svc:last-child {
+          padding-right: 0;
+        }
+        .services-grid .svc:not(:first-child) {
+          border-left: 1px solid var(--hr-border-grid);
+        }
+        .svc {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .svc-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(99,102,241,0.12);
+          color: var(--hr-accent-2);
+        }
+        .svc-icon svg { width: 18px; height: 18px; }
+        .svc h3 {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--hr-heading);
+          margin: 0;
+        }
+        .svc p {
+          font-size: 13px;
+          line-height: 1.55;
+          color: var(--hr-text-muted);
+          margin: 0 0 8px;
+        }
+        .svc ul {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .svc li {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: var(--hr-text);
+        }
+        .svc li .check {
+          width: 14px;
+          height: 14px;
+          color: var(--hr-accent);
+          flex-shrink: 0;
+        }
+        .services-footer {
+          grid-column: 1 / -1;
+          margin-top: 8px;
+          text-align: center;
+          color: var(--hr-text-muted);
+          font-size: 13px;
+        }
+        .services-footer .accent {
+          color: var(--hr-accent-2);
+          font-weight: 600;
+        }
+        @media (max-width: 1080px) {
+          .services { grid-template-columns: 1fr; }
+          .services-grid {
+            grid-template-columns: 1fr;
+            padding: 22px 24px;
+          }
+          .services-grid .svc {
+            padding: 0;
+          }
+          .services-grid .svc:not(:first-child) {
+            border-left: none;
+            border-top: 1px solid var(--hr-border-grid);
+            margin-top: 22px;
+            padding-top: 22px;
+          }
+        }
+
+        /* ── WebGL layer: transparent; page uses same body/html bg as the rest of the site ── */
+        .hr-shader-canvas {
+          position: absolute; inset: 0;
+          width: 100%; height: 100%;
+          display: block;
+          z-index: 0;
+          pointer-events: none;
+          background: transparent;
+        }
+
+        /* ── Hero (no own fill: inherits page background through parent) ───────────────── */
+        .hr-hero {
+          position: relative;
+          z-index: 1;
+          border-radius: 0;
+          overflow: hidden;
+          border: none;
+          background: transparent;
+          margin-top: 0;
+          padding-top: 80px;
+        }
+        /* Soft mask so the fluid band eases out toward the footer (opaque = show WebGL tint only) */
+        .hr-hero-bg-clip {
+          --hr-shader-mask-fade: min(clamp(200px, 44vh, 520px), 90%);
+          position: absolute; inset: 0; border-radius: 0;
+          overflow: hidden; pointer-events: none; z-index: 0;
+          -webkit-mask-image: linear-gradient(
+            to bottom,
+            #000 0,
+            #000 calc(100% - var(--hr-shader-mask-fade)),
+            rgba(0, 0, 0, 0.88) calc(100% - (var(--hr-shader-mask-fade) * 0.78)),
+            rgba(0, 0, 0, 0.45) calc(100% - (var(--hr-shader-mask-fade) * 0.42)),
+            transparent 100%
+          );
+          mask-image: linear-gradient(
+            to bottom,
+            #000 0,
+            #000 calc(100% - var(--hr-shader-mask-fade)),
+            rgba(0, 0, 0, 0.88) calc(100% - (var(--hr-shader-mask-fade) * 0.78)),
+            rgba(0, 0, 0, 0.45) calc(100% - (var(--hr-shader-mask-fade) * 0.42)),
+            transparent 100%
+          );
+          mask-mode: alpha;
+          -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+          -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+        }
+        .hr-hero-inner {
+          position: relative; z-index: 3;
+          display: grid; grid-template-columns: 1.2fr 1fr;
+          gap: 40px; align-items: stretch;
+          min-height: 580px;
+          /* section now starts below navbar, so only visual breathing room needed */
+          padding: 48px 56px 56px 64px;
+          overflow: visible;
+          max-width: 1280px;
+          margin: 0 auto;
+        }
+
+        /* ── Status row ─────────────────────────────────────────────── */
+        .hr-status-row {
+          display: flex; align-items: center; gap: 14px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+          color: var(--hr-text-muted); margin-bottom: 26px;
+        }
+        .hr-available { display: inline-flex; align-items: center; gap: 8px; color: var(--hr-available); font-weight: 600; }
+        .hr-status-dot {
+          width: 8px; height: 8px; border-radius: 999px;
+          background: var(--hr-available);
+          box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+          animation: hr-pulse 2.4s ease-in-out infinite;
+        }
+        @keyframes hr-pulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
+          50%       { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+        }
+        .hr-status-sep { color: var(--hr-text-faint); }
+
+        /* ── Headline ────────────────────────────────────────────────── */
+        .hr-h1 {
+          font-family: 'Geist', system-ui, sans-serif;
+          font-weight: 700; font-size: clamp(40px, 4.4vw, 60px);
+          line-height: 1.04; letter-spacing: -0.025em;
+          margin: 0 0 22px; color: var(--hr-heading); max-width: 640px;
+        }
+        .hr-h1 .hr-accent-word { color: var(--hr-accent-2); }
+        /* Subrayado neón (borde elíptico + máscara fade, sin cortes duros) */
+        .hr-h1 .subrayado-exacto {
+          position: relative;
+          display: inline-block;
+          white-space: nowrap;
+          isolation: isolate;
+        }
+        .hr-h1 .subrayado-exacto::after {
+          content: "";
+          position: absolute;
+          left: 0%;
+          top: 100%;
+          margin-top: 2px;
+          width: 96%;
+          height: 0;
+          border-top: 9px solid #4361ee;
+          border-bottom: 20px solid transparent;
+          border-radius: 50%;
+          transform: rotate(-1.5deg);
+          filter: blur(1.5px) drop-shadow(0 5px 7px rgba(67, 97, 238, 0.8));
+          -webkit-mask-image: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 1) 8%,
+            rgba(0, 0, 0, 0.9) 45%,
+            rgba(0, 0, 0, 0.2) 80%,
+            rgba(0, 0, 0, 0) 100%
+          );
+          mask-image: linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 1) 8%,
+            rgba(0, 0, 0, 0.9) 45%,
+            rgba(0, 0, 0, 0.2) 80%,
+            rgba(0, 0, 0, 0) 100%
+          );
+          z-index: -1;
+        }
+
+        /* ── Sub-headline ─────────────────────────────────────────────── */
+        .hr-sub {
+          color: var(--hr-text-muted); font-size: 16px; line-height: 1.6;
+          max-width: 520px; margin: 0 0 32px;
+        }
+
+        /* ── CTA buttons ─────────────────────────────────────────────── */
+        .hr-cta-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+        .hr-btn {
+          display: inline-flex; align-items: center; gap: 10px;
+          padding: 13px 22px; border-radius: 12px;
+          font-size: 14.5px; font-weight: 500; cursor: pointer;
+          transition: transform .2s ease, background .2s, border-color .2s, color .2s, box-shadow .2s ease;
+          border: 1px solid transparent; line-height: 1; text-decoration: none;
+        }
+        .hr-btn:active { transform: translateY(1px); }
+        .hr-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .hr-btn-primary { background: var(--hr-accent); color: #fff; box-shadow: 0 8px 24px -8px rgba(99,102,241,0.65); }
+        .hr-btn-primary svg { transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .hr-btn-primary:hover {
+          background: var(--hr-accent-2);
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px -12px rgba(99, 102, 241, 0.72);
+        }
+        .hr-btn-primary:hover svg { transform: translate(3px, -2px) rotate(-8deg); }
+        .hr-btn-primary:active { transform: translateY(0); box-shadow: 0 8px 22px -10px rgba(99, 102, 241, 0.55); }
+        .hr-btn-ghost { background: var(--hr-btn-ghost); color: var(--hr-text); border-color: var(--hr-border-strong); }
+        .hr-btn-ghost:hover {
+          background: var(--hr-btn-ghost-hover);
+          color: var(--hr-text);
+          border-color: rgba(99, 102, 241, 0.28);
+          transform: translateY(-1px);
+        }
+        /* Reuse demo-eye-blink keyframes from spotlight.css (loaded on public layout) */
+        .hr-btn-ghost:hover .demo-eye-blink {
+          animation: demo-eye-blink 650ms ease-in-out 1 forwards;
+          transform-origin: center;
+        }
+        .hr-btn-ghost:active { transform: translateY(0); }
+
+        /* ── Tech rail ────────────────────────────────────────────────── */
+        .hr-tech-rail { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; color: var(--hr-text-muted); font-size: 15px; font-weight: 600; }
+        .hr-tech { display: inline-flex; align-items: center; gap: 10px; }
+        .hr-tech svg { width: 24px; height: 24px; }
+        .hr-tech-dot {
+          width: 24px; height: 24px; border-radius: 6px;
+          display: inline-flex; align-items: center; justify-content: center;
+          font-size: 12px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+        }
+        .hr-dot-laravel { background: rgba(248,113,113,0.14); color: #f87171; }
+        .hr-dot-react   { background: rgba(97,218,251,0.12);  color: #61dafb; }
+        .hr-dot-js      { background: rgba(234,179,8,0.14);   color: #eab308; }
+        .hr-dot-php     { background: rgba(139,92,246,0.14);  color: #a78bfa; }
+        .hr-dot-mysql   { background: rgba(59,130,246,0.14);  color: #60a5fa; }
+
+        /* ── Right column ─────────────────────────────────────────────── */
+        .hr-hero-right {
+          position: relative;
+          display: flex;
+          align-items: stretch;
+          justify-content: center;
+          overflow: visible;
+          /* Extra canvas so glow / radial don’t run into the stage’s rounded rect or section clip */
+          padding: clamp(12px, 2.2vw, 28px) clamp(16px, 3vw, 44px) clamp(10px, 1.8vw, 24px) clamp(8px, 1.5vw, 20px);
+          box-sizing: border-box;
+        }
+        .hr-photo-stage {
+          position: relative;
+          width: 100%;
+          border-radius: 18px;
+          isolation: isolate;
+          box-sizing: border-box;
+          /* Inset content so the purple wash + blur fade fully before the outer border */
+          --hr-stage-pady: clamp(18px, 3vw, 36px);
+          --hr-stage-padx: clamp(22px, 4vw, 48px);
+          padding: var(--hr-stage-pady) var(--hr-stage-padx);
+        }
+        .hr-portrait-inline {
+          display: none;
+          width: min(100%, 520px);
+          height: auto;
+          object-fit: contain;
+          object-position: bottom center;
+          filter: drop-shadow(var(--hr-portrait-shadow));
+          position: relative;
+          z-index: 4;
+        }
+        /* Ambient light: padded stage + softer mask stops so nothing “rings” at the rounded edge */
+        .hr-photo-stage::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: radial-gradient(120% 100% at 60% 40%, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0.06) 32%, transparent 56%);
+          -webkit-mask-image: radial-gradient(ellipse 72% 70% at 60% 40%, #000 14%, transparent 66%);
+          mask-image: radial-gradient(ellipse 72% 70% at 60% 40%, #000 14%, transparent 66%);
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        /* ── Dots panel ──────────────────────────────────────────────── */
+        .hr-dots-panel {
+          position: absolute; left: -30%; right: -30%; top: 0; bottom: 0;
+          z-index: 1;
+          pointer-events: none; overflow: hidden;
+          -webkit-mask-image: linear-gradient(to right, transparent 0%, black var(--hr-dots-fade-w), black calc(100% - var(--hr-dots-fade-w)), transparent 100%);
+          mask-image:         linear-gradient(to right, transparent 0%, black var(--hr-dots-fade-w), black calc(100% - var(--hr-dots-fade-w)), transparent 100%);
+        }
+        .hr-dots-panel canvas { display: block; width: 100%; height: 100%; background-color: transparent; }
+        .hr-photo-glow {
+          position: absolute; left: 50%; top: 58%;
+          transform: translate(-50%, -50%);
+          width: 72%; aspect-ratio: 1/1;
+          background: radial-gradient(circle at center, rgba(99,102,241,0.42) 0%, rgba(99,102,241,0.12) 32%, rgba(99,102,241,0) 58%);
+          -webkit-mask-image: radial-gradient(circle at center, #000 0%, transparent 68%);
+          mask-image: radial-gradient(circle at center, #000 0%, transparent 68%);
+          filter: blur(10px); pointer-events: none; z-index: 2;
+        }
+
+        /* ── Portrait ────────────────────────────────────────────────── */
+        .hr-portrait-layer {
+          position: absolute;
+          /* Align with the right edge of the 1280px content column */
+          right: max(0px, calc((100% - 1280px) / 2));
+          top: 0; bottom: 0;
+          /*
+            Size ties to SECTION HEIGHT, not viewport width:
+            capped width avoids covering the headline; image uses max-height:100%.
+          */
+          width: auto;
+          max-width: min(520px, calc((min(100%, 1280px) / 2) - 32px));
+          min-width: 0;
+          z-index: 8;
+          pointer-events: none; display: flex; align-items: flex-end; justify-content: center;
+          overflow: visible;
+        }
+        .hr-portrait-layer img {
+          max-height: 100%;
+          width: auto;
+          max-width: 100%;
+          height: auto;
+          vertical-align: bottom;
+          object-fit: contain; object-position: bottom center;
+          filter: drop-shadow(var(--hr-portrait-shadow));
+        }
+
+        /* ── Idea card ───────────────────────────────────────────────── */
+        .hr-idea-card {
+          position: absolute;
+          right: max(40px, calc((100% - 1280px) / 2 + 40px));
+          bottom: 108px; /* above stats strip overlap */
+          width: 210px;
+          padding: 16px 18px; border-radius: 14px;
+          border: 1px solid var(--hr-border-strong);
+          background: var(--hr-idea-card-bg);
+          backdrop-filter: blur(12px) saturate(140%);
+          -webkit-backdrop-filter: blur(12px) saturate(140%);
+          z-index: 20; display: flex; flex-direction: column; gap: 8px;
+        }
+        .hr-idea-head { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--hr-accent-2); }
+        .hr-idea-card p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--hr-text-muted); }
+        .hr-idea-arrow {
+          align-self: flex-end; width: 28px; height: 28px;
+          border-radius: 999px; border: 1px solid var(--hr-border-strong);
+          display: inline-flex; align-items: center; justify-content: center;
+          color: var(--hr-text); text-decoration: none;
+          transition: background .2s, border-color .2s;
+        }
+        .hr-idea-arrow:hover { background: var(--hr-idea-arrow-hover); }
+
+        /* ── Stats strip ─────────────────────────────────────────────── */
+        .hr-stats {
+          margin-top: 0;
+          border: 1px solid var(--hr-border); background: var(--hr-bg-card);
+          border-radius: 22px; padding: 20px;
+          display: grid;
+          /* Always one row of four; minmax(0,1fr) lets cells shrink without forcing a grid wrap */
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px; position: relative; z-index: 1;
+          transition: background 0.2s, border-color 0.2s;
+        }
+        .hr-stat { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .hr-stat-icon {
+          width: 38px; height: 38px; border-radius: 11px;
+          display: inline-flex; align-items: center; justify-content: center;
+          background: rgba(99,102,241,0.12); color: var(--hr-accent-2); flex-shrink: 0;
+        }
+        .hr-stat-icon svg { width: 18px; height: 18px; }
+        .hr-stat-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .hr-stat-title { font-size: 13.5px; font-weight: 600; color: var(--hr-text); white-space: nowrap; }
+        .hr-stat-sub   { font-size: 11.5px; color: var(--hr-text-muted); white-space: nowrap; }
+        .hr-stat + .hr-stat { border-left: 1px solid var(--hr-border); padding-left: 12px; }
+
+        /* ── Responsive ──────────────────────────────────────────────── */
+        @media (max-width: 1080px) {
+          /* Single source of truth: dots stage height tracks portrait column (no huge empty band) */
+          .hr-hero {
+            /*
+              Match content width (~ padded viewport) so aspect height tracks the real image width.
+              92vw was often wider than the text column on phones → box taller than needed + felt like a growing gap.
+            */
+            --hr-portrait-w: min(560px, calc(100vw - max(56px, 32px + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))));
+            --hr-portrait-h: clamp(340px, min(72dvh, 70vh), 580px);
+            /*
+              Image asset is 520×720. A viewport-tall --hr-portrait-h alone leaves a fixed-height box
+              taller than the contained image → empty band above the photo on phones.
+              Box height = min(cap, aspect-fit height).
+            */
+            --hr-portrait-box-h: min(var(--hr-portrait-h), calc(var(--hr-portrait-w) * 720 / 520));
+          }
+          /* Explicit horizontal padding (+ safe-area) so phone layout never looks “collapsed” on one side */
+          .hr-hero-inner {
+            grid-template-columns: 1fr;
+            /* Desktop left `gap: 40px`; stacked layout must not inherit 40px *row* gap (huge band under copy). */
+            gap: 0;
+            row-gap: 0;
+            column-gap: 0;
+            padding-top: 40px;
+            padding-bottom: 32px;
+            padding-left: max(28px, 16px + env(safe-area-inset-left, 0px));
+            padding-right: max(28px, 16px + env(safe-area-inset-right, 0px));
+            /* Drop desktop min-height; let section height follow copy + portrait slot only */
+            min-height: unset;
+            /* Prevent leftover block-size from stretching rows: avoids a growing empty band
+               under .hr-hero-copy when the viewport is very narrow (portrait slot shrinks). */
+            align-content: start;
+            align-items: start;
+            max-width: 100%;
+          }
+          /* Keep inner portrait area ≥ --hr-portrait-box-h once padding is border-box */
+          .hr-photo-stage {
+            min-height: calc(var(--hr-portrait-box-h) + 2 * var(--hr-stage-pady));
             display: flex;
+            align-items: flex-end;
+            justify-content: center;
+          }
+          .hr-hero-right {
+            min-height: calc(var(--hr-portrait-box-h) + 2 * var(--hr-stage-pady) + clamp(12px, 2.2vw, 28px) + clamp(10px, 1.8vw, 24px));
+          }
+          /* Stacked hero: width + aspect-capped height so img fills the box (no letterboxing gap) */
+          .hr-portrait-layer {
+            display: none;
+          }
+          .hr-portrait-inline {
+            display: block;
+            width: min(100%, var(--hr-portrait-w));
+            height: var(--hr-portrait-box-h);
+          }
+          .hr-idea-card { right: 32px; bottom: 100px; }
+        }
+        /* Narrow viewports: keep 4 stats in one row, stack icon → title → text inside each cell */
+        @media (max-width: 900px) {
+          .hr-stat {
             flex-direction: column;
             align-items: center;
-            gap: 16px;
+            text-align: center;
+            gap: 6px;
+          }
+          .hr-stat-text { align-items: center; }
+          .hr-stat-title,
+          .hr-stat-sub {
+            white-space: normal;
+            line-height: 1.3;
+          }
         }
-        .hero-social-link {
-            color: #0a0a0a;
-            display: block;
-            transition: opacity 0.2s;
-        }
-        .dark .hero-social-link {
-            color: #e5e7eb;
-        }
-        .hero-social-link:hover { opacity: 0.4; }
-        /* CTA buttons */
-        .hero-cta-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 24px 13px 13px;
-            border: 1.5px solid #0a0a0a;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.65);
-            backdrop-filter: blur(6px);
-            font-family: 'Geist', system-ui, sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            color: #0a0a0a;
-            text-decoration: none;
-            transition:
-                background 0.2s ease,
-                transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .hero-cta-primary:hover {
-            background: rgba(10,10,10,0.07);
-            color: #0a0a0a;
-            transform: scale(1.045);
-        }
-        .dark .hero-cta-primary {
-            border-color: rgba(229, 231, 235, 0.6);
-            background: rgba(24, 26, 31, 0.6);
-            color: #f9fafb;
-        }
-        .dark .hero-cta-primary:hover {
-            background: rgba(229, 231, 235, 0.12);
-            color: #ffffff;
-            transform: scale(1.045);
-        }
-        .hero-cta-secondary {
-            display: inline-flex;
-            align-items: center;
-            padding: 13px 24px;
-            border: 1.5px solid rgba(10,10,10,0.2);
-            border-radius: 999px;
-            background: rgba(255,255,255,0.45);
-            backdrop-filter: blur(6px);
-            font-family: 'Geist', system-ui, sans-serif;
-            font-size: 15px;
-            font-weight: 500;
-            color: #3a3a38;
-            text-decoration: none;
-            transition:
-                background 0.2s ease,
-                transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .hero-cta-secondary:hover {
-            background: rgba(10,10,10,0.05);
-            color: #0a0a0a;
-            transform: scale(1.045);
-        }
-        .dark .hero-cta-secondary {
-            border-color: rgba(229, 231, 235, 0.25);
-            background: rgba(24, 26, 31, 0.5);
-            color: #d1d5db;
-        }
-        .dark .hero-cta-secondary:hover {
-            background: rgba(229, 231, 235, 0.08);
-            color: #ffffff;
-            transform: scale(1.045);
-        }
-        .dark .hero-soft-section [data-hero-primary] { color: #f9fafb !important; }
-        .dark .hero-soft-section [data-hero-muted] { color: #9ca3af !important; }
-        /*
-         * Más intensidad sólo en el tinte del glifo (+ halo muy suave), sin fondo propio:
-         * el mint/índigo del shader queda más atrás contra un gris casi tinta / blanco papel.
-         */
-        .hero-soft-section [data-hero-body] {
-            font-weight: 400;
-            color: #1a1b19 !important;
-            text-shadow:
-                0 0 14px rgba(255, 255, 255, 0.52),
-                0 0 32px rgba(255, 255, 255, 0.22);
-        }
-        .dark .hero-soft-section [data-hero-body] {
-            color: #eef0f4 !important;
-            text-shadow:
-                0 0 14px rgba(12, 14, 18, 0.45),
-                0 0 28px rgba(0, 0, 0, 0.2);
-        }
-        .dark .hero-soft-section [data-hero-divider] { background: rgba(229, 231, 235, 0.25) !important; }
-        .dark .hero-soft-section [data-hero-cta-icon] {
-            background: #f9fafb !important;
-            color: #181a1f !important;
-        }
-        /* Availability pulse dot */
-        .hero-dot-pulse {
-            display: inline-block;
-            width: 7px; height: 7px;
-            border-radius: 999px;
-            background: #22c55e;
-            box-shadow: 0 0 0 0 rgba(34,197,94,0.45);
-            animation: hero-dot-pulse 2.4s ease-in-out infinite;
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-        @keyframes hero-dot-pulse {
-            0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.45); }
-            50%      { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
-        }
-        /* Two-column hero layout */
-        .hero-layout {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: end;
-            gap: clamp(32px, 4vw, 64px);
-        }
-        .hero-image-col {
-            /* Desde un poco bajo el header fijo hasta el borde inferior de la sección.
-               El containing block es el div content-layer (position:relative). */
-            position: absolute;
-            top: clamp(72px, 5.25rem, 92px);
-            bottom: 0;
-            right: clamp(20px, 5.5vw, 88px);
-            width: min(52vw, 820px);
-            z-index: 2;
-            display: block;
-            pointer-events: none;
+        @media (max-width: 720px) {
+          .hr-hero {
+            padding-top: 72px; /* match fixed navbar height on mobile */
+            --hr-portrait-w: min(540px, calc(100vw - max(56px, 32px + env(safe-area-inset-left, 0px) + env(safe-area-inset-right, 0px))));
+            --hr-portrait-h: clamp(300px, min(68dvh, 65vh), 540px);
+            --hr-portrait-box-h: min(var(--hr-portrait-h), calc(var(--hr-portrait-w) * 720 / 520));
+          }
+          .hr-hero-inner {
+            padding-bottom: 24px;
+          }
+          .hr-stats {
+            gap: 8px;
+            padding: 14px 10px;
+          }
+          .hr-stat + .hr-stat {
+            border-left: 1px solid var(--hr-border);
+            padding-left: 8px;
+          }
+          .hr-stat-title { font-size: 12px; }
+          .hr-stat-sub { font-size: 10px; }
+          .hr-stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+          }
+          .hr-stat-icon svg { width: 16px; height: 16px; }
+          .hr-h1 { font-size: 38px; }
+          .hr-idea-card { right: max(16px, env(safe-area-inset-right, 0px)); bottom: 72px; }
+          .hr-stats-wrapper { padding: 0 12px; margin-top: -28px; }
         }
 
-        /* Mismo ancho/caja que la foto: el tinte no “ensucia” el hueco del column */
-        .hero-profile-wrap {
-            height: 100%;
-            width: fit-content;
-            max-width: 100%;
-            margin-left: auto;
-            position: relative;
-            pointer-events: none;
-            /* isolation: isolate crea un grupo de composición aislado: los blend-modes
-               de ::before/::after operan contra los píxeles internos del grupo (la imagen),
-               no contra el fondo de la página. Donde el PNG tiene alpha=0, la salida del
-               grupo también es transparente → sin tinte sobre el fondo. */
-            isolation: isolate;
-            /* Elipse original; transición más “fuerte” al arrancar desde la esquina (paradas intermedias) */
-            --hero-img-fade: radial-gradient(
-                ellipse 150% 100% at 0% 100%,
-                transparent 0%,
-                transparent 3%,
-                rgba(0, 0, 0, 0.48) 13%,
-                rgba(0, 0, 0, 0.9) 24%,
-                black 52%
-            );
+        /* ── Card sections: headings follow theme heading token ─────── */
+        .hr-section-card h2,
+        .hr-section-card h3 { color: var(--hr-heading) !important; }
+        .hr-section-card .mb-12 > p {
+          color: var(--hr-text-muted) !important;
         }
-
-        .dark .hero-profile-wrap {
-            --hero-img-fade: radial-gradient(
-                ellipse 150% 100% at 0% 100%,
-                transparent 0%,
-                transparent 3%,
-                rgba(0, 0, 0, 0.52) 12%,
-                rgba(0, 0, 0, 0.94) 22%,
-                black 50%
-            );
-        }
-
-        /* Pseudo-elementos de tinte eliminados: el mask-image geométrico no puede
-           seguir el alpha channel del WebP sin causar artefactos (halo, sangrado).
-           La integración visual viene del mask-image fade en la propia imagen
-           + filter: saturate/brightness + el shader WebGL de fondo. */
-
-        .hero-profile-img {
-            display: block;
-            height: 100%;
-            width: auto;
-            max-width: 100%;
-            position: relative;
-            z-index: 0;
-            object-fit: contain;
-            object-position: bottom center;
-
-            /* ── Integración ambiental sin distorsión de color ──
-               mix-blend-mode sobre overlays externos tiñe el fondo en zonas
-               transparentes. hue-rotate con ángulos grandes (>30°) distorsiona
-               los tonos piel. La integración correcta viene del mask-image fade
-               + el shader de fondo: solo necesitamos reducir la saturación y el
-               contraste para que la imagen "retroceda" hacia el entorno. */
-            filter: saturate(0.88) brightness(0.97);
-
-            mask-image: var(--hero-img-fade);
-            -webkit-mask-image: var(--hero-img-fade);
-
-            transition: filter 0.3s ease;
-        }
-        .dark .hero-profile-img {
-            /* En dark mode oscurecemos para integrarnos con el fondo #181a1f */
-            filter: saturate(0.82) brightness(0.80) contrast(1.05);
-        }
-        /* Responsive collapse */
-        @media (max-width: 900px) {
-            .hero-layout {
-                grid-template-columns: 1fr;
-            }
-            .hero-image-col { display: none; }
-        }
-        /*
-         * Ocultar imagen en orientación portrait, independientemente del ancho del viewport.
-         * Esto cubre el caso de "modo ordenador/desktop" en móvil: el navegador simula
-         * un viewport ancho (>900px) pero la pantalla física sigue siendo portrait.
-         * Limit a max-width:1200px para no afectar monitores de escritorio en portrait.
-         * También ocultar cuando el viewport es demasiado bajo (landscape en móvil pequeño).
-         */
-        @media (orientation: portrait) and (max-width: 1200px) {
-            .hero-layout { grid-template-columns: 1fr; }
-            .hero-image-col { display: none; }
-        }
-        @media (max-height: 520px) {
-            .hero-image-col { display: none; }
-        }
-        @media (max-width: 767px) {
-            .hero-sub-grid {
-                grid-template-columns: 1fr !important;
-                gap: 28px !important;
-            }
-            .hero-socials-rail {
-                flex-direction: row !important;
-                gap: 20px !important;
-            }
-            .hero-socials-handle {
-                writing-mode: horizontal-tb !important;
-                transform: none !important;
-            }
-            .hero-status-block { display: none !important; }
-        }
-        @media (max-width: 480px) {
-            .hero-eyebrow-row { display: none; }
-        }
-
-        /*
-         * Paneles de sección: material mate semitransparente + grano SVG (sin blur / sin “cristal”).
-         */
-        .section-glass-panel {
-            /* Grano: --section-matte-grain en resources/css/app.css (:root) */
-            background-color: rgba(244, 245, 248, 0.88);
-            background-image: var(--section-matte-grain);
-            background-size: 160px 160px;
-            background-blend-mode: overlay;
-            border: 2px solid rgba(15, 23, 42, 0.11);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.65),
-                inset 0 -1px 0 rgba(15, 23, 42, 0.05),
-                0 2px 4px rgba(15, 23, 42, 0.04),
-                0 10px 32px rgba(15, 23, 42, 0.08);
-        }
-        .dark .section-glass-panel {
-            background-color: rgba(26, 28, 33, 0.86);
-            background-image: var(--section-matte-grain);
-            background-blend-mode: soft-light;
-            border: 2px solid rgba(226, 232, 240, 0.14);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.09),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-                0 4px 6px rgba(0, 0, 0, 0.2),
-                0 14px 40px rgba(0, 0, 0, 0.28);
-        }
-        /* Mayor especificidad que spotlight.css (.js-spotlight-card) */
-        .js-spotlight-card.section-inner-card,
-        .skill-card.section-inner-card {
-            background-color: rgba(250, 250, 252, 0.9) !important;
-            background-image: var(--section-matte-grain) !important;
-            background-size: 144px 144px !important;
-            background-blend-mode: overlay !important;
-            border: 2px solid rgba(15, 23, 42, 0.1) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.75),
-                inset 0 -1px 0 rgba(15, 23, 42, 0.04),
-                0 1px 2px rgba(15, 23, 42, 0.05),
-                0 6px 18px rgba(15, 23, 42, 0.06);
-        }
-        .dark .js-spotlight-card.section-inner-card,
-        .dark .skill-card.section-inner-card {
-            background-color: rgba(34, 36, 41, 0.9) !important;
-            background-image: var(--section-matte-grain) !important;
-            background-blend-mode: soft-light !important;
-            border: 2px solid rgba(226, 232, 240, 0.12) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.08),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-                0 2px 4px rgba(0, 0, 0, 0.18),
-                0 8px 22px rgba(0, 0, 0, 0.22);
-        }
-        .js-spotlight-card.section-inner-card:hover,
-        .skill-card.section-inner-card:hover {
-            border-color: rgba(15, 23, 42, 0.18) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.85),
-                inset 0 -1px 0 rgba(15, 23, 42, 0.05),
-                0 2px 3px rgba(15, 23, 42, 0.06),
-                0 10px 28px rgba(15, 23, 42, 0.1);
-        }
-        .dark .js-spotlight-card.section-inner-card:hover,
-        .dark .skill-card.section-inner-card:hover {
-            border-color: rgba(226, 232, 240, 0.2) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-                0 4px 8px rgba(0, 0, 0, 0.22),
-                0 12px 36px rgba(0, 0, 0, 0.34);
-        }
-        /* Servicios: panel y tarjetas algo más fríos/grisáceos (solo esta sección) */
-        #services.section-glass-panel {
-            background-color: rgba(228, 231, 236, 0.9);
-        }
-        .dark #services.section-glass-panel {
-            background-color: rgba(40, 42, 48, 0.88);
-        }
-        #services .js-spotlight-card.section-inner-card {
-            background-color: rgba(236, 240, 248, 0.93) !important;
-            border: 2px solid rgba(100, 116, 139, 0.24) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.82),
-                inset 0 -1px 0 rgba(71, 85, 105, 0.06),
-                0 1px 2px rgba(51, 65, 85, 0.05),
-                0 6px 18px rgba(51, 65, 85, 0.07);
-        }
-        .dark #services .js-spotlight-card.section-inner-card {
-            background-color: rgba(44, 47, 54, 0.9) !important;
-            border: 2px solid rgba(148, 163, 184, 0.2) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.07),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.38),
-                0 2px 4px rgba(0, 0, 0, 0.16),
-                0 8px 22px rgba(0, 0, 0, 0.24);
-        }
-        #services .js-spotlight-card.section-inner-card:hover {
-            border-color: rgba(71, 85, 105, 0.38) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.92),
-                inset 0 -1px 0 rgba(71, 85, 105, 0.08),
-                0 2px 4px rgba(51, 65, 85, 0.07),
-                0 10px 30px rgba(51, 65, 85, 0.12);
-        }
-        .dark #services .js-spotlight-card.section-inner-card:hover {
-            border-color: rgba(148, 163, 184, 0.32) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.09),
-                inset 0 -1px 0 rgba(0, 0, 0, 0.48),
-                0 4px 8px rgba(0, 0, 0, 0.2),
-                0 12px 38px rgba(0, 0, 0, 0.4);
-        }
-
-        /* ── Scroll Reveal ─────────────────────────────────────────────
-           Sólo activa los estados ocultos cuando JS ya cargó (.reveal-ready),
-           así los elementos son visibles aunque JS falle (graceful degradation).
-        ──────────────────────────────────────────────────────────────── */
-        .reveal-ready [data-reveal] {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                        transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-ready [data-reveal].is-revealed {
-            opacity: 1 !important;
-            transform: none !important;
-        }
-        [data-reveal-delay="100"] { transition-delay: 100ms; }
-        [data-reveal-delay="150"] { transition-delay: 150ms; }
-        [data-reveal-delay="200"] { transition-delay: 200ms; }
-        [data-reveal-delay="300"] { transition-delay: 300ms; }
-
-        /* ── Mobile Skill CTA ──────────────────────────────────────────
-           En móvil (hover: none), muestra el hint cuando la card está en pantalla.
-        ──────────────────────────────────────────────────────────────── */
-        .skill-card.is-in-view .skill-cta-hint {
-            opacity: 1 !important;
-        }
+        #about h2, #about h3   { color: var(--hr-heading) !important; }
+        #about p               { color: var(--hr-text-muted) !important; }
+        #projects h2           { color: var(--hr-heading) !important; }
     </style>
 
-    <section id="home" class="hero-soft-section">
+    {{-- ── Hero: full-width ─────────────────────────────────────────── --}}
+    <section class="hr-hero" id="home" aria-label="Presentación">
 
-        {{-- Content layer --}}
-        <div style="position:relative;z-index:2;display:flex;flex-direction:column;min-height:82svh;">
+            {{-- WebGL tint only (transparent); page background matches body ─────────── --}}
+            <div class="hr-hero-bg-clip">
+                <canvas id="hr-shader-canvas" class="hr-shader-canvas" aria-hidden="true"></canvas>
+            </div>
 
-            {{-- Spacer matching the fixed navbar height (~68px) --}}
-            <div style="flex-shrink:0;height:68px;"></div>
+            <div class="hr-hero-inner">
 
-            {{-- Vertically centred main body --}}
-            <div style="flex:1;display:flex;flex-direction:column;justify-content:center;
-                        padding:0 clamp(20px,5.5vw,88px) clamp(28px,4vh,56px);">
+                {{-- ── LEFT: copy ──────────────────────────────────── --}}
+                <div class="hr-hero-copy">
 
-                <div class="hero-layout">
+                    {{-- Status row --}}
+                    <div class="hr-status-row">
+                        <span class="hr-available">
+                            <span class="hr-status-dot"></span>Disponible
+                        </span>
+                        <span class="hr-status-sep">·</span>
+                        <span>Sevilla, España</span>
+                        <span class="hr-status-sep">·</span>
+                        <span>UTC+1</span>
+                    </div>
 
-                {{-- LEFT: text content --}}
-                <div>
+                    {{-- Headline --}}
+                    <h1 class="hr-h1">
+                        Desarrollo <span class="hr-accent-word">webs y apps</span><br>
+                        que hacen <span class="subrayado-exacto">crecer negocios</span>
+                    </h1>
 
-                {{-- Eyebrow: status pill --}}
-                <div class="hero-eyebrow-row"
-                     style="display:flex;align-items:center;gap:10px;margin-bottom:clamp(22px,3.5vh,46px);">
-                    <span class="hero-dot-pulse"></span>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;
-                                 letter-spacing:0.1em;text-transform:uppercase;
-                                 color:#0a0a0a;font-weight:600;" data-hero-primary>Disponible</span>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;
-                                 letter-spacing:0.1em;color:#7a7a76;" data-hero-muted>· Sevilla · UTC+1</span>
+                    {{-- Sub-headline --}}
+                    <p class="hr-sub">
+                        Ingeniero full‑stack en Sevilla. Diseño, desarrollo y lanzo
+                        productos digitales modernos que generan resultados reales.
+                    </p>
+
+                    {{-- CTAs --}}
+                    <div class="hr-cta-row">
+                        <a class="hr-btn hr-btn-primary" href="#contact">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                            Solicitar proyecto
+                        </a>
+                        <a class="hr-btn hr-btn-ghost" href="#projects">
+                            <svg class="demo-eye-blink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Ver trabajos
+                        </a>
+                    </div>
+
+                    {{-- Tech rail --}}
+                    <div class="hr-tech-rail">
+                        <span class="hr-tech">
+                            <x-icons.tech-react />
+                            React
+                        </span>
+                        <span class="hr-tech">
+                            <x-icons.tech-node-js />
+                            Node.js
+                        </span>
+                        <span class="hr-tech">
+                            <x-icons.tech-kotlin />
+                            Kotlin
+                        </span>
+                        <span class="hr-tech">
+                            <x-icons.tech-laravel />
+                            Laravel
+                        </span>
+                        <span class="hr-tech">
+                            <x-icons.tech-aws />
+                            AWS
+                        </span>
+                    </div>
+
+                </div>{{-- /hr-hero-copy --}}
+
+                {{-- ── RIGHT: dots panel + portrait --}}
+                <div class="hr-hero-right">
+                    <div class="hr-photo-stage">
+                        {{-- Dots background (wave animation + cursor glow) --}}
+                        <div class="hr-dots-panel" id="hr-dots-panel" aria-hidden="true">
+                            <canvas class="hr-dots-canvas"></canvas>
+                        </div>
+                        <div class="hr-photo-glow" aria-hidden="true"></div>
+                        <img class="hr-portrait-inline"
+                             src="{{ asset('img/me-noBg-dark.webp') }}"
+                             alt=""
+                             width="520" height="720"
+                             decoding="async" fetchpriority="high">
+                    </div>
+                </div>{{-- /hr-hero-right --}}
+
+            </div>{{-- /hr-hero-inner --}}
+
+            {{-- Portrait anchored to the bottom of the hero card --}}
+            <div class="hr-portrait-layer" aria-hidden="true">
+                <img src="{{ asset('img/me-noBg-dark.webp') }}"
+                     alt="Carlos — Fullstack Developer"
+                     width="520" height="720"
+                     loading="eager" decoding="async">
+            </div>
+
+            {{-- Floating idea card --}}
+            <aside class="hr-idea-card">
+                <div class="hr-idea-head">
+                    <span style="display:inline-block;width:6px;height:6px;border-radius:999px;background:var(--hr-accent-2);"></span>
+                    ¿Tienes una idea?
                 </div>
+                <p>La convierto en un producto digital sólido y escalable.</p>
+                <a class="hr-idea-arrow" href="#contact" aria-label="Cuéntame tu idea">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                </a>
+            </aside>
 
-                {{-- Big editorial headline --}}
-                <h1 style="font-family:'Geist',system-ui,sans-serif;
-                            font-weight:600;
-                            font-size:clamp(44px,8.5vw,124px);
-                            line-height:1.03;
-                            letter-spacing:-0.035em;
-                            color:#0a0a0a;
-                            margin:0;" data-hero-primary>
-                    <span class="hero-headline-line"><span class="hero-title-accent">Dando</span>&nbsp;<span class="hero-hl">vida</span></span>
-                    <span class="hero-headline-line">a &nbsp;<span class="hero-hl">tus ideas</span></span>
-                </h1>
+    </section>{{-- /hr-hero --}}
 
-                {{-- Sub-grid: socials rail | copy+CTA | status --}}
-                <div class="hero-sub-grid">
+    {{-- ── Stats strip: centered wrapper ──────────────────────────── --}}
+    <div class="hr-stats-wrapper">
+        <section class="hr-stats" aria-label="Indicadores">
 
-                    {{-- Social icons (vertical rail) --}}
-                    <div class="hero-socials-rail">
-                        <a href="{{ env('APP_GITHUB_URL', 'https://github.com/CarlosBTav') }}"
-                           target="_blank" rel="noopener noreferrer"
-                           class="hero-social-link" title="GitHub">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2c-3.2.69-3.87-1.36-3.87-1.36-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.69 1.25 3.34.95.1-.74.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .96-.31 3.15 1.18.91-.25 1.89-.38 2.86-.38s1.95.13 2.86.38c2.18-1.49 3.14-1.18 3.14-1.18.62 1.58.23 2.75.11 3.04.74.81 1.18 1.84 1.18 3.1 0 4.42-2.69 5.4-5.26 5.68.41.36.78 1.06.78 2.15v3.18c0 .31.21.67.8.56C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
-                            </svg>
-                        </a>
-                        <a href="{{ env('APP_LINKEDIN_URL', 'https://www.linkedin.com/in/carlos-b-6a8a9a2b5/') }}"
-                           target="_blank" rel="noopener noreferrer"
-                           class="hero-social-link" title="LinkedIn">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.22 8.5h4.56V23H.22V8.5zM8.34 8.5h4.37v1.98h.06c.61-1.15 2.1-2.36 4.32-2.36 4.62 0 5.47 3.04 5.47 7v7.88h-4.56v-6.99c0-1.67-.03-3.82-2.33-3.82-2.33 0-2.69 1.82-2.69 3.7V23H8.34V8.5z"/>
-                            </svg>
-                        </a>
-                        <div style="width:1px;height:28px;background:rgba(10,10,10,0.15);" data-hero-divider></div>
-                        <span class="hero-socials-handle"
-                              style="font-family:'JetBrains Mono',monospace;font-size:10px;
-                                     letter-spacing:0.14em;color:#7a7a76;
-                                     writing-mode:vertical-rl;transform:rotate(180deg);
-                                     user-select:none;" data-hero-muted>@carlos.codex</span>
-                    </div>
+            <div class="hr-stat">
+                <div class="hr-stat-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.431L24 9.25l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.097 0 9.25l8.332-1.232z"/></svg>
+                </div>
+                <div class="hr-stat-text">
+                    <span class="hr-stat-title">+10 proyectos</span>
+                    <span class="hr-stat-sub">Entregados con éxito</span>
+                </div>
+            </div>
 
-                    {{-- Description + call-to-action buttons --}}
-                    <div>
-                        <p style="font-size:clamp(15px,1.2vw,17px);line-height:1.65;
-                                  max-width:460px;margin:0;
-                                  font-family:'Geist',system-ui,sans-serif;" data-hero-body>
-                            Ingeniero full‑stack:<br>
-                            Construyo aplicaciones web y móvil, sistemas y los pequeños detalles
-                            que hacen que un producto se sienta cuidado.
-                        </p>
-                        <div style="margin-top:28px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-                            <a href="#projects" class="hero-cta-primary">
-                                <span style="width:34px;height:34px;border-radius:999px;
-                                             background:#0a0a0a;color:#fff;
-                                             display:inline-flex;align-items:center;
-                                             justify-content:center;font-size:16px;
-                                             flex-shrink:0;" data-hero-cta-icon>↗</span>
-                                Ver proyectos
-                            </a>
-                            <a href="#contact" class="hero-cta-secondary">Contactar</a>
-                        </div>
-                    </div>
+            <div class="hr-stat">
+                <div class="hr-stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="hr-stat-text">
+                    <span class="hr-stat-title">Clientes satisfechos</span>
+                    <span class="hr-stat-sub">Trabajo cercano y transparente</span>
+                </div>
+            </div>
 
-                    {{-- Right-aligned status metadata --}}
-                    <div class="hero-status-block"
-                         style="text-align:right;font-family:'JetBrains Mono',monospace;
-                                font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;
-                                color:#7a7a76;line-height:2;" data-hero-muted>
-                        <div style="color:#0a0a0a;font-weight:600;display:flex;align-items:center;
-                                    justify-content:flex-end;gap:7px;margin-bottom:1px;" data-hero-primary>
-                            <span class="hero-dot-pulse"></span>Disponible · Q2 2026
-                        </div>
-                        <div>Sevilla · UTC+1</div>
-                    </div>
+            <div class="hr-stat">
+                <div class="hr-stat-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+                </div>
+                <div class="hr-stat-text">
+                    <span class="hr-stat-title">Respuesta en 24h</span>
+                    <span class="hr-stat-sub">Atención rápida y directa</span>
+                </div>
+            </div>
 
-                </div>{{-- /hero-sub-grid --}}
+            <div class="hr-stat">
+                <div class="hr-stat-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="hr-stat-text">
+                    <span class="hr-stat-title">Freelance disponible</span>
+                    <span class="hr-stat-sub">Nuevos proyectos</span>
+                </div>
+            </div>
 
-                </div>{{-- /LEFT text content --}}
+        </section>{{-- /hr-stats --}}
+    </div>{{-- /hr-stats-wrapper --}}
 
-                {{-- RIGHT: profile image --}}
-                <div class="hero-image-col">
-                    <div class="hero-profile-wrap">
-                        <img src="{{ asset('img/me-noBg-dark.webp') }}"
-                             alt="Carlos — Fullstack Developer"
-                             class="hero-profile-img"
-                             width="720" height="900"
-                             loading="eager"
-                             decoding="async">
-                    </div>
-                </div>{{-- /hero-image-col --}}
-
-                </div>{{-- /hero-layout --}}
-
-            </div>{{-- /main body --}}
-
-        </div>{{-- /content layer --}}
-
-    </section>
 
     <!--
     |------------------------------------------------------------------|
     |  ##########             SERVICIOS SECTION            ##########  |                
     |------------------------------------------------------------------|
     -->
-    <section id="services" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mb-8">
-        <!-- Decoración de fondo suave -->
-        <div class="absolute top-0 left-0 -ml-20 -mt-20 w-72 h-72 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <section id="services" class="relative z-10 transition-colors duration-300 mx-3 md:mx-6 lg:mx-10 mt-8 mb-8">
+      <div class="max-w-screen-xl px-4 mx-auto">
+        <div class="hr-section-card services">
+          <div class="services-head">
+            <span class="eyebrow"><span class="dot"></span>Mis servicios</span>
+            <h2>Soluciones digitales <span class="accent">a medida</span> para tu negocio</h2>
+            <p>Desde la idea hasta el lanzamiento. Me encargo de todo el proceso para que tú te centres en lo importante.</p>
+            <a class="pill-cta" href="#services-all">
+              Ver todos los servicios
+              <span class="arrow">→</span>
+            </a>
+          </div>
 
-        <div class="max-w-screen-xl px-4 mx-auto relative z-10">
-            
-            <!-- Cabecera de la sección -->
-            <div class="text-center max-w-3xl mx-auto mb-16" data-reveal>
-                <div class="flex items-center justify-center gap-2 mb-4">
-                    <span class="relative flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-                    </span>
-                    <span class="text-blue-600 dark:text-blue-400 font-bold tracking-widest uppercase text-xs">
-                        ¿Qué puedo hacer por ti?
-                    </span>
-                </div>
-                
-                <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.15]">
-                    Construye conmigo tu
-                    <p> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">web o app móvil</span></p>
-                </h2>
-                <p class="text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                    Soluciones tecnológicas a medida para impulsar tu carrera o tu negocio. Desde una presencia online profesional hasta herramientas avanzadas de gestión.
-                </p>
+          <div class="services-grid">
+            <div class="svc">
+              <span class="svc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
+              </span>
+              <h3>Desarrollo Web</h3>
+              <p>Páginas rápidas, modernas y optimizadas para convertir.</p>
+              <ul>
+                <li><x-icons.check />Landing pages</li>
+                <li><x-icons.check />Webs corporativas</li>
+                <li><x-icons.check />E‑commerce</li>
+              </ul>
             </div>
 
-            <!-- Grid de Servicios -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                <!-- Servicio 1: Portfolio -->
-                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden" data-reveal data-reveal-delay="100">
-                    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Páginas Web y Portfolios</h3>
-                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Destaca en internet con una web rápida, moderna y optimizada. Ideal para marca personal, creativos e individuos que quieren mostrar su trabajo al mundo.
-                    </p>
-                    {{-- Efecto de resplandor sutil al fondo esquina inferior derecha --}}
-                    <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500"></div>
-                </div>
-
-                <!-- Servicio 2: ERP & CRM -->
-                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden" data-reveal data-reveal-delay="200">
-                    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Sistemas de Gestión</h3>
-                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Desarrollo de ERPs y CRMs a medida. Optimiza el tiempo de tu empresa organizando a tus clientes, facturación y procesos internos en un solo lugar seguro.
-                    </p>
-                    {{-- Efecto de resplandor sutil al fondo esquina inferior derecha --}}
-                    <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500"></div>
-                </div>
-
-                <!-- Servicio 3: Apps Móviles -->
-                <div class="js-spotlight-card section-inner-card group p-8 rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden" data-reveal data-reveal-delay="300">
-                    <div class="w-14 h-14 bg-white dark:bg-gray-800 rounded-xl shadow-sm flex items-center justify-center mb-6 text-indigo-500 group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Aplicaciones Móviles</h3>
-                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
-                        Llevo tu idea a los bolsillos de tus usuarios. Desarrollo aplicaciones intuitivas, rápidas y listas para ser publicadas en las tiendas oficiales.
-                    </p>
-                    {{-- Efecto de resplandor sutil al fondo esquina inferior derecha --}}
-                    <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-colors duration-500"></div>
-                </div>
+            <div class="svc">
+              <span class="svc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
+              </span>
+              <h3>Apps Móviles</h3>
+              <p>Apps nativas Android y multiplataforma con excelente experiencia.</p>
+              <ul>
+                <li><x-icons.check />Android (Kotlin)</li>
+                <li><x-icons.check />Apps multiplataforma</li>
+                <li><x-icons.check />Integraciones y APIs</li>
+              </ul>
             </div>
 
-            <!-- Banner de Oferta y CTA -->
-            <div class="relative bg-gradient-to-br from-indigo-50 via-white to-blue-50 dark:from-gray-800 dark:via-gray-800 dark:to-indigo-900/30 rounded-3xl p-8 md:p-12 border border-indigo-100 dark:border-gray-700 overflow-hidden shadow-lg" data-reveal data-reveal-delay="150">
-                <!-- Decoración fondo banner -->
-                <div class="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-indigo-400 to-blue-500 opacity-10 dark:opacity-20 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-                
-                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left">
-                    <div class="max-w-2xl">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold mb-4">
-                            <span>🎁 Oferta especial por tiempo limitado</span>
-                        </div>
-                        <h3 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                            Prototipo gratuito, sin compromiso.
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-300 text-lg">
-                            Solo tienes que contarme tu idea. Diseñaré un prototipo visual para que veas cómo luciría tu proyecto <strong>totalmente gratis y sin compromiso</strong>. Si el resultado te apasiona entonces podemos proceder a hacerlo realidad por un precio super competitivo.
-                        </p>
-                    </div>
-                    
-<div class="flex-shrink-0 flex flex-col items-center lg:items-end gap-3">
-    <a href="#contact" class="group relative inline-flex items-center justify-center px-8 py-4 w-full sm:w-auto text-base font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl overflow-hidden transition-all duration-300 active:scale-95 shadow-sm">
-        <!-- Fondo animado que entra por la izquierda -->
-        <span class="absolute inset-0 w-full h-full bg-gray-100 dark:bg-gray-700 -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></span>
-        
-        <!-- El texto debe tener z-10 para quedar sobre el fondo que entra -->
-        <span class="relative z-10">¡Me interesa!</span>
-    </a>
-    <span class="text-sm text-gray-500 dark:text-gray-400">Abierto a nuevas contrataciones</span>
-</div>
-                </div>
+            <div class="svc">
+              <span class="svc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              </span>
+              <h3>Software a medida</h3>
+              <p>Soluciones personalizadas para automatizar y escalar tu negocio.</p>
+              <ul>
+                <li><x-icons.check />APIs y backends</li>
+                <li><x-icons.check />Paneles administrativos</li>
+                <li><x-icons.check />Integraciones externas</li>
+              </ul>
             </div>
+          </div>
 
+          <div class="services-footer">
+            Tecnología moderna. Código limpio. <span class="accent">Resultados reales.</span>
+          </div>
         </div>
+      </div>
     </section>
 
 
@@ -724,15 +1156,13 @@
     |  ##########             SOBRE MI SECTION             ##########  |
     |------------------------------------------------------------------|
     -->
-    {{-- overflow-x-clip: el halo top-right usa -mr-20 y sobresale; sin clip el documento amplía scrollWidth en móvil --}}
     <section id="about" class="relative py-24 bg-transparent transition-colors duration-300 overflow-x-clip">
         <div class="absolute top-0 right-0 -mr-20 -mt-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/18 rounded-full blur-3xl pointer-events-none hidden md:block"></div>
 
         <div class="max-w-screen-xl px-4 mx-auto relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
-                
-                <!-- Columna izquierda decorativa -->
+
                 <div class="lg:col-span-5 relative group lg:pr-10" data-reveal>
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
                     <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
@@ -740,7 +1170,6 @@
                             <img src="{{ asset('img/me-alt.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos trabajando" class="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105">
                         </div>
                     </div>
-
                     <div class="absolute -bottom-6 -right-2 lg:right-4 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-4 animate-floating z-20">
                         <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full text-indigo-600 dark:text-indigo-400">
                             <x-icons.cpu class="w-6 h-6" />
@@ -752,29 +1181,21 @@
                     </div>
                 </div>
 
-                <!-- Columna derecha -->
                 <div class="lg:col-span-7" data-reveal data-reveal-delay="150">
-                    <!-- Badge con pulso sutil -->
                     <div class="flex items-center gap-2 mb-4">
                         <span class="relative flex h-3 w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
                         </span>
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase text-xs">
-                            Conoce mi perfil
-                        </span>
+                        <span class="text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase text-xs">Conoce mi perfil</span>
                     </div>
-    
-                                    
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-white mb-6 leading-[1.15]">
                         Diseñando y programando apps y webs con la mejor <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-blue-400">arquitectura de software.</span>
                     </h2>
-
                     <div class="space-y-4 text-base md:text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
                         <p>Empecé como profesional en el sector electrónico aeroespacial, un entorno <strong>científico y metódico</strong>.</p>
                         <p>Con el tiempo decidí licenciarme como programador web y de aplicaciones y actualmente llevo <strong>más de 7 años</strong> combinando una metodología científica y mi visión creativa para construir proyectos modernos y óptimos para particulares y empresas.</p>
                     </div>
-
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
                         <div class="flex items-center gap-3 bg-white dark:bg-gray-800/50 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                             <div class="text-indigo-500"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg></div>
@@ -785,7 +1206,6 @@
                             <span class="font-medium text-gray-800 dark:text-gray-200">Desarrollo móvil</span>
                         </div>
                     </div>
-
                     <a href="{{ route('public.about') }}" class="group inline-flex items-center justify-center px-6 py-3.5 text-base font-semibold text-white bg-gray-900 hover:bg-gray-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg">
                         Conoce mi historia completa
                         <svg class="w-5 h-5 ml-2 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -797,15 +1217,14 @@
     </section>
 
 
-
     <!--
     |------------------------------------------------------------------|
     |  ##########              SKILLS SECTION              ##########  |
     |------------------------------------------------------------------|
     -->
-
-    <section id="skills" x-data="skillsComponent()" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mt-8 mb-8">
+    <section id="skills" x-data="skillsComponent()" class="relative z-10 py-24 transition-colors duration-300 mx-3 md:mx-6 lg:mx-10 mt-8 mb-8">
         <div class="max-w-screen-xl px-4 mx-auto relative">
+            <div class="hr-section-card">
             <div class="mb-12" data-reveal>
                 <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Stack Tecnológico</h2>
                 <div class="w-20 h-1.5 bg-indigo-600 mt-4 rounded-full"></div>
@@ -813,8 +1232,7 @@
                     Trabajo con una gran gama de tecnologías de desarrollo, tanto web (Portfolios, CRMs, ERPs y CMS) como en aplicaciones móviles y multiplataforma. Todo en <strong>completo fullstack</strong>.
                 </p>
             </div>
-            
-            <!-- Grid Principal (6 Tarjetas) -->
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <template x-for="(skill, key) in skillsData" :key="key">
                     <div @click="openModal(key)" class="skill-card js-spotlight-card section-inner-card group cursor-pointer rounded-2xl p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-col h-full relative overflow-hidden" data-reveal>
@@ -826,14 +1244,12 @@
                             </div>
                             <h3 class="text-lg font-bold text-gray-900 dark:text-white leading-tight" x-text="skill.title"></h3>
                         </div>
-                        
                         <div class="flex flex-wrap gap-2 mt-auto relative z-10">
                             <template x-for="(tech, index) in skill.technologies.slice(0, 4)" :key="index">
                                 <img :src="tech.badge" :alt="tech.name" class="h-6 rounded shadow-sm">
                             </template>
                             <span x-show="skill.technologies.length > 4" class="flex items-center px-2 py-1 text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded" x-text="`+${skill.technologies.length - 4}`"></span>
                         </div>
-
                         <div class="skill-cta-hint mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
                             Ver detalle de tecnologías
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
@@ -841,28 +1257,21 @@
                     </div>
                 </template>
             </div>
+            </div>{{-- /hr-section-card --}}
         </div>
 
-        <!-- MODAL OVERLAY -->
+        <!-- Skills Modal (unchanged) -->
         <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-[100] overflow-y-auto">
-            
-            <!-- Fondo Oscuro -->
             <div x-show="modalOpen" x-transition.opacity.duration.300ms @click="closeModal()" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm min-h-screen"></div>
-
-            <!-- Contenedor Flex -->
             <div class="relative min-h-screen flex flex-col md:flex-row items-center justify-center p-4 md:p-8 overflow-hidden pointer-events-none">
-                
-                <!-- TARJETA PRINCIPAL (Izquierda - Z-INDEX ALTO) -->
-                <!-- 'relative z-20' para que tape a la otra card al salir -->
-                <div x-show="modalOpen" 
-                    x-transition:enter="ease-out duration-500" 
-                    x-transition:enter-start="opacity-0 translate-y-8 sm:scale-95" 
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
-                    x-transition:leave="ease-in duration-300" 
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
-                    x-transition:leave-end="opacity-0 translate-y-8 sm:scale-95" 
+                <div x-show="modalOpen"
+                    x-transition:enter="ease-out duration-500"
+                    x-transition:enter-start="opacity-0 translate-y-8 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-300"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-8 sm:scale-95"
                     class="relative z-20 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-500 pointer-events-auto">
-                    
                     <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                         <div class="flex items-center gap-3">
                             <div x-if="activeSkill" :class="`p-2 rounded-lg ${activeSkill?.bg} ${activeSkill?.color}`">
@@ -874,21 +1283,18 @@
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                     </div>
-
                     <div class="px-6 py-6">
                         <div x-show="activeSkill?.image" class="mb-5 overflow-hidden rounded-xl h-32 md:h-40 bg-gray-100 dark:bg-gray-800">
                             <img :src="activeSkill?.image" :alt="activeSkill?.title" class="w-full h-full object-cover opacity-90">
                         </div>
                         <p class="text-gray-600 dark:text-gray-300 text-sm mb-6 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl" x-html="activeSkill?.description"></p>
-                        
                         <h4 class="text-xs font-bold tracking-wider uppercase text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-2">
                             Haz clic en una tecnología
                             <svg class="w-4 h-4 text-indigo-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
                         </h4>
-                        
                         <div class="flex flex-wrap gap-3 mb-2">
                             <template x-for="(tech, index) in activeSkill?.technologies" :key="index">
-                                <img :src="tech.badge" :alt="tech.name" 
+                                <img :src="tech.badge" :alt="tech.name"
                                     @click="openTech(tech)"
                                     class="h-8 rounded shadow-sm transition-all duration-300 cursor-pointer ring-offset-2 dark:ring-offset-gray-900"
                                     :class="activeTech === tech ? 'ring-2 ring-indigo-500 scale-105 opacity-100' : 'hover:scale-105 opacity-80 hover:opacity-100 grayscale-[20%] hover:grayscale-0'">
@@ -896,9 +1302,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- TARJETA DE DETALLE (Z-INDEX BAJO) -->
-                <!-- Poner '!' da prioridad a la animación y los márgenes negativos fuerzan a la tarjeta a esconderse detrás -->
                 <div x-show="showTechDetails"
                     x-transition:enter="transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1)"
                     x-transition:enter-start="opacity-0 !-mt-[20rem] md:!mt-0 md:!-ml-[24rem] scale-95"
@@ -907,7 +1310,6 @@
                     x-transition:leave-start="opacity-100 mt-4 md:mt-0 md:ml-6 scale-100"
                     x-transition:leave-end="opacity-0 !-mt-[20rem] md:!mt-0 md:!-ml-[24rem] scale-95"
                     class="relative z-10 w-full max-w-sm bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-indigo-100 dark:border-gray-700 pointer-events-auto mt-4 md:mt-0 md:ml-6">
-                    
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-4">
                             <img :src="activeTech?.badge" :alt="activeTech?.name" class="h-8 rounded shadow-sm">
@@ -915,22 +1317,10 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
-                        
                         <h4 class="text-lg font-extrabold text-gray-900 dark:text-white mb-2">Mi experiencia</h4>
                         <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed" x-text="activeTech?.description"></p>
                     </div>
-                    
-                    <!-- Decoración -->
-                    <div class="absolute bottom-0 right-0 p-4 opacity-5 pointer-events-none">
-                        <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <rect x="4" y="4" width="7" height="7" rx="2" />
-                            <rect x="13" y="13" width="7" height="7" rx="2" />
-                            <circle cx="17" cy="7" r="2" />
-                            <circle cx="7" cy="17" r="2" />
-                        </svg>
-                    </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -949,21 +1339,16 @@
                 <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">Proyectos</h2>
                 <div class="w-20 h-1.5 bg-indigo-600 mt-4 rounded-full"></div>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" data-reveal data-reveal-delay="100">
                 @forelse($projects->take(3) as $project)
-                    
-                    <!-- Usamos nuestro nuevo componente de Card -->
                     <x-project-card :project="$project" />
-
                 @empty
                     <p class="col-span-full text-center text-gray-500 py-12">No hay proyectos destacados.</p>
                 @endforelse
             </div>
-
             <div class="mt-16 text-center">
                 <a href="/proyectos" class="group inline-flex items-center gap-3 px-8 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-sm tracking-wide transition-all duration-200 hover:scale-105 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 hover:shadow-indigo-500/30">
-                    Ver más proyectos 
+                    Ver más proyectos
                     <span class="text-indigo-600 dark:text-indigo-400 font-mono text-lg transition-transform duration-300 group-hover:text-white group-hover:translate-x-1">&lt;&gt;</span>
                 </a>
             </div>
@@ -976,16 +1361,14 @@
     |  ##########             CONTACT SECTION              ##########  |
     |------------------------------------------------------------------|
     -->
-    <section id="contact" class="section-glass-panel relative z-10 py-24 transition-colors duration-300 overflow-hidden mx-3 md:mx-6 lg:mx-10 rounded-3xl mt-8 mb-8">
+    <section id="contact" class="relative z-10 py-24 transition-colors duration-300 mx-3 md:mx-6 lg:mx-10 mt-8 mb-8">
         <div class="max-w-screen-md mx-auto px-4 relative z-10">
-            
-            <!-- Cabecera de la sección -->
+            <div class="hr-section-card">
             <div class="text-center mb-12" data-reveal>
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                     Hablemos de tu proyecto
                 </h2>
                 <div class="w-24 h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 mt-5 rounded-full mx-auto"></div>
-                
                 @if (session('status'))
                     <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-xl border border-green-200 dark:border-green-800/50 flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -993,62 +1376,41 @@
                     </div>
                 @else
                     <p class="mt-5 text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-                        Puedes escribirme <span class="font-semibold">sin compromiso</span> para contarme tu idea de proyecto: ya sea un <span class="font-semibold">portfolio profesional</span>, un <span class="font-semibold">CRM</span>, un <span class="font-semibold">ERP</span> o una <span class="font-semibold">app móvil</span> a medida. 
+                        Puedes escribirme <span class="font-semibold">sin compromiso</span> para contarme tu idea de proyecto.
                         Cuéntame qué necesitas y te responderé con propuestas y próximos pasos claros.
                     </p>
                     <div class="mt-5 flex flex-wrap justify-center gap-2 text-xs font-semibold">
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-800/60 hover:scale-105 transition-transform">
-                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                            Portfolios
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-200 dark:border-emerald-800/60 hover:scale-105 transition-transform">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            CRMs
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-800/60 hover:scale-105 transition-transform">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            ERPs
-                        </span>
-                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100 dark:bg-sky-900/40 dark:text-sky-200 dark:border-sky-800/60 hover:scale-105 transition-transform">
-                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                            Apps móviles
-                        </span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 dark:bg-indigo-900/40 dark:text-indigo-200 dark:border-indigo-800/60 hover:scale-105 transition-transform"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>Portfolios</span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-200 dark:border-emerald-800/60 hover:scale-105 transition-transform"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>CRMs</span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-800/60 hover:scale-105 transition-transform"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>ERPs</span>
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100 dark:bg-sky-900/40 dark:text-sky-200 dark:border-sky-800/60 hover:scale-105 transition-transform"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>Apps móviles</span>
                     </div>
                 @endif
             </div>
 
-            <!-- Tarjeta del Formulario -->
             <div class="relative overflow-hidden" data-reveal data-reveal-delay="150">
-                
                 <form id="contactForm" action="{{ route('contact.store') }}" method="POST" class="space-y-6 relative z-10" novalidate>
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Nombre -->
                         <div class="space-y-1.5">
                             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre completo</label>
-                            <input type="text" id="name" name="name" value="{{ old('name') }}" required 
+                            <input type="text" id="name" name="name" value="{{ old('name') }}" required
                                 placeholder="Ej. Ana García"
                                 class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
                         </div>
-                        
-                        <!-- Email -->
                         <div class="space-y-1.5">
                             <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Correo electrónico</label>
-                            <input type="email" id="email" name="email" value="{{ old('email') }}" required 
+                            <input type="email" id="email" name="email" value="{{ old('email') }}" required
                                 placeholder="hola@gmail.com"
                                 class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500 transition-colors">
                         </div>
                     </div>
-                    
-                    <!-- Mensaje -->
                     <div class="space-y-1.5">
                         <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">¿En qué puedo ayudarte?</label>
-                        <textarea id="content" name="content" rows="4" required 
+                        <textarea id="content" name="content" rows="4" required
                             placeholder="Me gustaría hablar contigo sobre el desarrollo de..."
                             class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500 transition-colors resize-none">{{ old('content') }}</textarea>
                     </div>
-                    
-                    <!-- Botón Principal -->
                     <div class="pt-2">
                         <button type="submit" class="w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center gap-2 px-8 py-3.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg shadow-indigo-500/20 ml-auto">
                             <span>Enviar mensaje</span>
@@ -1056,398 +1418,218 @@
                         </button>
                     </div>
                 </form>
-
-                <!-- Alternativa secundaria (Discreta) -->
                 <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800/60 relative z-10 flex items-center justify-center">
                     <p class="text-sm text-gray-500 dark:text-gray-500 flex flex-wrap items-center justify-center gap-1.5 text-center">
-                        <span>¿Prefieres usar el correo?</span> 
+                        <span>¿Prefieres usar el correo?</span>
                         <a href="mailto:{{ env('APP_CONTACT_EMAIL') }}" class="group inline-flex items-center gap-1.5 font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
-                            <!-- El icono y el texto ahora estarán alineados al centro exacto entre sí -->
                             <x-icons.email class="w-5 h-5 transition-colors duration-300" />
                             <span>Contáctame por email</span>
                         </a>
                     </p>
                 </div>
-
             </div>
+            </div>{{-- /hr-section-card --}}
         </div>
     </section>
 
 @endsection
 
 
-
-<!--
-    |------------------------------------------------------------------|
-    |  ##########               SCRIPTS JS                 ##########  |                
-    |------------------------------------------------------------------|
--->
 @push('scripts')
+{{-- ── WebGL diagonal-flow shader (hero card) + AI dots background ── --}}
 <script>
-/* ================================================================
-   HERO FLUID BACKGROUND — WebGL domain-warped fluid field
-   Translated from hero-soft.jsx (FluidField component).
-   Palette: --color-primary (mint) → --color-secondary (indigo).
-   ================================================================ */
-(function () {
-    const canvas = document.getElementById('hero-fluid-canvas');
-    if (!canvas) return;
+/* ────────────────────────────────────────────────────────────────────
+   1. WebGL shader — dark diagonal-flow contained in .hr-hero card
+   ──────────────────────────────────────────────────────────────────── */
+(function initHeroShader() {
+  const canvas = document.getElementById('hr-shader-canvas');
+  if (!canvas) return;
+  const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: true, alpha: true });
+  if (!gl) return;
+  gl.disable(gl.DEPTH_TEST);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const gl = canvas.getContext('webgl', { premultipliedAlpha: false, antialias: true });
-    if (!gl) return;
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width * dpr));
+    const h = Math.max(1, Math.floor(rect.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    gl.viewport(0, 0, w, h);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(canvas);
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-    /** Altura estable para normalizar el scroll del shader sin jitter al mostrar/ocultar UI del navegador. */
-    function layoutViewportCssHeight() {
-        return Math.max(1, document.documentElement.clientHeight || window.innerHeight);
+  const vsSrc = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
+  const fsSrc = `
+    precision highp float;
+    uniform vec2  u_res;
+    uniform float u_time;
+    uniform float u_intensity;
+    uniform vec3  u_cA;
+    uniform vec3  u_cB;
+    uniform float u_fluidMix;
+    uniform float u_pastel;
+    uniform float u_vignFloor;
+    float noise(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){
+      vec2 uv = gl_FragCoord.xy / u_res.xy;
+      float ratio = u_res.x / u_res.y;
+      vec2 p = uv; p.x *= ratio;
+      float t = u_time * 0.18;
+      vec2 shift = p;
+      for (float i = 1.0; i < 4.0; i++) {
+        shift.x += 0.42 / i * sin(i * 1.7 * p.y + t * 1.05);
+        shift.y += 0.36 / i * cos(i * 1.7 * p.x + t * 0.95);
+      }
+      float diagonal = shift.x + shift.y * ratio;
+      float wobble = 0.22 * sin(p.y * 2.6 + t * 1.15)
+                   + 0.16 * cos(p.x * 2.2 - t * 0.88)
+                   + 0.09 * sin((p.x + p.y * 0.7) * 3.4 + t * 0.42);
+      float target = ratio * 1.02 + wobble;
+      float band = abs(diagonal - target);
+      band += 0.055 * (noise(p * 6.2 + vec2(t * 0.12, -t * 0.08)) - 0.5);
+      /* Slightly wider core than opaque-era mask so the band reads clearly on page bg */
+      float mask = smoothstep(1.48, -0.04, band);
+      float mixer    = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
+      vec3  bandCol  = mix(u_cA, u_cB, mixer);
+      vec3  fluid    = bandCol * u_fluidMix;
+      vec3  ice      = vec3(0.99, 0.99, 1.0);
+      vec3  pastelCore = mix(ice, bandCol, 0.62);
+      pastelCore = mix(pastelCore, vec3(1.0), 0.12);
+      vec3  color = mix(fluid, pastelCore, u_pastel);
+      float vign     = smoothstep(1.1, 0.3, length(uv - vec2(0.35, 0.5)));
+      color *= mix(u_vignFloor, 1.0, vign);
+      /*
+        Peak opacity must exceed legacy “opaque mix × u_intensity”: same fluid over page bg disappears
+        if α stays ~0.35. Boost coverage; pow softens halo without killing the stripe core.
+      */
+      float stripeAmp = clamp(mask * u_intensity * 3.05, 0.0, 1.0);
+      float blendAlpha = clamp(pow(stripeAmp, 0.76), 0.0, 1.0);
+      float g = (noise(uv + fract(u_time)) - 0.5) * 0.025;
+      color += g * mix(1.0, 0.45, u_pastel) * stripeAmp;
+      gl_FragColor = vec4(color, blendAlpha);
     }
-
-    let resizeRaf = 0;
-    function resize() {
-        const rect = canvas.getBoundingClientRect();
-        const cssW = Math.max(1, rect.width || window.innerWidth);
-        const cssH = Math.max(1, rect.height || window.innerHeight);
-
-        const bufW = Math.max(1, Math.floor(cssW * dpr));
-        const bufH = Math.max(1, Math.floor(cssH * dpr));
-        if (canvas.width !== bufW || canvas.height !== bufH) {
-            canvas.width = bufW;
-            canvas.height = bufH;
-        }
-        gl.viewport(0, 0, bufW, bufH);
-    }
-
-    function scheduleResize() {
-        if (resizeRaf) return;
-        resizeRaf = requestAnimationFrame(() => {
-            resizeRaf = 0;
-            resize();
-        });
-    }
-
-    resize();
-    window.addEventListener('resize', scheduleResize, { passive: true });
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', scheduleResize, { passive: true });
-    }
-
-    /* ── Shaders ── */
-    const vsSrc = `attribute vec2 a; void main(){ gl_Position = vec4(a, 0., 1.); }`;
-
-    const fsSrc = `
-        precision highp float;
-        uniform vec2  u_res;
-        uniform float u_time;
-        uniform float u_dark;
-        uniform float u_scroll; /* scrollY / innerHeight — pans the field vertically */
-
-        float noise(vec2 p) {
-            return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-        }
-
-        void main(){
-            vec2 uv    = gl_FragCoord.xy / u_res.xy;
-            float ratio = u_res.x / u_res.y;
-
-            /* Offset vertical coordinate by scroll so the pattern pans with the page.
-               WebGL's y-axis runs bottom→top (opposite to CSS), so we subtract:
-               scrolling down increases scrollY → decreases p.y → samples lower
-               in the virtual field → pattern moves up, matching page content. */
-            vec2 p = uv;
-            p.x   *= ratio;
-            p.y   -= u_scroll;
-
-            float t = u_time * 0.25;
-
-            /* Domain warp — liquid flow */
-            vec2 shift = p;
-            for (float i = 1.0; i < 3.0; i++) {
-                shift.x += 0.35 / i * sin(i * 1.8 * p.y + t);
-                shift.y += 0.30 / i * cos(i * 1.8 * p.x + t);
-            }
-
-            /* Diagonal band: top-right → bottom-left */
-            float diagonal = shift.x + shift.y * ratio;
-            float target   = ratio * 1.0;
-            float mask     = smoothstep(0.9, 0.0, abs(diagonal - target));
-
-            /* Colour drift along the band */
-            float mixer     = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
-            vec3  cA        = vec3(0.604, 0.820, 0.824);   /* --color-primary   #9ad1d2 */
-            vec3  cB        = vec3(0.388, 0.400, 0.945);   /* --color-secondary #6366f1 */
-            vec3  fluid     = mix(cA, cB, mixer);
-
-            vec3  lightBg   = vec3(1.0, 1.0, 1.0);
-            vec3  darkBg    = vec3(0.0941, 0.1020, 0.1216);
-            vec3  bg        = mix(lightBg, darkBg, u_dark);
-            vec3  color     = mix(bg, fluid, mask * 0.95);
-
-            /* Subtle film grain */
-            float grain = (noise(uv + fract(u_time)) - 0.5) * 0.05;
-            color += grain;
-
-            gl_FragColor = vec4(color, 1.0);
-        }
-    `;
-
-    function mkShader(type, src) {
-        const s = gl.createShader(type);
-        gl.shaderSource(s, src);
-        gl.compileShader(s);
-        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-            console.warn('[hero-fluid] shader error:', gl.getShaderInfoLog(s));
-        }
-        return s;
-    }
-
-    const prog = gl.createProgram();
-    gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   vsSrc));
-    gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, fsSrc));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    /* Full-screen quad */
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -1,-1,  1,-1,  -1, 1,
-        -1, 1,  1,-1,   1, 1,
-    ]), gl.STATIC_DRAW);
-    const aLoc = gl.getAttribLocation(prog, 'a');
-    gl.enableVertexAttribArray(aLoc);
-    gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
-
-    const uRes    = gl.getUniformLocation(prog, 'u_res');
-    const uTime   = gl.getUniformLocation(prog, 'u_time');
-    const uDark   = gl.getUniformLocation(prog, 'u_dark');
-    const uScroll = gl.getUniformLocation(prog, 'u_scroll');
-
-    const t0    = performance.now();
-    const speed = 0.06;
-
-    /* Pause when tab is hidden to save GPU */
-    let paused = false;
-    document.addEventListener('visibilitychange', () => {
-        paused = document.hidden;
-        if (!paused) requestAnimationFrame(frame);
-    });
-
-    function frame() {
-        if (paused) return;
-        const t      = (performance.now() - t0) / 1000 * speed * 8.0;
-        const isDark = document.documentElement.classList.contains('dark') ? 1 : 0;
-        /* Normalize by innerHeight so one viewport-scroll = +1 in shader space.
-           Reading scrollY inside rAF is non-blocking — no layout reflow. */
-        const scroll = window.scrollY / Math.max(1, layoutViewportCssHeight());
-        gl.uniform2f(uRes,    canvas.width, canvas.height);
-        gl.uniform1f(uTime,   t);
-        gl.uniform1f(uDark,   isDark);
-        gl.uniform1f(uScroll, scroll);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        requestAnimationFrame(frame);
-    }
-    frame();
+  `;
+  function mkS(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, mkS(gl.VERTEX_SHADER, vsSrc));
+  gl.attachShader(prog, mkS(gl.FRAGMENT_SHADER, fsSrc));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+  const aLoc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(aLoc);
+  gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+  const uRes = gl.getUniformLocation(prog, 'u_res');
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uIntensity = gl.getUniformLocation(prog, 'u_intensity');
+  const uCA = gl.getUniformLocation(prog, 'u_cA');
+  const uCB = gl.getUniformLocation(prog, 'u_cB');
+  const uFluidMix = gl.getUniformLocation(prog, 'u_fluidMix');
+  const uPastel = gl.getUniformLocation(prog, 'u_pastel');
+  const uVignFloor = gl.getUniformLocation(prog, 'u_vignFloor');
+  function parseHexRgbNorm(hex) {
+    let h = hex.trim().replace(/^#/, '');
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+    const n = parseInt(h, 16);
+    if (!Number.isFinite(n) || h.length !== 6) return [0.39, 0.4, 0.59];
+    return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  }
+  function parseFluidMix() {
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hr-shader-fluid-mix').trim());
+    return Number.isFinite(v) ? v : 0.55;
+  }
+  function parsePastelUniform() {
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hr-shader-pastel').trim());
+    return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0;
+  }
+  function parseVignFloor() {
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hr-shader-vign-floor').trim());
+    return Number.isFinite(v) ? v : 0.85;
+  }
+  const t0 = performance.now();
+  let active = true;
+  function frame() {
+    if (!active) return;
+    const t = ((performance.now() - t0) / 1000) * 0.5;
+    const root = document.documentElement;
+    const intensity = parseFloat(getComputedStyle(root).getPropertyValue('--hr-shader-intensity').trim()) || 0.22;
+    const style = getComputedStyle(root);
+    const [ar, ag, ab] = parseHexRgbNorm(style.getPropertyValue('--hr-accent-soft'));
+    const [cr, cg, cb] = parseHexRgbNorm(style.getPropertyValue('--hr-accent'));
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, t);
+    gl.uniform1f(uIntensity, intensity);
+    gl.uniform3f(uCA, ar, ag, ab);
+    gl.uniform3f(uCB, cr, cg, cb);
+    gl.uniform1f(uFluidMix, parseFluidMix());
+    gl.uniform1f(uPastel, parsePastelUniform());
+    gl.uniform1f(uVignFloor, parseVignFloor());
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(frame);
+  }
+  frame();
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(([e]) => { active = e.isIntersecting; if (active) frame(); }, { threshold: 0 }).observe(canvas);
+  }
 })();
-/* ================================================================ */
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('contactForm');
-        
-        if (form) {
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const submitBtn = form.querySelector('button[type="submit"]');
-                const originalBtnText = submitBtn.innerHTML;
-                
-                form.querySelectorAll('.error-msg, .server-error-banner').forEach(el => el.remove());
-                form.querySelectorAll('.border-red-500, .border-indigo-500').forEach(el => el.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500', 'border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400'));
 
-                // Frontend Validation to prevent loading flicker on empty fields
-                if (!form.checkValidity()) {
-                    let firstInvalid = null;
-                    const elements = form.elements;
-                    for (let i = 0; i < elements.length; i++) {
-                        const input = elements[i];
-                        if (input.willValidate && !input.checkValidity()) {
-                            if (!firstInvalid) firstInvalid = input;
-                            input.classList.add('border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400');
-                            const errorDiv = document.createElement('p');
-                            errorDiv.className = 'error-msg mt-1.5';
-                            errorDiv.setAttribute('role', 'alert');
-                            
-                            let errorMsg = 'Este campo es obligatorio.';
-                            if (input.validity.typeMismatch) {
-                                errorMsg = 'El formato no es válido.';
-                            }
+/* ────────────────────────────────────────────────────────────────────
+   2. AI dots — port of ai-dots-background.blade.php, scoped to hero
+   ──────────────────────────────────────────────────────────────────── */
+(function initHeroDots() {
+  const root   = document.getElementById('hr-dots-panel');
+  if (!root) return;
+  const canvas = root.querySelector('.hr-dots-canvas');
+  if (!canvas || !canvas.getContext) return;
+  const ctx    = canvas.getContext('2d');
+  let dots     = [], spacing = 22;
+  const mouse  = { x:-1000, y:-1000, px:-1000, py:-1000, speed:0, radius:120, ready:false };
 
-                            errorDiv.innerHTML = `
-                                <span class="inline-flex items-center gap-1.5 rounded-md border border-indigo-200/70 bg-indigo-50/80 px-2 py-1 text-sm text-indigo-600 dark:border-indigo-500/20 dark:bg-indigo-950/20 dark:text-indigo-400">
-                                    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                    </svg>
-                                    <span>${errorMsg}</span>
-                                </span>
-                            `;
-                            input.parentNode.appendChild(errorDiv);
-                        }
-                    }
-                    if (firstInvalid) firstInvalid.focus();
-                    return; // Detenemos aquí para no hacer fetch ni poner el spinner
-                }
+  const waveDefs = [
+    { duration:7500,  alternateReverse:false, radius:64, radiusPulse:0.16, phase:0.2,
+      keys:[{x:-0.3,y:-0.1,rotate:-5,scaleX:0.95,scaleY:0.72},{x:0,y:0.15,rotate:3,scaleX:1.08,scaleY:1.2},{x:0.3,y:-0.15,rotate:-2,scaleX:1.02,scaleY:0.86}],
+      segments:[[[-200,200],[100,50],[300,350],[600,200]],[[600,200],[900,50],[1100,350],[1400,200]]]},
+    { duration:9500,  alternateReverse:true,  radius:50, radiusPulse:0.18, phase:2.1,
+      keys:[{x:0.3,y:0.15,rotate:5,scaleX:1.08,scaleY:1.12},{x:0,y:-0.1,rotate:-2,scaleX:0.92,scaleY:0.84},{x:-0.3,y:0.1,rotate:3,scaleX:1.12,scaleY:1.28}],
+      segments:[[[-200,200],[200,350],[400,50],[700,200]],[[700,200],[1000,350],[1200,50],[1400,200]]]},
+    { duration:11000, alternateReverse:false, radius:58, radiusPulse:0.2,  phase:4.2,
+      keys:[{x:-0.18,y:0.18,rotate:7,scaleX:1.1,scaleY:0.78},{x:0.12,y:-0.06,rotate:-5,scaleX:0.88,scaleY:1.22},{x:0.24,y:0.14,rotate:4,scaleX:1.04,scaleY:0.96}],
+      segments:[[[-200,180],[80,310],[280,90],[540,210]],[[540,210],[800,330],[980,80],[1400,180]]]}
+  ];
 
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Enviando...
-                `;
+  const ss = t => t<0?0:t>1?1:t*t*(3-2*t);
+  const ei = t => 0.5 - Math.cos(t*Math.PI)*0.5;
+  const lp = (a,b,t) => a+(b-a)*t;
+  function rp(x,y,d){ const a=d*Math.PI/180,c=Math.cos(a),s=Math.sin(a); return {x:x*c-y*s,y:x*s+y*c}; }
+  function ik(keys,p){ let s=keys[0],e=keys[1],l=p/0.5; if(p>0.5){s=keys[1];e=keys[2];l=(p-0.5)/0.5;} l=ei(l); return {x:lp(s.x,e.x,l),y:lp(s.y,e.y,l),rotate:lp(s.rotate,e.rotate,l),scaleX:lp(s.scaleX,e.scaleX,l),scaleY:lp(s.scaleY,e.scaleY,l)}; }
+  function wm(def,now){ const tt=now/def.duration,it=Math.floor(tt); let p=tt-it; if((def.alternateReverse&&it%2===0)||(!def.alternateReverse&&it%2===1))p=1-p; return ik(def.keys,p); }
+  function cb(pts,t){ const m=1-t; return [m*m*m*pts[0][0]+3*m*m*t*pts[1][0]+3*m*t*t*pts[2][0]+t*t*t*pts[3][0],m*m*m*pts[0][1]+3*m*m*t*pts[1][1]+3*m*t*t*pts[2][1]+t*t*t*pts[3][1]]; }
+  function ds(px,py,ax,ay,bx,by){ const vx=bx-ax,vy=by-ay,wx=px-ax,wy=py-ay,len=vx*vx+vy*vy||1; let t=(wx*vx+wy*vy)/len; t=Math.max(0,Math.min(1,t)); return Math.hypot(px-(ax+vx*t),py-(ay+vy*t)); }
+  function dtp(px,py,segs){ let cl=Infinity; for(let s=0;s<segs.length;s++){ let last=cb(segs[s],0); for(let i=1;i<=22;i++){ const nx=cb(segs[s],i/22); const d=ds(px,py,last[0],last[1],nx[0],nx[1]); if(d<cl)cl=d; last=nx; } } return cl; }
+  function twv(gx,gy,def,now,cw,ch){ let p=rp(gx-cw*0.5,gy-ch*0.5,10); let lx=p.x+cw,ly=p.y+ch*0.5; const m=wm(def,now); let x=lx-cw-m.x*cw,y=ly-ch*0.5-m.y*ch; p=rp(x,y,-m.rotate); return {x:(p.x/m.scaleX+cw)/Math.max(cw*2,1)*1000,y:(p.y/m.scaleY+ch*0.5)/Math.max(ch,1)*400}; }
+  function wb(gx,gy,cw,ch,now){ let st=0; for(let i=0;i<waveDefs.length;i++){ const def=waveDefs[i]; const p=twv(gx,gy,def,now,cw,ch); const d=dtp(p.x,p.y,def.segments); const r=def.radius*(1+Math.sin(now*0.00055+def.phase)*def.radiusPulse); const b=1-ss(d/r); if(b>st)st=b; } return st; }
+  function vis(gx,gy,cw,ch,now){ let v=wb(gx,gy,cw,ch,now); if(mouse.ready){const dx=mouse.x-gx,dy=mouse.y-gy; v+=Math.exp(-(dx*dx+dy*dy)/(220*220))*0.7;} return Math.max(0,Math.min(1,v)); }
+  function Dot(x,y){ this.x=x; this.y=y; this.bx=x; this.by=y; this.vx=0; this.vy=0; }
+  Dot.prototype.update=function(){ const dx=mouse.x-this.x,dy=mouse.y-this.y,dist=Math.sqrt(dx*dx+dy*dy); if(dist<mouse.radius&&mouse.speed>0.5){ const force=(mouse.radius-dist)/mouse.radius,ang=Math.atan2(dy,dx); let pow=mouse.speed*0.005; if(pow>1.2)pow=1.2; this.vx-=Math.cos(ang)*force*pow; this.vy-=Math.sin(ang)*force*pow; } this.x+=this.vx; this.y+=this.vy; this.vx*=0.9; this.vy*=0.9; this.x+=(this.bx-this.x)*0.007; this.y+=(this.by-this.y)*0.007; };
+  Dot.prototype.draw=function(now,rgb){ const v=vis(this.bx,this.by,canvas.width,canvas.height,now); ctx.globalAlpha=0.18+(1-0.18)*v; ctx.fillStyle='rgb('+rgb+')'; ctx.beginPath(); ctx.arc(this.x,this.y,0.6+(1.55-0.6)*v,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; };
 
-                try {
-                    const formData = new FormData(form);
-                    const response = await fetch(form.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
-                    });
-
-                    const contentType = response.headers.get("content-type");
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        const data = await response.json();
-
-                        if (!response.ok) {
-                            if (response.status === 422) {
-                                for (const [field, errors] of Object.entries(data.errors)) {
-                                    const input = form.querySelector(`[name="${field}"]`);
-                                    if (input) {
-                                        input.classList.add('border-indigo-500', 'focus:border-indigo-500', 'focus:ring-indigo-500', 'dark:border-indigo-400');
-                                        const errorDiv = document.createElement('p');
-                                        errorDiv.className = 'error-msg mt-1.5';
-                                        errorDiv.setAttribute('role', 'alert');
-                                        errorDiv.innerHTML = `
-                                            <span class="inline-flex items-center gap-1.5 rounded-md border border-indigo-200/70 bg-indigo-50/80 px-2 py-1 text-sm text-indigo-600 dark:border-indigo-500/20 dark:bg-indigo-950/20 dark:text-indigo-400">
-                                                <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                                </svg>
-                                                <span>${errors[0]}</span>
-                                            </span>
-                                        `;
-                                        input.parentNode.appendChild(errorDiv);
-                                    } else {
-                                        mostrarError(form, `Error en el campo "${field}": ${errors[0]}`);
-                                    }
-                                }
-                            } else {
-                                mostrarError(form, data.message || 'Error desconocido del servidor.');
-                            }
-                        } else {
-                            const successCard = `
-                                <div class="flex flex-col items-center justify-center p-8 text-center bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-2xl transition-all duration-500">
-                                    <div class="w-16 h-16 bg-green-100 dark:bg-green-800/50 rounded-full flex items-center justify-center mb-6 shadow-sm shadow-green-500/20">
-                                        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    </div>
-                                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">¡Mensaje Enviado!</h3>
-                                    <p class="text-gray-600 dark:text-gray-300">${data.message}</p>
-                                </div>
-                            `;
-                            form.parentElement.innerHTML = successCard;
-                        }
-                    } else {
-                        mostrarError(form, 'Fallo interno del servidor (Error 500).');
-                    }
-                } catch (error) {
-                    mostrarError(form, 'Error de conexión. Revisa tu internet e inténtalo de nuevo.');
-                } finally {
-                    if (document.body.contains(submitBtn)) {
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalBtnText;
-                    }
-                }
-            });
-
-            function mostrarError(formulario, mensaje) {
-                const errorBanner = document.createElement('div');
-                errorBanner.className = 'server-error-banner mb-6';
-                errorBanner.setAttribute('role', 'alert');
-                errorBanner.innerHTML = `
-                    <div class="flex gap-3 rounded-xl border border-indigo-200/80 bg-indigo-50/60 px-4 py-3 dark:border-indigo-500/30 dark:bg-indigo-950/30">
-                        <span class="flex shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 p-1.5" aria-hidden="true">
-                            <svg class="h-5 w-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Algo salió mal</p>
-                            <p class="mt-1 text-sm text-gray-700 dark:text-gray-300 message-text"></p>
-                        </div>
-                    </div>
-                `;
-                errorBanner.querySelector('.message-text').textContent = mensaje;
-                formulario.prepend(errorBanner);
-            }
-        }
-    });
-</script>
-
-<!-- Scroll Reveal + Mobile Skill CTA -->
-<script>
-(function () {
-    'use strict';
-
-    // Activa los estilos CSS de ocultación sólo cuando JS está disponible
-    document.documentElement.classList.add('reveal-ready');
-
-    /* ── Scroll Reveal ─────────────────────────────────────────────── */
-    function setupReveal() {
-        var observer = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-revealed');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-        // Stagger escalonado para las skill cards renderizadas por Alpine
-        var skillGrid = document.querySelector('#skills .grid');
-        if (skillGrid) {
-            Array.from(skillGrid.children).forEach(function (card, i) {
-                if (card.hasAttribute('data-reveal')) {
-                    card.style.transitionDelay = (i * 80) + 'ms';
-                }
-            });
-        }
-
-        document.querySelectorAll('[data-reveal]').forEach(function (el) {
-            observer.observe(el);
-        });
-    }
-
-    /* ── Mobile Skill CTA ──────────────────────────────────────────── */
-    function setupMobileSkillCTA() {
-        // Sólo en dispositivos sin hover (móvil / táctil)
-        if (!window.matchMedia('(hover: none)').matches) return;
-
-        var ctaObserver = new IntersectionObserver(function (entries) {
-            entries.forEach(function (entry) {
-                entry.target.classList.toggle('is-in-view', entry.isIntersecting);
-            });
-        }, { threshold: 0.55 });
-
-        document.querySelectorAll('.skill-card').forEach(function (card) {
-            ctaObserver.observe(card);
-        });
-    }
-
-    /* ── Ejecutar tras Alpine (garantiza que x-for ya renderizó) ───── */
-    document.addEventListener('alpine:initialized', function () {
-        setupReveal();
-        setupMobileSkillCTA();
-    });
+  function syncSize(){ const w=Math.max(1,Math.floor(canvas.clientWidth)),h=Math.max(1,Math.floor(canvas.clientHeight)); if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;} const ds=parseInt(root.dataset.spacing,10); if(ds>=8&&ds<=60)spacing=ds; dots=[]; for(let x=0;x<=canvas.width;x+=spacing)for(let y=0;y<=canvas.height;y+=spacing)dots.push(new Dot(x,y)); }
+  function animate(){ const now=performance.now(); const rgb=getComputedStyle(root).getPropertyValue('--hr-dots-dot').trim()||'165, 180, 252'; ctx.clearRect(0,0,canvas.width,canvas.height); let spd=Math.hypot(mouse.x-mouse.px,mouse.y-mouse.py); if(spd>72)spd=72; mouse.speed+=(spd-mouse.speed)*0.1; mouse.px=mouse.x; mouse.py=mouse.y; for(let i=0;i<dots.length;i++){dots[i].update();dots[i].draw(now,rgb);} requestAnimationFrame(animate); }
+  window.addEventListener('mousemove',(e)=>{ if('pointerType'in e&&e.pointerType==='touch')return; const rect=canvas.getBoundingClientRect(); mouse.x=e.clientX-rect.left; mouse.y=e.clientY-rect.top; if(!mouse.ready){mouse.px=mouse.x;mouse.py=mouse.y;mouse.speed=0;mouse.ready=true;} },{passive:true});
+  window.addEventListener('resize',syncSize);
+  if(window.ResizeObserver)new ResizeObserver(syncSize).observe(canvas.parentElement||root);
+  syncSize(); animate();
 })();
 </script>
 
@@ -1504,8 +1686,8 @@ document.addEventListener('alpine:init', () => {
                 technologies:[
                     { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Lo utilizo para montar tiendas online rápidamente con un sistema ya establecido. He trabajado con él durante mi trabajo como programador en "Al Rescate". No solo lo he configuradp, también he desarrollado módulos a medida en PHP y adaptado plantillas para cubrir flujos de venta B2B y B2C muy específicos.' },
                     { name: 'Dolibarr ERP', badge: 'https://img.shields.io/badge/Dolibarr_ERP-2980B9?style=flat', description: 'He usado este sistema para digitalizar la gestión de empresas durante mi trabajo en "Al rescate". Lo he usado para darle a clientes el control total de facturación, almacén e incluso lo he sincronizado por API con sus tiendas web.' },
-                    { name: 'WooCommerce', badge: 'https://img.shields.io/badge/WooCommerce-96588A?style=flat&logo=woocommerce&logoColor=white', description: 'Mi elección para e-commerce más ágiles e integrados. Podeis ver un ejemplo de mi trabajo con WooCommerce en la web "LaBichaTattoo.es". Me he metido a fondo en su código modificando hooks, creando pasarelas de pago personalizadas y optimizando el proceso de checkout.' },
-                    { name: 'WordPress', badge: 'https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white', description: 'Mientras que los CMS no son una buena opción para proyectos grandes o complejos, para el desarrollo de webs medianamente sencillas WordPress es una herramienta útil para diseños super rápidos y autogestionables por el usuario final.' }
+                    { name: 'Stripe', badge: 'https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white', description: 'Pagos online y facturación: Checkout, Payment Intents, webhooks y cuentas conectadas cuando hace falta marketplace. Lo integro desde backend (Laravel u otros) para no depender de plugins rígidos y controlar flujos, idempotencia y seguridad (SCA, 3DS) al detalle.' },
+                    { name: 'Laravel Cashier', badge: 'https://img.shields.io/badge/Laravel_Cashier-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Para SaaS y tiendas con suscripciones en Laravel: planes, pruebas, renovaciones y portal de facturación del cliente sobre Stripe. Encaja con mi stack habitual y sube el nivel frente a solo “instalar un plugin de pago”.' }
                 ]
             },
             bbdd: {
@@ -1591,4 +1773,5 @@ document.addEventListener('alpine:init', () => {
     }))
 })
 </script>
+
 @endpush

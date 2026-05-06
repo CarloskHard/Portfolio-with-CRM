@@ -493,7 +493,8 @@
     </style>
 
     <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        /* Sync with the 'color-theme' key used by the theme-toggle component */
+        if (localStorage['color-theme'] === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -515,9 +516,9 @@
     <!-- Incluimos el pie de página -->
     @include('partials.footer')
 
-    <!-- BOTÓN SCROLL TO TOP -->
-    <div id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed right-8 z-50 pointer-events-none" style="opacity: 0; transform: translateY(20px); bottom: 32px;">
-        <div class="h-12 w-12 rounded-full bg-indigo-600 hover:bg-indigo-500 cursor-pointer flex items-center justify-center shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-colors duration-300" role="button" tabindex="0">
+    <!-- BOTÓN SCROLL TO TOP: sin opacity/transform inline (si no, ganan a las clases del script y nunca se ve) -->
+    <div id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed right-8 z-[80] bottom-8 opacity-0 pointer-events-none translate-y-10 transition-opacity transition-transform duration-300">
+        <div class="h-12 w-12 rounded-full bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-600 dark:hover:bg-indigo-500 cursor-pointer flex items-center justify-center shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-colors duration-300" role="button" tabindex="0">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="m18 15-6-6-6 6"></path></svg>
         </div>
     </div>
@@ -553,7 +554,6 @@
         }
 
         if (scrollBtn) {
-            scrollBtn.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
             window.addEventListener('scroll', syncScrollToTopFab, { passive: true });
             window.addEventListener('resize', syncScrollToTopFab);
             syncScrollToTopFab();

@@ -1,4 +1,4 @@
-<button id="theme-toggle" type="button" class="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-300 w-10 h-10 overflow-hidden hover:opacity-80">
+<button id="theme-toggle" type="button" class="relative inline-flex items-center justify-center p-2 rounded-lg text-gray-500 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-700 transition-all duration-300 w-10 h-10 overflow-hidden">
     
     <!-- ICONO LUNA (Visible en Light -> Color Indigo) -->
     <svg id="theme-toggle-dark-icon" class="w-5 h-5 transition-all duration-500 transform absolute
@@ -28,13 +28,15 @@
 
     // 2. Evento Click
     var themeToggleBtn = document.getElementById('theme-toggle');
-    themeToggleBtn.addEventListener('click', function() {
-        if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('color-theme', 'light');
-        } else {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('color-theme', 'dark');
-        }
-    });
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+    }
 </script>
