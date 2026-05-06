@@ -760,6 +760,10 @@
           object-fit: contain; object-position: bottom center;
           filter: drop-shadow(var(--hr-portrait-shadow));
         }
+        /* Desktop/layer portrait: hard switch by theme (prevents both images showing). */
+        .hr-portrait-layer .hr-portrait-dark { display: none; }
+        html.dark .hr-portrait-layer .hr-portrait-light { display: none; }
+        html.dark .hr-portrait-layer .hr-portrait-dark { display: block; }
 
         /* ── Idea card ───────────────────────────────────────────────── */
         .hr-idea-card {
@@ -844,15 +848,27 @@
             align-items: start;
             max-width: 100%;
           }
-          /* Keep inner portrait area ≥ --hr-portrait-box-h once padding is border-box */
+          /*
+            Mobile: collapse any artificial vertical box height so the portrait
+            hugs the copy more closely. The generic min-height based on
+            --hr-portrait-box-h was leaving extra empty space above the bitmap.
+          */
           .hr-photo-stage {
-            min-height: calc(var(--hr-portrait-box-h) + 2 * var(--hr-stage-pady));
+            /* Let the image define the height; keep just enough padding for the glow. */
+            min-height: auto;
             display: flex;
             align-items: flex-end;
             justify-content: center;
+            padding-top: calc(var(--hr-stage-pady) * 0.5);
+            /* Remove extra blank band under the bitmap on stacked/mobile layout. */
+            padding-bottom: 0;
           }
           .hr-hero-right {
-            min-height: calc(var(--hr-portrait-box-h) + 2 * var(--hr-stage-pady) + clamp(12px, 2.2vw, 28px) + clamp(10px, 1.8vw, 24px));
+            /* Keep hero-right snug to the stats strip so the portrait appears to emerge from behind it,
+               without reintroducing a tall fixed box above the bitmap. */
+            min-height: auto;
+            padding-top: clamp(4px, 1.5vw, 10px);
+            padding-bottom: 0;
           }
           /* Stacked hero: width + aspect-capped height so img fills the box (no letterboxing gap) */
           .hr-portrait-layer {
@@ -861,8 +877,13 @@
           .hr-portrait-inline {
             display: block;
             width: min(100%, var(--hr-portrait-w));
-            height: var(--hr-portrait-box-h);
+            /* Let intrinsic aspect + stage padding drive total height; avoid ghost box above image. */
+            height: auto;
           }
+          /* Mobile/inline portrait: force a single visible image by theme. */
+          .hr-portrait-inline.hr-portrait-dark { display: none; }
+          html.dark .hr-portrait-inline.hr-portrait-light { display: none; }
+          html.dark .hr-portrait-inline.hr-portrait-dark { display: block; }
           .hr-idea-card { right: 32px; bottom: 100px; }
         }
         /* Narrow viewports: keep 4 stats in one row, stack icon → title → text inside each cell */
@@ -908,7 +929,8 @@
           .hr-stat-icon svg { width: 16px; height: 16px; }
           .hr-h1 { font-size: 38px; }
           .hr-idea-card { right: max(16px, env(safe-area-inset-right, 0px)); bottom: 72px; }
-          .hr-stats-wrapper { padding: 0 12px; margin-top: -28px; }
+          /* Pull stats strip up a bit more on phones so it visually meets the portrait. */
+          .hr-stats-wrapper { padding: 0 12px; margin-top: -40px; }
         }
 
         /* ── Card sections: headings follow theme heading token ─────── */
@@ -1004,7 +1026,12 @@
                             <canvas class="hr-dots-canvas"></canvas>
                         </div>
                         <div class="hr-photo-glow" aria-hidden="true"></div>
-                        <img class="hr-portrait-inline"
+                        <img class="hr-portrait-inline hr-portrait-light"
+                             src="{{ asset('img/me-noBg-light.webp') }}"
+                             alt=""
+                             width="520" height="720"
+                             decoding="async" fetchpriority="high">
+                        <img class="hr-portrait-inline hr-portrait-dark"
                              src="{{ asset('img/me-noBg-dark.webp') }}"
                              alt=""
                              width="520" height="720"
@@ -1016,13 +1043,20 @@
 
             {{-- Portrait anchored to the bottom of the hero card --}}
             <div class="hr-portrait-layer" aria-hidden="true">
-                <img src="{{ asset('img/me-noBg-dark.webp') }}"
+                <img class="hr-portrait-light"
+                     src="{{ asset('img/me-noBg-light.webp') }}"
+                     alt="Carlos — Fullstack Developer"
+                     width="520" height="720"
+                     loading="eager" decoding="async">
+                <img class="hr-portrait-dark"
+                     src="{{ asset('img/me-noBg-dark.webp') }}"
                      alt="Carlos — Fullstack Developer"
                      width="520" height="720"
                      loading="eager" decoding="async">
             </div>
 
-            {{-- Floating idea card --}}
+            {{-- Floating idea card (hidden temporarily) --}}
+            {{--
             <aside class="hr-idea-card">
                 <div class="hr-idea-head">
                     <span style="display:inline-block;width:6px;height:6px;border-radius:999px;background:var(--hr-accent-2);"></span>
@@ -1033,6 +1067,7 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </a>
             </aside>
+            --}}
 
     </section>{{-- /hr-hero --}}
 
@@ -1449,9 +1484,9 @@
   gl.disable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
   function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = canvas.getBoundingClientRect();
     const w = Math.max(1, Math.floor(rect.width * dpr));
     const h = Math.max(1, Math.floor(rect.height * dpr));
@@ -1491,8 +1526,14 @@
       float target = ratio * 1.02 + wobble;
       float band = abs(diagonal - target);
       band += 0.055 * (noise(p * 6.2 + vec2(t * 0.12, -t * 0.08)) - 0.5);
-      /* Slightly wider core than opaque-era mask so the band reads clearly on page bg */
-      float mask = smoothstep(1.48, -0.04, band);
+      /*
+        band scales ~linearly with aspect ratio (width/height). Fixed smoothstep edges
+        blow up on tall phones (tiny ratio) and invert smoothstep had edge0 > edge1 (undefined).
+        Normalizing makes stripe width consistent across viewports.
+      */
+      float bandN = band / max(ratio, 0.04);
+      /* Narrow core, soft falloff (valid smoothstep: low < high) */
+      float mask = 1.0 - smoothstep(0.06, 0.74, bandN);
       float mixer    = smoothstep(0.2, 0.8, uv.x + sin(t * 0.5) * 0.2);
       vec3  bandCol  = mix(u_cA, u_cB, mixer);
       vec3  fluid    = bandCol * u_fluidMix;
