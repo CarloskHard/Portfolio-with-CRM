@@ -78,9 +78,9 @@
           --hr-text-muted: #9aa0ad;
           --hr-text-faint: #6b7180;
           --hr-heading: #f5f6fa;
-          --hr-accent: #6366f1;
+          --hr-accent: #5a61dd;
           --hr-accent-2: #818cf8;
-          --hr-accent-soft: #a5b4fc;
+          --hr-accent-soft: #7f90f6;
           --hr-available: #22c55e;
           --hr-dots-fade-w: 19%;
           --hr-idea-card-bg: rgba(20, 22, 30, 0.82);
@@ -1080,8 +1080,8 @@
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.431L24 9.25l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.097 0 9.25l8.332-1.232z"/></svg>
                 </div>
                 <div class="hr-stat-text">
-                    <span class="hr-stat-title">+10 proyectos</span>
-                    <span class="hr-stat-sub">Entregados con éxito</span>
+                    <span class="hr-stat-title">A medida</span>
+                    <span class="hr-stat-sub">Soluciones web escalables</span>
                 </div>
             </div>
 
@@ -1520,11 +1520,13 @@
         shift.y += 0.36 / i * cos(i * 1.7 * p.x + t * 0.95);
       }
       float diagonal = shift.x + shift.y * ratio;
+      /* Bounded phase drift keeps motion alive without pushing band off-canvas */
+      float sweep = sin(t * 0.72) * (0.32 * max(ratio, 0.35));
       float wobble = 0.22 * sin(p.y * 2.6 + t * 1.15)
                    + 0.16 * cos(p.x * 2.2 - t * 0.88)
                    + 0.09 * sin((p.x + p.y * 0.7) * 3.4 + t * 0.42);
       float target = ratio * 1.02 + wobble;
-      float band = abs(diagonal - target);
+      float band = abs((diagonal + sweep) - target);
       band += 0.055 * (noise(p * 6.2 + vec2(t * 0.12, -t * 0.08)) - 0.5);
       /*
         band scales ~linearly with aspect ratio (width/height). Fixed smoothstep edges
@@ -1597,10 +1599,12 @@
     return Number.isFinite(v) ? v : 0.85;
   }
   const t0 = performance.now();
+  /* Start from a later visual phase so first frame looks "settled" */
+  const shaderStartOffsetSec = 50.0;
   let active = true;
   function frame() {
     if (!active) return;
-    const t = ((performance.now() - t0) / 1000) * 0.5;
+    const t = ((performance.now() - t0) / 1000 + shaderStartOffsetSec) * 0.5;
     const root = document.documentElement;
     const intensity = parseFloat(getComputedStyle(root).getPropertyValue('--hr-shader-intensity').trim()) || 0.22;
     const style = getComputedStyle(root);
