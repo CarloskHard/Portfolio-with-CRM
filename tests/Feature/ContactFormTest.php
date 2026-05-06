@@ -20,6 +20,8 @@ class ContactFormTest extends TestCase
             'name' => 'Ada Lovelace',
             'email' => 'ada@example.com',
             'content' => 'Hola, quiero hablar sobre un proyecto web para mi negocio.',
+            'inquiry_type' => 'web',
+            'web_products' => ['basic_web', 'crm'],
         ]);
 
         $response->assertOk()->assertJson([
@@ -43,6 +45,7 @@ class ContactFormTest extends TestCase
             'name' => 'Grace Hopper',
             'email' => 'grace@example.com',
             'content' => 'Me interesa una propuesta para actualizar mi sitio web.',
+            'inquiry_type' => 'business',
         ]);
 
         $response->assertOk()->assertJson([

@@ -38,6 +38,11 @@ Route::get('/sobre-mi',[PortfolioController::class, 'about'])->name('public.abou
 Route::get('/cv', [PortfolioController::class, 'cv'])->name('public.cv');
 Route::get('/cv/descargar', [PortfolioController::class, 'cvDownload'])->name('public.cv.download');
 
+// Presupuestos (solo por enlace directo, sin entrada en el menú público)
+Route::get('/presupuesto/{slug?}', [PortfolioController::class, 'quote'])
+    ->where('slug', '[A-Za-z0-9\-_]+')
+    ->name('public.quote');
+
 /*
 |--------------------------------------------------------------------------
 | Rutas Web PRIVADAS  (Backend / Admin)
@@ -60,6 +65,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // CRUD de Clientes
     Route::resource('clients', ClientController::class);
+    Route::post('/clients/{client}/quotes', [ClientController::class, 'storeQuote'])->name('clients.quotes.store');
+    Route::delete('/clients/{client}/quotes/{quoteVersion}', [ClientController::class, 'destroyQuote'])->name('clients.quotes.destroy');
 
 
     // GESTIÓN DE CONTACTOS (Agenda dentro de Clientes)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Technology;
+use App\Models\QuoteVersion;
 
 class PortfolioController extends Controller
 {
@@ -56,5 +57,33 @@ class PortfolioController extends Controller
             ->view('public.cv', ['downloadMode' => true], 200)
             ->header('Content-Type', 'text/html; charset=UTF-8')
             ->header('Content-Disposition', 'attachment; filename="carlos-burgos-tavora-cv.html"');
+    }
+
+    public function quote(string $slug = 'general')
+    {
+        $quoteVersion = QuoteVersion::with('client')->where('slug', $slug)->first();
+
+        if ($quoteVersion) {
+            return view('public.quote', [
+                'quote' => [
+                    'title' => $quoteVersion->title,
+                    'client_name' => $quoteVersion->client->commercial_name,
+                    'updated_at' => optional($quoteVersion->quote_date)->toDateString() ?? $quoteVersion->updated_at->toDateString(),
+                    'currency' => $quoteVersion->currency,
+                    'notes' => $quoteVersion->notes ?? [],
+                    'items' => $quoteVersion->items ?? [],
+                ],
+                'slug' => $slug,
+            ]);
+        }
+
+        $quoteVersions = config('quotes.versions', []);
+        $quote = $quoteVersions[$slug] ?? null;
+
+        if (! $quote) {
+            abort(404);
+        }
+
+        return view('public.quote', compact('quote', 'slug'));
     }
 }
