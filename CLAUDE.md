@@ -316,6 +316,7 @@ The `compose.yaml` includes:
 
 - **Debug toolbar:** Install `barryvdh/laravel-debugbar` for development profiling
 - **Log location:** `storage/logs/laravel.log`
+- **500 after small Blade edits:** Check `storage/logs/laravel.log` first. If the error is `file_put_contents(.../storage/framework/views/...): Permission denied`, it is usually a compiled Blade cache ownership issue, not the Blade change itself. Clear compiled views with `php artisan view:clear`, then ensure `storage/` and `bootstrap/cache/` are writable by the web server group (`www-data`) before retrying.
 - **Tinker:** `./vendor/bin/sail artisan tinker` for interactive REPL
 - **Database inspection:** `./vendor/bin/sail mysql --user=root --password=password` (check `.env` for actual creds)
 - **Queue inspection:** Monitor jobs via `storage/logs/` or `./vendor/bin/sail artisan queue:listen`

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 735" role="img" aria-label="Carlos Codex logo">
   <defs>
-    <radialGradient id="logoGradient" cx="48%" cy="28%" r="68%">
-      <stop offset="0%" stop-color="#e0e7ff"/>
-      <stop offset="24%" stop-color="#a5b4fc"/>
+    <radialGradient id="logoGradient" cx="48%" cy="18%" r="68%">
+      <stop offset="0%" stop-color="#c7d2fe"/>
+      <stop offset="24%" stop-color="#9aa8fb"/>
       <stop offset="58%" stop-color="#6366f1"/>
       <stop offset="100%" stop-color="#4f46e5"/>
     </radialGradient>

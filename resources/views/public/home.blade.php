@@ -1235,8 +1235,9 @@
                 <div class="lg:col-span-5 relative group lg:pr-10" data-reveal>
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
                     <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
-                        <div class="overflow-hidden rounded-xl">
-                            <img src="{{ asset('img/logo.svg') }}" alt="Logo Carlos Codex" class="w-full h-auto object-contain p-8 transform transition-transform duration-700 group-hover:scale-105 drop-shadow-[0_18px_28px_rgba(15,23,42,0.22)] dark:drop-shadow-[0_18px_32px_rgba(154,209,210,0.18)]">
+                        <div class="relative overflow-hidden rounded-xl">
+                            <img src="{{ asset('img/logo.svg') }}" alt="" aria-hidden="true" class="absolute inset-x-0 top-0 w-full h-auto object-contain p-8 translate-x-1 translate-y-4 scale-[0.98] opacity-25 blur-[3px] brightness-0 pointer-events-none select-none">
+                            <img src="{{ asset('img/logo.svg') }}" alt="Logo Carlos Codex" class="relative w-full h-auto object-contain p-8 transform transition-transform duration-700 group-hover:scale-105 drop-shadow-[2px_14px_26px_rgba(15,23,42,0.22)] dark:drop-shadow-[2px_14px_30px_rgba(154,209,210,0.18)]">
                         </div>
                     </div>
                     <div class="absolute -bottom-6 -right-2 lg:right-4 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-4 animate-floating z-20">
