@@ -347,15 +347,15 @@
                            :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
                     </li>
                     <li>
-                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
-                           class="srn-link"
-                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
-                    </li>
-                    <li>
                         <a href="{{ route('public.about') }}"
                            class="srn-link {{ $isAbout ? 'is-active' : '' }}"
                            :class="(isHome && activeHomeSection === 'about') ? 'is-active' : ''"
                            @if($isAbout) aria-current="page" @endif>Sobre mí</a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
+                           class="srn-link"
+                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
                     </li>
                     <li>
                         <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"
@@ -390,16 +390,16 @@
                            :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
                     </li>
                     <li>
-                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
-                           @click="open = false"
-                           class="srn-mobile-link"
-                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
-                    </li>
-                    <li>
                         <a href="{{ route('public.about') }}"
                            @click="open = false"
                            class="srn-mobile-link {{ $isAbout ? 'is-active' : '' }}"
                            :class="(isHome && activeHomeSection === 'about') ? 'is-active' : ''">Sobre mí</a>
+                    </li>
+                    <li>
+                        <a href="{{ $isHome ? '#projects' : route('home') . '#projects' }}"
+                           @click="open = false"
+                           class="srn-mobile-link"
+                           :class="(isHome && activeHomeSection === 'projects') ? 'is-active' : ''">Portfolio</a>
                     </li>
                     <li>
                         <a href="{{ $isHome ? '#contact' : route('home') . '#contact' }}"

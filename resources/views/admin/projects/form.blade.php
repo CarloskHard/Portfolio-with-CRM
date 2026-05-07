@@ -49,6 +49,17 @@
                                 <input type="url" name="url_demo" value="{{ old('url_demo', $project->url_demo) }}"
                                     class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             </div>
+
+                            <div>
+                                <label for="demo_cta_label" class="block text-sm font-bold text-gray-700">Texto botón demo</label>
+                                <select name="demo_cta_label" id="demo_cta_label"
+                                    class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="Demo" {{ old('demo_cta_label', $project->demo_cta_label ?? 'Demo') === 'Demo' ? 'selected' : '' }}>Demo</option>
+                                    <option value="Visitar" {{ old('demo_cta_label', $project->demo_cta_label) === 'Visitar' ? 'selected' : '' }}>Visitar</option>
+                                    <option value="Ver app" {{ old('demo_cta_label', $project->demo_cta_label) === 'Ver app' ? 'selected' : '' }}>Ver app (icono Play Store)</option>
+                                </select>
+                                <p class="mt-1 text-xs text-gray-500">Si no hay URL demo, este texto se ignora.</p>
+                            </div>
                             
                             <!-- Visibilidad -->
                             <div>

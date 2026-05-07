@@ -3,7 +3,7 @@
 
 @props([
     'images' => [],
-    'fallback' => asset('img/logo.png')
+    'fallback' => asset('img/logo.svg')
 ])
 
 <div x-data="{

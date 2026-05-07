@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Carlos Codex | Full Stack Developer</title>
     <meta name="description" content="Desarrollo de aplicaciones y webs para particulares y empresas. +7 años desarrollando software. Cuéntame tu idea y te devolveré un producto real."> <!-- Snippet en búsqueda de Google -->
-    <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png" sizes="512x512">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

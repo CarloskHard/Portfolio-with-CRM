@@ -11,7 +11,7 @@ class Project extends Model
 
     protected $fillable =[
         'title', 'description', 'images', 'sort_order',
-        'visibility', 'url_demo', 'url_repo'
+        'visibility', 'url_demo', 'url_repo', 'demo_cta_label'
     ];
 
     // Esto convierte automáticamente el JSON de la base de datos a un array de PHP y viceversa

@@ -78,12 +78,19 @@ class ProjectController extends Controller
             'order' => 'nullable|array', // Array que nos manda el Front con el orden
             'url_repo' => 'nullable|url',
             'url_demo' => 'nullable|url',
+            'demo_cta_label' => 'nullable|in:Demo,Visitar,Ver app',
             'visibility' => 'required|in:public,private,draft',
             'technologies' => 'nullable|array',
             'technologies.*' => 'exists:technologies,id',
             'clients' => 'nullable|array',
             'clients.*' => 'exists:clients,id',
         ]);
+
+        if (empty($data['url_demo'])) {
+            $data['demo_cta_label'] = null;
+        } else {
+            $data['demo_cta_label'] = $data['demo_cta_label'] ?? 'Demo';
+        }
 
         // GESTIÓN DE IMÁGENES Y SU ORDEN
         $finalImages = [];
@@ -133,12 +140,19 @@ class ProjectController extends Controller
             'order' => 'nullable|array',
             'url_repo' => 'nullable|url',
             'url_demo' => 'nullable|url',
+            'demo_cta_label' => 'nullable|in:Demo,Visitar,Ver app',
             'visibility' => 'required|in:public,private,draft',
             'technologies' => 'nullable|array', 
             'technologies.*' => 'exists:technologies,id',
             'clients' => 'nullable|array',
             'clients.*' => 'exists:clients,id',
         ]);
+
+        if (empty($data['url_demo'])) {
+            $data['demo_cta_label'] = null;
+        } else {
+            $data['demo_cta_label'] = $data['demo_cta_label'] ?? 'Demo';
+        }
 
         // GESTIÓN DE IMÁGENES NUEVAS Y ORDEN
         $finalImages = [];

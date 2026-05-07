@@ -313,6 +313,22 @@
           padding: 32px;
           position: relative;
         }
+
+        /* Skill cards: CTA bajo la tarjeta — en móvil al entrar en vista; en desktop al hover */
+        .skill-card .skill-cta-hint {
+          opacity: 0;
+          transition: opacity 0.35s ease;
+        }
+        @media (max-width: 767.98px) {
+          .skill-card.skill-card--in-view .skill-cta-hint {
+            opacity: 1;
+          }
+        }
+        @media (min-width: 768px) {
+          .skill-card:hover .skill-cta-hint {
+            opacity: 1;
+          }
+        }
         /* ── Services styles used by "Hero Redesign.html" markup ────── */
         .services {
           display: grid;
@@ -474,16 +490,34 @@
           .services { grid-template-columns: 1fr; }
           .services-grid {
             grid-template-columns: 1fr;
-            padding: 22px 24px;
+            padding: 0;
+            gap: 14px;
+            border: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
           }
           .services-grid .svc {
-            padding: 0;
+            padding: 18px 16px;
+            border: 1px solid var(--hr-border-grid);
+            border-radius: 14px;
+            background: var(--hr-bg-services-grid);
+            gap: 10px;
+          }
+          .services-grid .svc:first-child,
+          .services-grid .svc:last-child {
+            padding-left: 16px;
+            padding-right: 16px;
           }
           .services-grid .svc:not(:first-child) {
             border-left: none;
+            margin-top: 0;
+            padding-top: 18px;
+          }
+          .services-grid .svc ul {
             border-top: 1px solid var(--hr-border-grid);
-            margin-top: 22px;
-            padding-top: 22px;
+            margin-top: 6px;
+            padding-top: 10px;
           }
         }
 
@@ -552,7 +586,9 @@
           display: flex; align-items: center; gap: 14px;
           font-family: 'JetBrains Mono', monospace;
           font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
-          color: var(--hr-text-muted); margin-bottom: 26px;
+          color: var(--hr-text-muted);
+          margin-top: 16px;
+          margin-bottom: 14px;
         }
         .hr-available { display: inline-flex; align-items: center; gap: 8px; color: var(--hr-available); font-weight: 600; }
         .hr-status-dot {
@@ -963,8 +999,6 @@
                             <span class="hr-status-dot"></span>Disponible
                         </span>
                         <span class="hr-status-sep">·</span>
-                        <span>Sevilla, España</span>
-                        <span class="hr-status-sep">·</span>
                         <span>UTC+1</span>
                     </div>
 
@@ -1202,7 +1236,7 @@
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
                     <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
                         <div class="overflow-hidden rounded-xl">
-                            <img src="{{ asset('img/me-alt.png') }}" onerror="this.src='{{ asset('img/logo.png') }}'" alt="Carlos trabajando" class="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105">
+                            <img src="{{ asset('img/logo.svg') }}" alt="Logo Carlos Codex" class="w-full h-auto object-contain p-8 transform transition-transform duration-700 group-hover:scale-105 drop-shadow-[0_18px_28px_rgba(15,23,42,0.22)] dark:drop-shadow-[0_18px_32px_rgba(154,209,210,0.18)]">
                         </div>
                     </div>
                     <div class="absolute -bottom-6 -right-2 lg:right-4 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 flex items-center gap-4 animate-floating z-20">
@@ -1285,9 +1319,12 @@
                             </template>
                             <span x-show="skill.technologies.length > 4" class="flex items-center px-2 py-1 text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded" x-text="`+${skill.technologies.length - 4}`"></span>
                         </div>
-                        <div class="skill-cta-hint mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity relative z-10">
-                            Ver detalle de tecnologías
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <div class="skill-cta-hint mt-5 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center gap-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 relative z-10">
+                            <span>
+                                <span class="md:hidden">Pulsa para ver más detalles</span>
+                                <span class="hidden md:inline">Ver detalle de tecnologías</span>
+                            </span>
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </div>
                     </div>
                 </template>
@@ -1375,8 +1412,10 @@
                 <div class="w-20 h-1.5 bg-indigo-600 mt-4 rounded-full"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" data-reveal data-reveal-delay="100">
-                @forelse($projects->take(3) as $project)
-                    <x-project-card :project="$project" />
+                @forelse($projects->take(4) as $index => $project)
+                    <div @class(['hidden md:block lg:hidden' => $index === 3])>
+                        <x-project-card :project="$project" />
+                    </div>
                 @empty
                     <p class="col-span-full text-center text-gray-500 py-12">No hay proyectos destacados.</p>
                 @endforelse
@@ -1686,6 +1725,57 @@ document.addEventListener('alpine:init', () => {
         activeSkill: null,
         activeTech: null,
         showTechDetails: false,
+        _skillCardsIo: null,
+        _skillCardsMqHandler: null,
+
+        init() {
+            this.$nextTick(() => this.bindSkillCardViewportHints());
+        },
+
+        bindSkillCardViewportHints() {
+            const sectionEl = this.$el;
+            if (!sectionEl || !window.IntersectionObserver) return;
+
+            const mq = window.matchMedia('(max-width: 767px)');
+            const clearClasses = () => {
+                sectionEl.querySelectorAll('.skill-card').forEach((el) => el.classList.remove('skill-card--in-view'));
+            };
+            const stop = () => {
+                if (this._skillCardsIo) {
+                    this._skillCardsIo.disconnect();
+                    this._skillCardsIo = null;
+                }
+                clearClasses();
+            };
+            const start = () => {
+                if (this._skillCardsIo) return;
+                this._skillCardsIo = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((e) => {
+                            e.target.classList.toggle('skill-card--in-view', e.isIntersecting);
+                        });
+                    },
+                    { threshold: 0.35, rootMargin: '0px 0px -6% 0px' },
+                );
+                sectionEl.querySelectorAll('.skill-card').forEach((el) => this._skillCardsIo.observe(el));
+            };
+            const sync = () => {
+                if (mq.matches) start();
+                else stop();
+            };
+
+            if (this._skillCardsMqHandler) {
+                if (typeof mq.removeEventListener === 'function') {
+                    mq.removeEventListener('change', this._skillCardsMqHandler);
+                } else {
+                    mq.removeListener(this._skillCardsMqHandler);
+                }
+            }
+            this._skillCardsMqHandler = sync;
+            if (typeof mq.addEventListener === 'function') mq.addEventListener('change', this._skillCardsMqHandler);
+            else mq.addListener(this._skillCardsMqHandler);
+            sync();
+        },
         
         skillsData: {
             web: {

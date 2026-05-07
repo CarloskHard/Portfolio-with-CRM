@@ -12,6 +12,8 @@
         if (empty($images) && !empty($project->image_url)) {
             $images = [$project->image_url];
         }
+        $demoCtaLabel = $project->demo_cta_label ?: 'Demo';
+        $isAppCta = $demoCtaLabel === 'Ver app';
     @endphp
 
     <!-- LLAMADA AL COMPONENTE CARRUSEL -->
@@ -64,11 +66,15 @@
                     <span class="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/0 via-indigo-500/0 to-cyan-500/0 group-hover/demo:from-indigo-500/[0.05] group-hover/demo:via-indigo-500/[0.02] group-hover/demo:to-cyan-500/[0.05] dark:group-hover/demo:from-indigo-300/[0.07] dark:group-hover/demo:via-indigo-300/[0.03] dark:group-hover/demo:to-cyan-300/[0.07] transition-colors duration-300 z-0"></span>
 
                     {{-- Icono --}}
-                    <x-icons.eye class="demo-eye-blink relative z-10 w-4 h-4 transition-all duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white group-hover/demo:scale-105" />
+                    @if($isAppCta)
+                        <x-icons.play-store class="relative z-10 w-4 h-4 transition-all duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white group-hover/demo:scale-105" />
+                    @else
+                        <x-icons.eye class="demo-eye-blink relative z-10 w-4 h-4 transition-all duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white group-hover/demo:scale-105" />
+                    @endif
                     
                     {{-- Texto --}}
                     <span class="relative z-10 transition-colors duration-300 group-hover/demo:text-gray-900 dark:group-hover/demo:text-white">
-                        Demo
+                        {{ $demoCtaLabel }}
                     </span>
                 </a>
             @endif

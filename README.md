@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/img/logo.png" alt="DevPortfolio Logo" width="120" />
+  <img src="./public/img/logo.svg" alt="DevPortfolio Logo" width="120" />
 </p>
 
 <h1 align="center">DevPortfolio CMS</h1>

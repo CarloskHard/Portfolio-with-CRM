@@ -17,7 +17,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Fav icon -->
-        <link rel="icon" href="{{ asset('img/logo.png') }}" type="image/png">
+        <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png" sizes="512x512">
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
