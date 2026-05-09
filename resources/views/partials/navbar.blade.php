@@ -2,6 +2,7 @@
     $currentRoute = Route::currentRouteName();
     $isHome = $currentRoute === 'home';
     $isAbout = $currentRoute === 'public.about';
+    $isServicePage = request()->routeIs('public.services', 'public.services.*');
     $navLogo = 'CARLOS.CODEX';
 @endphp
 
@@ -342,9 +343,9 @@
             <div class="srn-center">
                 <ul class="srn-links">
                     <li>
-                        <a href="{{ $isHome ? '#services' : route('home') . '#services' }}"
-                           class="srn-link"
-                           :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
+                        <a href="{{ route('public.services') }}"
+                           class="srn-link {{ $isServicePage ? 'is-active' : '' }}"
+                           @if($isServicePage) aria-current="page" @endif>Servicios</a>
                     </li>
                     <li>
                         <a href="{{ route('public.about') }}"
@@ -384,10 +385,9 @@
             <div>
                 <ul class="srn-mobile-links">
                     <li>
-                        <a href="{{ $isHome ? '#services' : route('home') . '#services' }}"
+                        <a href="{{ route('public.services') }}"
                            @click="open = false"
-                           class="srn-mobile-link"
-                           :class="(isHome && activeHomeSection === 'services') ? 'is-active' : ''">Servicios</a>
+                           class="srn-mobile-link {{ $isServicePage ? 'is-active' : '' }}">Servicios</a>
                     </li>
                     <li>
                         <a href="{{ route('public.about') }}"

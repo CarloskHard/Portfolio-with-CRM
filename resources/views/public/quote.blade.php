@@ -28,7 +28,7 @@
                     <thead class="bg-gray-50 dark:bg-gray-900/60">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">Servicio</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">Descripcion</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">Descripción</th>
                             <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">Precio</th>
                         </tr>
                     </thead>
@@ -44,7 +44,7 @@
                         @empty
                             <tr>
                                 <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-300">
-                                    No hay lineas de presupuesto para esta version.
+                                    No hay líneas de presupuesto para esta versión.
                                 </td>
                             </tr>
                         @endforelse

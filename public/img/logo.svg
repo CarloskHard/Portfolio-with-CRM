@@ -15,7 +15,5 @@
     </mask>
   </defs>
   <rect width="1024" height="735" fill="none"/>
-  <g filter="url(#softBottomShadow)">
-    <rect width="1024" height="735" fill="url(#logoGradient)" mask="url(#logoMask)"/>
-  </g>
+  <rect width="1024" height="735" fill="url(#logoGradient)" mask="url(#logoMask)"/>
 </svg>

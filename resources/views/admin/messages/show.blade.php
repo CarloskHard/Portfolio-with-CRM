@@ -121,7 +121,7 @@
                         
                         <form action="{{ route('messages.destroy', $message) }}" method="POST">
                             @csrf @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold px-3 py-1 rounded hover:bg-red-50 transition" onclick="return confirm('¿Seguro que quieres borrar este mensaje permanentemente?')">
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold px-3 py-1 rounded hover:bg-red-50 transition" onclick="return confirm('¿Enviar este mensaje a la papelera?')">
                                 Eliminar Mensaje
                             </button>
                         </form>

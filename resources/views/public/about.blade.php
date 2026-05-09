@@ -22,7 +22,7 @@
                 </p>
                 <p class="mb-6">
                     Empecé mi carrera como técnico en electrónica aeroespacial y diseño de PCBs. Aunque me encantaba el hardware, desde los 17 años mi pasión era programar videojuegos en mi tiempo libre.
-                     Al final, el lado el del software me pudo: Dejé mi trabajo, me licencié en <span class="font-semibold text-indigo-600 dark:text-indigo-400">Desarrollo de Aplicaciones Web (DAW)</span> y <span class="font-semibold text-indigo-600 dark:text-indigo-400">Multiplataforma (DAM)</span>, y cambié la electrónica por el código.
+                     Al final, el lado del software me pudo: Dejé mi trabajo, me licencié en <span class="font-semibold text-indigo-600 dark:text-indigo-400">Desarrollo de Aplicaciones Web (DAW)</span> y <span class="font-semibold text-indigo-600 dark:text-indigo-400">Multiplataforma (DAM)</span>, y cambié la electrónica por el código.
                 </p>
                 <p>
                     Al principio trabajé desarrollando sistemas de control remoto para iOS y actualmente me especializo en desarrollo <strong>Web Fullstack</strong> (Especialmente Servidores, ERPs y CRMs) y <strong>Aplicaciones Multiplataforma</strong> (Android Studio con Compose Multiplatform).

@@ -16,7 +16,11 @@ class ClientController extends Controller
     public function index(Request $request)
     {
         // 1. Base de la consulta con el conteo de proyectos
-        $query = Client::withCount('projects');
+        // y carga de proyectos para el desplegable en la tabla.
+        $query = Client::withCount('projects')
+            ->with(['projects' => function ($projectQuery) {
+                $projectQuery->select('projects.id', 'projects.title', 'projects.visibility', 'projects.sort_order');
+            }]);
 
         // 2. FILTRO: Si hay un tipo en la URL (?type=company), filtramos
         if ($request->filled('type')) {
@@ -51,8 +55,9 @@ class ClientController extends Controller
         // PATRÓN MODELO VACÍO:
         // Pasamos un objeto vacío para que la vista 'form' pueda usar $client->commercial_name sin error
         $client = new Client();
-        
-        return view('admin.clients.form', compact('client'));
+        $documentationVersionOptions = $this->documentationVersionOptions();
+
+        return view('admin.clients.form', compact('client', 'documentationVersionOptions'));
     }
 
     /**
@@ -60,11 +65,16 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
+        $request->merge([
+            'documentation_slug' => filled($request->input('documentation_slug')) ? $request->input('documentation_slug') : null,
+        ]);
+
         $validated = $request->validate([
             'commercial_name' => 'required|string|max:255',
             'type' => 'required|in:company,individual',
             'tax_id' => 'nullable|string|max:20', // CIF/NIF
             'notes' => 'nullable|string',
+            'documentation_slug' => ['nullable', 'string', 'max:120', Rule::in(array_keys(config('documentation.versions', [])))],
         ]);
 
         Client::create($validated);
@@ -78,9 +88,45 @@ class ClientController extends Controller
     public function edit(Client $client)
     {
         $client->load('quoteVersions');
+        $documentationLinks = collect(config('documentation.versions', []))
+            ->map(function (array $documentation, string $slug) {
+                return [
+                    'slug' => $slug,
+                    'title' => $documentation['title'] ?? $slug,
+                    'client_name' => $documentation['client_name'] ?? null,
+                    'commercial_name_aliases' => $documentation['commercial_name_aliases'] ?? [],
+                    'updated_at' => $documentation['updated_at'] ?? null,
+                ];
+            })
+            ->filter(function (array $documentation) use ($client) {
+                $clientName = Str::lower(trim($client->commercial_name));
+                $documentationClientName = Str::lower(trim((string) ($documentation['client_name'] ?? '')));
+                $nameMatches = $documentationClientName !== '' && $documentationClientName === $clientName;
+
+                $aliases = collect($documentation['commercial_name_aliases'] ?? [])
+                    ->merge([$documentation['client_name'] ?? ''])
+                    ->filter()
+                    ->map(fn ($alias) => Str::lower(trim((string) $alias)))
+                    ->filter()
+                    ->unique();
+                $aliasMatches = $aliases->contains(fn (string $alias) => $alias === $clientName);
+
+                $clientSlug = Str::slug($client->commercial_name);
+                $docSlug = $documentation['slug'];
+                $slugMatches = $docSlug === $clientSlug
+                    || Str::endsWith($clientSlug, '-'.$docSlug);
+
+                $explicitSlug = (string) ($client->documentation_slug ?? '');
+                $explicitMatch = $explicitSlug !== '' && $explicitSlug === $docSlug;
+
+                return $nameMatches || $aliasMatches || $slugMatches || $explicitMatch;
+            })
+            ->values();
+
+        $documentationVersionOptions = $this->documentationVersionOptions();
 
         // Pasamos el cliente existente a la misma vista 'form'
-        return view('admin.clients.form', compact('client'));
+        return view('admin.clients.form', compact('client', 'documentationLinks', 'documentationVersionOptions'));
     }
 
     /**
@@ -88,11 +134,16 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
+        $request->merge([
+            'documentation_slug' => filled($request->input('documentation_slug')) ? $request->input('documentation_slug') : null,
+        ]);
+
         $validated = $request->validate([
             'commercial_name' => 'required|string|max:255',
             'type' => 'required|in:company,individual',
             'tax_id' => 'nullable|string|max:20',
             'notes' => 'nullable|string',
+            'documentation_slug' => ['nullable', 'string', 'max:120', Rule::in(array_keys(config('documentation.versions', [])))],
         ]);
 
         $client->update($validated);
@@ -185,5 +236,17 @@ class ClientController extends Controller
         }
 
         return $candidate;
+    }
+
+    /**
+     * @return array<string, string> slug publico => etiqueta en el desplegable del formulario
+     */
+    private function documentationVersionOptions(): array
+    {
+        return collect(config('documentation.versions', []))
+            ->mapWithKeys(function (array $documentation, string $slug) {
+                return [$slug => (string) ($documentation['title'] ?? $slug)];
+            })
+            ->all();
     }
 }

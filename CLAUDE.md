@@ -1,5 +1,7 @@
 # Portfolio-with-CRM: Project Documentation
 
+> Guía común para todos los proyectos en `/var/www`: leer también `/var/www/AGENTS_COMMON.md` antes de aplicar reglas específicas del proyecto.
+
 **Project Type:** Full-Stack Web Application (Laravel + Blade + Alpine.js)  
 **Language:** PHP 8.2, JavaScript (ES6+)  
 **Framework:** Laravel 12  

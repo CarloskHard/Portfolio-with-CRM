@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Carlos Codex | Full Stack Developer</title>
-    <meta name="description" content="Desarrollo de aplicaciones y webs para particulares y empresas. +7 años desarrollando software. Cuéntame tu idea y te devolveré un producto real."> <!-- Snippet en búsqueda de Google -->
+    <title>@yield('title', 'Carlos Codex | Full Stack Developer')</title>
+    <meta name="description" content="@yield('meta_description', 'Desarrollo de aplicaciones y webs para particulares y empresas. +7 años desarrollando software. Cuéntame tu idea y te devolveré un producto real.')"> <!-- Snippet en búsqueda de Google -->
     <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('img/favicon.png') }}?v={{ filemtime(public_path('img/favicon.png')) }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}?v={{ filemtime(public_path('favicon.ico')) }}">
     
@@ -47,6 +47,24 @@
         #scroll-progress-container { position: fixed; right: 0; top: 0; width: 4px; height: 100vh; height: 100lvh; background-color: rgba(229, 231, 235, 0.3); z-index: 100; }
         .dark #scroll-progress-container { background-color: rgba(55, 65, 81, 0.3); }
         #scroll-progress-bar { width: 100%; height: 0%; background: linear-gradient(to bottom, #818cf8, #4f46e5); box-shadow: 0 0 8px rgba(79, 70, 229, 0.5); transition: height 0.1s ease-out; }
+
+        /* Entrada al cargar: todas las vistas que usan este layout (<main>) */
+        @keyframes public-page-enter {
+            0% { opacity: 0; transform: translate3d(0, 18px, 0); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0); }
+        }
+        .public-page-enter {
+            animation: public-page-enter 1.45s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+            will-change: opacity, transform;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .public-page-enter {
+                animation: none;
+                opacity: 1;
+                transform: none;
+                will-change: auto;
+            }
+        }
 
         @keyframes float-natural { 
             0%   { transform: translate(0, 0) rotate(0deg); } 
@@ -308,7 +326,7 @@
             animation: hero-wave-expand 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
             animation-delay: calc(var(--char-index) * 26ms);
         }
-        /* Desktop: ola guiada por raton (sustituye a la animacion hover) */
+        /* Desktop: ola guiada por ratón (sustituye a la animación hover) */
         @media (min-width: 1024px) {
             .hero-name-vfx .hero-wave-char {
                 animation: none !important;
@@ -510,7 +528,7 @@
     @include('partials.navbar')
 
     <!-- AQUÍ SE INYECTARÁ EL CONTENIDO DE LA VISTA -->
-    <main class="relative z-10 flex-grow min-w-0">
+    <main class="public-page-enter relative z-10 flex-grow min-w-0">
         @yield('content')
     </main>
 

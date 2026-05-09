@@ -119,9 +119,25 @@
                         </thead>
                         <tbody class="text-gray-600 text-sm font-light">
                             @foreach($clients as $client)
-                            <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            @php $projectsRowId = 'projects-row-'.$client->id; @endphp
+                            <tr
+                                class="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
+                                onclick="window.location='{{ route('clients.edit', $client) }}'">
                                 <td class="py-3 px-6 text-left whitespace-nowrap font-medium">
-                                    {{ $client->commercial_name }}
+                                    <div class="flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            id="toggle-{{ $projectsRowId }}"
+                                            class="inline-flex h-6 w-6 items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors"
+                                            title="Mostrar proyectos"
+                                            aria-label="Mostrar proyectos"
+                                            onclick="event.stopPropagation(); const row = document.getElementById('{{ $projectsRowId }}'); const icon = document.getElementById('toggle-icon-{{ $projectsRowId }}'); row.classList.toggle('hidden'); icon.classList.toggle('rotate-90')">
+                                            <svg id="toggle-icon-{{ $projectsRowId }}" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                        <span>{{ $client->commercial_name }}</span>
+                                    </div>
                                 </td>
                                 <td class="py-3 px-6 text-left">
                                     <span class="px-3 py-1 rounded-full text-xs {{ $client->type == 'company' ? 'bg-blue-200 text-blue-800' : 'bg-green-200 text-green-800' }}">
@@ -132,7 +148,7 @@
                                     {{ $client->projects_count }}
                                 </td>
                                 <td class="py-3 px-6 text-center">
-                                    <div class="flex item-center justify-center">
+                                    <div class="flex item-center justify-center" onclick="event.stopPropagation()">
                                         <a href="{{ route('clients.edit', $client) }}" class="w-4 mr-2 transform hover:text-purple-500 hover:scale-110">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -147,6 +163,38 @@
                                             </button>
                                         </form>
                                     </div>
+                                </td>
+                            </tr>
+                            <tr id="{{ $projectsRowId }}" class="hidden bg-gray-50">
+                                <td colspan="4" class="py-3 px-6">
+                                    @if($client->projects->count() > 0)
+                                        <div class="pl-8 md:pl-10">
+                                            <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Proyectos</div>
+                                            <div class="space-y-2">
+                                            @foreach($client->projects as $project)
+                                                <a
+                                                    href="{{ route('projects.edit', $project) }}"
+                                                    class="group flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-indigo-50"
+                                                    onclick="event.stopPropagation()">
+                                                    <span class="flex items-center gap-2 text-sm text-gray-700 group-hover:text-indigo-700">
+                                                        <span class="text-gray-400">└─</span>
+                                                        <span>{{ $project->title }}</span>
+                                                    </span>
+                                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold
+                                                        {{ $project->visibility === 'public' ? 'bg-green-100 text-green-700' : '' }}
+                                                        {{ $project->visibility === 'private' ? 'bg-amber-100 text-amber-700' : '' }}
+                                                        {{ $project->visibility === 'draft' ? 'bg-gray-200 text-gray-700' : '' }}">
+                                                        {{ $project->visibility === 'public' ? 'Publico' : ($project->visibility === 'private' ? 'Privado' : 'Borrador') }}
+                                                    </span>
+                                                </a>
+                                            @endforeach
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="pl-8 md:pl-10">
+                                            <span class="text-sm text-gray-500 italic">Este cliente no tiene proyectos asociados.</span>
+                                        </div>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach

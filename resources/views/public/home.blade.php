@@ -1,5 +1,15 @@
 @extends('layouts.public')
 
+@php
+    $selectedService = request()->query('service');
+    $serviceLeadMessages = [
+        'web-development' => 'Quiero una propuesta para desarrollo web. Mi objetivo es...',
+        'app-development' => 'Quiero una propuesta para desarrollo de app. Mi objetivo es...',
+        'custom-solutions' => 'Quiero hablar sobre una solución a medida para...',
+    ];
+    $prefilledContactMessage = old('content', $serviceLeadMessages[$selectedService] ?? '');
+@endphp
+
 @section('content')
 
     <!--
@@ -329,6 +339,54 @@
             opacity: 1;
           }
         }
+
+        html.skills-modal-open,
+        body.skills-modal-open {
+          overflow: hidden !important;
+          overscroll-behavior: none;
+        }
+        .skills-modal-overlay {
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 2147483000 !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          overflow: hidden;
+          isolation: isolate;
+        }
+        .skills-modal-backdrop {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          background: rgba(17, 24, 39, 0.74);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+        }
+        .skills-modal-stage {
+          position: relative;
+          z-index: 1;
+          width: 100%;
+          max-width: 72rem;
+          max-height: min(92dvh, 920px);
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          pointer-events: none;
+          padding: 4px;
+        }
+        @media (min-width: 768px) {
+          .skills-modal-stage {
+            flex-direction: row;
+            gap: 24px;
+          }
+        }
         /* ── Services styles used by "Hero Redesign.html" markup ────── */
         .services {
           display: grid;
@@ -375,7 +433,7 @@
           margin: 0 0 24px;
           max-width: 280px;
         }
-        .services-head .pill-cta {
+        .services .pill-cta {
           display: inline-flex;
           align-items: center;
           gap: 10px;
@@ -387,11 +445,11 @@
           font-weight: 500;
           transition: background .2s, border-color .2s;
         }
-        .services-head .pill-cta:hover {
+        .services .pill-cta:hover {
           background: var(--hr-pill-hover-bg);
           border-color: var(--hr-pill-hover-border);
         }
-        .services-head .pill-cta .arrow {
+        .services .pill-cta .arrow {
           width: 22px;
           height: 22px;
           border-radius: 999px;
@@ -474,6 +532,10 @@
           height: 14px;
           color: var(--hr-accent);
           flex-shrink: 0;
+        }
+        .svc .pill-cta {
+          margin-top: auto;
+          width: max-content;
         }
         .services-footer {
           grid-column: 1 / -1;
@@ -978,6 +1040,36 @@
         #about h2, #about h3   { color: var(--hr-heading) !important; }
         #about p               { color: var(--hr-text-muted) !important; }
         #projects h2           { color: var(--hr-heading) !important; }
+
+        /* ── Landing: scroll reveal (entrada global → layouts/public <main>) ── */
+        [data-reveal] {
+            opacity: 0;
+            transform: translate3d(0, 18px, 0);
+            transition:
+                opacity 1.05s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 1.05s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transition-delay: var(--hr-reveal-delay, 0ms);
+        }
+        [data-reveal-direction="left"] {
+            transform: translate3d(-16px, 16px, 0);
+        }
+        [data-reveal-direction="right"] {
+            transform: translate3d(16px, 16px, 0);
+        }
+        [data-reveal].is-visible {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            [data-reveal],
+            [data-reveal-direction="left"],
+            [data-reveal-direction="right"] {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+        }
     </style>
 
     {{-- ── Hero: full-width ─────────────────────────────────────────── --}}
@@ -1109,7 +1201,7 @@
     <div class="hr-stats-wrapper">
         <section class="hr-stats" aria-label="Indicadores">
 
-            <div class="hr-stat">
+            <div class="hr-stat" data-reveal data-reveal-delay="0">
                 <div class="hr-stat-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .587l3.668 7.431L24 9.25l-6 5.847L19.336 24 12 19.897 4.664 24 6 15.097 0 9.25l8.332-1.232z"/></svg>
                 </div>
@@ -1119,7 +1211,7 @@
                 </div>
             </div>
 
-            <div class="hr-stat">
+            <div class="hr-stat" data-reveal data-reveal-delay="70">
                 <div class="hr-stat-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 </div>
@@ -1129,7 +1221,7 @@
                 </div>
             </div>
 
-            <div class="hr-stat">
+            <div class="hr-stat" data-reveal data-reveal-delay="140">
                 <div class="hr-stat-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z"/></svg>
                 </div>
@@ -1139,7 +1231,7 @@
                 </div>
             </div>
 
-            <div class="hr-stat">
+            <div class="hr-stat" data-reveal data-reveal-delay="210">
                 <div class="hr-stat-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
@@ -1161,18 +1253,18 @@
     <section id="services" class="relative z-10 transition-colors duration-300 mx-3 md:mx-6 lg:mx-10 mt-8 mb-8">
       <div class="max-w-screen-xl px-4 mx-auto">
         <div class="hr-section-card services">
-          <div class="services-head">
+          <div class="services-head" data-reveal>
             <span class="eyebrow"><span class="dot"></span>Mis servicios</span>
             <h2>Soluciones digitales <span class="accent">a medida</span> para tu negocio</h2>
             <p>Desde la idea hasta el lanzamiento. Me encargo de todo el proceso para que tú te centres en lo importante.</p>
-            <a class="pill-cta" href="#services-all">
-              Ver todos los servicios
+            <a class="pill-cta" href="{{ route('public.services') }}">
+              Explorar servicios
               <span class="arrow">→</span>
             </a>
           </div>
 
           <div class="services-grid">
-            <div class="svc">
+            <div class="svc" data-reveal data-reveal-delay="0">
               <span class="svc-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><path d="M8 21h8M12 17v4"></path></svg>
               </span>
@@ -1183,9 +1275,10 @@
                 <li><x-icons.check />Webs corporativas</li>
                 <li><x-icons.check />E‑commerce</li>
               </ul>
+              <a href="{{ route('public.services.web') }}" class="pill-cta">Ver servicio</a>
             </div>
 
-            <div class="svc">
+            <div class="svc" data-reveal data-reveal-delay="85">
               <span class="svc-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12" y2="18"></line></svg>
               </span>
@@ -1196,23 +1289,25 @@
                 <li><x-icons.check />Apps multiplataforma</li>
                 <li><x-icons.check />Integraciones y APIs</li>
               </ul>
+              <a href="{{ route('public.services.app') }}" class="pill-cta">Ver servicio</a>
             </div>
 
-            <div class="svc">
+            <div class="svc" data-reveal data-reveal-delay="170">
               <span class="svc-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
               </span>
-              <h3>Software a medida</h3>
-              <p>Soluciones personalizadas para automatizar y escalar tu negocio.</p>
+              <h3>Soluciones a medida</h3>
+              <p>Si no encaja en un servicio estándar, definimos juntos una solución personalizada.</p>
               <ul>
                 <li><x-icons.check />APIs y backends</li>
                 <li><x-icons.check />Paneles administrativos</li>
                 <li><x-icons.check />Integraciones externas</li>
               </ul>
+              <a href="{{ route('home', ['service' => 'custom-solutions']) }}#contact" class="pill-cta">Hablar de mi caso</a>
             </div>
           </div>
 
-          <div class="services-footer">
+          <div class="services-footer" data-reveal data-reveal-delay="60">
             Tecnología moderna. Código limpio. <span class="accent">Resultados reales.</span>
           </div>
         </div>
@@ -1232,7 +1327,7 @@
         <div class="max-w-screen-xl px-4 mx-auto relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
 
-                <div class="lg:col-span-5 relative group lg:pr-10" data-reveal>
+                <div class="lg:col-span-5 relative group lg:pr-10" data-reveal data-reveal-direction="left">
                     <div class="absolute inset-0 bg-gradient-to-tr from-indigo-500 to-blue-500 rounded-2xl transform rotate-3 scale-105 opacity-20 dark:opacity-40 transition-transform duration-500 group-hover:rotate-6"></div>
                     <div class="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 group-hover:-translate-y-2 border border-white/50 dark:border-gray-700 bg-white dark:bg-gray-800 p-2">
                         <div class="relative overflow-hidden rounded-xl">
@@ -1251,7 +1346,7 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-7" data-reveal data-reveal-delay="150">
+                <div class="lg:col-span-7" data-reveal data-reveal-delay="150" data-reveal-direction="right">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="relative flex h-3 w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
@@ -1333,10 +1428,22 @@
             </div>{{-- /hr-section-card --}}
         </div>
 
-        <!-- Skills Modal (unchanged) -->
-        <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-[100] overflow-y-auto">
-            <div x-show="modalOpen" x-transition.opacity.duration.300ms @click="closeModal()" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm min-h-screen"></div>
-            <div class="relative min-h-screen flex flex-col md:flex-row items-center justify-center p-4 md:p-8 overflow-hidden pointer-events-none">
+        <template x-teleport="body">
+        <div
+            x-show="modalOpen"
+            style="display: none;"
+            class="skills-modal-overlay"
+            role="dialog"
+            aria-modal="true"
+            @keydown.escape.window="closeModal()"
+        >
+            <div
+                x-show="modalOpen"
+                x-transition.opacity.duration.300ms
+                @click="closeModal()"
+                class="skills-modal-backdrop"
+            ></div>
+            <div class="skills-modal-stage">
                 <div x-show="modalOpen"
                     x-transition:enter="ease-out duration-500"
                     x-transition:enter-start="opacity-0 translate-y-8 sm:scale-95"
@@ -1347,9 +1454,11 @@
                     class="relative z-20 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-500 pointer-events-auto">
                     <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                         <div class="flex items-center gap-3">
-                            <div x-if="activeSkill" :class="`p-2 rounded-lg ${activeSkill?.bg} ${activeSkill?.color}`">
-                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="activeSkill?.icon"></path></svg>
-                            </div>
+                            <template x-if="activeSkill">
+                                <div :class="`p-2 rounded-lg ${activeSkill.bg} ${activeSkill.color}`">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="activeSkill.icon"></path></svg>
+                                </div>
+                            </template>
                             <h3 class="text-xl font-bold text-gray-900 dark:text-white" x-text="activeSkill?.title"></h3>
                         </div>
                         <button @click="closeModal()" class="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
@@ -1396,6 +1505,7 @@
                 </div>
             </div>
         </div>
+        </template>
     </section>
 
 
@@ -1421,7 +1531,7 @@
                     <p class="col-span-full text-center text-gray-500 py-12">No hay proyectos destacados.</p>
                 @endforelse
             </div>
-            <div class="mt-16 text-center">
+            <div class="mt-16 text-center" data-reveal data-reveal-delay="80">
                 <a href="/proyectos" class="group inline-flex items-center gap-3 px-8 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold text-sm tracking-wide transition-all duration-200 hover:scale-105 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 hover:shadow-indigo-500/30">
                     Ver más proyectos
                     <span class="text-indigo-600 dark:text-indigo-400 font-mono text-lg transition-transform duration-300 group-hover:text-white group-hover:translate-x-1">&lt;&gt;</span>
@@ -1484,7 +1594,7 @@
                         <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300">¿En qué puedo ayudarte?</label>
                         <textarea id="content" name="content" rows="4" required
                             placeholder="Me gustaría hablar contigo sobre el desarrollo de..."
-                            class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500 transition-colors resize-none">{{ old('content') }}</textarea>
+                            class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500 transition-colors resize-none">{{ $prefilledContactMessage }}</textarea>
                     </div>
                     <div class="pt-2">
                         <button type="submit" class="w-full sm:w-auto sm:min-w-[200px] flex justify-center items-center gap-2 px-8 py-3.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 active:scale-95 transition-all duration-200 shadow-md hover:shadow-lg shadow-indigo-500/20 ml-auto">
@@ -1511,6 +1621,49 @@
 
 
 @push('scripts')
+{{-- Scroll-triggered reveal (data-reveal); re-binds after Alpine x-for paint --}}
+<script>
+(function () {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let revealIo = null;
+
+    function bindScrollReveals() {
+        if (reduceMotion.matches) {
+            document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-visible'));
+            return;
+        }
+        if (!revealIo) {
+            revealIo = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        entry.target.classList.add('is-visible');
+                        revealIo.unobserve(entry.target);
+                    });
+                },
+                { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.06 }
+            );
+        }
+        document.querySelectorAll('[data-reveal]:not([data-reveal-bound])').forEach((el) => {
+            el.setAttribute('data-reveal-bound', '');
+            const ms = el.dataset.revealDelay;
+            if (ms !== undefined && ms !== '') {
+                el.style.setProperty('--hr-reveal-delay', `${ms}ms`);
+            }
+            revealIo.observe(el);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        bindScrollReveals();
+        requestAnimationFrame(() => {
+            bindScrollReveals();
+            requestAnimationFrame(bindScrollReveals);
+        });
+    });
+    window.addEventListener('load', bindScrollReveals);
+})();
+</script>
 {{-- ── WebGL diagonal-flow shader (hero card) + AI dots background ── --}}
 <script>
 /* ────────────────────────────────────────────────────────────────────
@@ -1788,11 +1941,11 @@ document.addEventListener('alpine:init', () => {
                 description: 'Mi núcleo de trabajo diario. Monto webs de portfolio, tiendas online, ERPs(Gestión de recursos internos para negocios) y CRMs.(Sistemas internos para gestión de clientes).',
                 technologies:[
                     { name: 'Laravel', badge: 'https://img.shields.io/badge/Laravel-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Mi framework principal de backend: Me permite desplegar webs sólidas en minutos. Lo utilizo a diario para gestionar autenticaciones seguras y orquestar toda la lógica de negocio de mis proyectos usando Eloquent ORM.' },
-                    { name: 'PHP', badge: 'https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white', description: 'Como es estandar en desarrollo web, PHP es el motor de la mayoría de mis desarrollos backend. He evolucionado con el lenguaje, aprovechando su tipado fuerte en las últimas versiones para escribir código limpio, moderno y orientado a objetos.' },
+                    { name: 'PHP', badge: 'https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white', description: 'Es el estándar en desarrollo web; PHP es el motor de la mayoría de mis desarrollos backend. He evolucionado con el lenguaje, aprovechando su tipado fuerte en las últimas versiones para escribir código limpio, moderno y orientado a objetos.' },
                     { name: 'JavaScript', badge: 'https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black', description: 'Lo uso para dar vida a mis interfaces. Desde manipular el DOM de forma directa hasta consumir mis propias APIs asíncronas, es mi herramienta clave para crear una experiencia de usuario fluida.' },
                     { name: 'Tailwind CSS', badge: 'https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white', description: 'Mi framework CSS de cabecera. Es una mejora a simplemente usar CSS: Agiliza enormemente mi flujo de trabajo maquetando directamente en el HTML lo cual crea un código más limpio y mejor arquitectura. CSS todavía tiene sus usos, especialmente para elementos repetitivos/consistentes.' },
                     { name: 'HTML5', badge: 'https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white', description: 'La base de todo proyecto web. He usado HTML en todos mis proyectos web ( Aunque obviamente en proyectos con CMS no se usa apenas pues se programa mediante bloques, lo cual puede servir para proyectos rápidos y simples, pero no hay nada tan flexible y básico para diseñar web como HTML).' },
-                    { name: 'CSS3', badge: 'https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white', description: 'Aunque use frameworks CSS, el uso de CSS nativo sigue teniendo cavida para los detalles precisos o cuando se repite un estilo en varios elementos. Además también lo he trabajado en proyectos no tan modernos mientras trabajé con empresas de ERP.' },
+                    { name: 'CSS3', badge: 'https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white', description: 'Aunque use frameworks CSS, el uso de CSS nativo sigue teniendo cabida para los detalles precisos o cuando se repite un estilo en varios elementos. Además también lo he trabajado en proyectos no tan modernos mientras trabajé con empresas de ERP.' },
                     { name: 'jQuery', badge: 'https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jquery&logoColor=white', description: 'Me ha salvado la vida al tomar el relevo de proyectos heredados. Aún lo utilizo para dar mantenimiento a sistemas más antiguos o implementar scripts rápidos de validación.' },
                     { name: 'Bootstrap', badge: 'https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white', description: 'Mi opción rápida y segura cuando necesito levantar el panel de administración de un CRM o un dashboard interno. Me permite entregar prototipos funcionales y estables en tiempo récord.' }
                 ]
@@ -1820,7 +1973,7 @@ document.addEventListener('alpine:init', () => {
                 bg: 'bg-pink-50 dark:bg-pink-900/30',
                 description: 'Digitalizo negocios implementando tiendas online y desarrollando programas internos de gestión de los recursos (ERP) y clientes (CRM).',
                 technologies:[
-                    { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Lo utilizo para montar tiendas online rápidamente con un sistema ya establecido. He trabajado con él durante mi trabajo como programador en "Al Rescate". No solo lo he configuradp, también he desarrollado módulos a medida en PHP y adaptado plantillas para cubrir flujos de venta B2B y B2C muy específicos.' },
+                    { name: 'PrestaShop', badge: 'https://img.shields.io/badge/PrestaShop-df0067?style=flat&logo=prestashop&logoColor=white', description: 'Lo utilizo para montar tiendas online rápidamente con un sistema ya establecido. He trabajado con él durante mi trabajo como programador en "Al Rescate". No solo lo he configurado, también he desarrollado módulos a medida en PHP y adaptado plantillas para cubrir flujos de venta B2B y B2C muy específicos.' },
                     { name: 'Dolibarr ERP', badge: 'https://img.shields.io/badge/Dolibarr_ERP-2980B9?style=flat', description: 'He usado este sistema para digitalizar la gestión de empresas durante mi trabajo en "Al rescate". Lo he usado para darle a clientes el control total de facturación, almacén e incluso lo he sincronizado por API con sus tiendas web.' },
                     { name: 'Stripe', badge: 'https://img.shields.io/badge/Stripe-635BFF?style=flat&logo=stripe&logoColor=white', description: 'Pagos online y facturación: Checkout, Payment Intents, webhooks y cuentas conectadas cuando hace falta marketplace. Lo integro desde backend (Laravel u otros) para no depender de plugins rígidos y controlar flujos, idempotencia y seguridad (SCA, 3DS) al detalle.' },
                     { name: 'Laravel Cashier', badge: 'https://img.shields.io/badge/Laravel_Cashier-FF2D20?style=flat&logo=laravel&logoColor=white', description: 'Para SaaS y tiendas con suscripciones en Laravel: planes, pruebas, renovaciones y portal de facturación del cliente sobre Stripe. Encaja con mi stack habitual y sube el nivel frente a solo “instalar un plugin de pago”.' }
@@ -1882,6 +2035,8 @@ document.addEventListener('alpine:init', () => {
             this.showTechDetails = false;
             this.activeTech = null;
             this.modalOpen = true;
+            document.documentElement.classList.add('skills-modal-open');
+            document.body.classList.add('skills-modal-open');
             document.body.classList.add('overflow-hidden');
         },
         closeModal() {
@@ -1891,6 +2046,8 @@ document.addEventListener('alpine:init', () => {
                 this.activeSkill = null;
                 this.activeTech = null;
             }, 500); // Espera a que termine la animación css
+            document.documentElement.classList.remove('skills-modal-open');
+            document.body.classList.remove('skills-modal-open');
             document.body.classList.remove('overflow-hidden');
         },
         openTech(tech) {

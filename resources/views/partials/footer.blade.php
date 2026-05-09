@@ -56,6 +56,15 @@
                         <li>
                             <a href="{{ $isHome ? '#skills' : route('home') . '#skills' }}" class="hover:text-teal-400 transition">Tecnologías</a>
                         </li>
+                        <li>
+                            <a href="{{ route('public.services') }}" class="hover:text-teal-400 transition">Servicios</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('public.services.web') }}" class="hover:text-teal-400 transition">Servicio Web</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('public.services.app') }}" class="hover:text-teal-400 transition">Servicio App</a>
+                        </li>
                     </ul>
                 </div>
 

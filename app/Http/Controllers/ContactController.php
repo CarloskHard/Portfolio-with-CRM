@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class ContactController extends Controller
 {
     // Guardar un nuevo contacto asociado a un cliente
-    public function storeContact(Request $request, Client $client)
+    public function store(Request $request, Client $client)
     {
         $request->validate([
             'first_name' => 'required|string|max:255',
@@ -51,7 +51,67 @@ class ContactController extends Controller
 
         return back()->with('success', 'Contacto añadido correctamente.');
     }
-    
+
+    // Actualizar un contacto existente
+    public function update(Request $request, Contact $contact)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'position' => 'nullable|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'notes' => 'nullable|string',
+        ]);
+
+        $contact->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'position' => $request->position,
+            'notes' => $request->notes,
+        ]);
+
+        // Upsert email
+        $emailMethod = $contact->contactMethods()->where('type', 'email')->first();
+        if ($request->filled('email')) {
+            if ($emailMethod) {
+                $emailMethod->update([
+                    'value' => $request->email,
+                    'details' => 'Principal',
+                ]);
+            } else {
+                $contact->contactMethods()->create([
+                    'type' => 'email',
+                    'value' => $request->email,
+                    'details' => 'Principal',
+                ]);
+            }
+        } elseif ($emailMethod) {
+            $emailMethod->delete();
+        }
+
+        // Upsert phone
+        $phoneMethod = $contact->contactMethods()->where('type', 'phone')->first();
+        if ($request->filled('phone')) {
+            if ($phoneMethod) {
+                $phoneMethod->update([
+                    'value' => $request->phone,
+                    'details' => 'Móvil',
+                ]);
+            } else {
+                $contact->contactMethods()->create([
+                    'type' => 'phone',
+                    'value' => $request->phone,
+                    'details' => 'Móvil',
+                ]);
+            }
+        } elseif ($phoneMethod) {
+            $phoneMethod->delete();
+        }
+
+        return back()->with('success', 'Contacto actualizado correctamente.');
+    }
+
 
     // Borrar un contacto
     public function destroy(Contact $contact)

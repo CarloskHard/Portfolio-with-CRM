@@ -216,6 +216,7 @@
                 items: [],         
                 newFiles:[],      
                 draggedIndex: null,
+                errors: [],
 
                 init() {
                     if (existingImages && Array.isArray(existingImages)) {
@@ -232,8 +233,25 @@
 
                 addFiles(event) {
                     const files = Array.from(event.target.files);
-                    
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                    const maxBytes = 5 * 1024 * 1024;
+
+                    this.errors = [];
+
                     files.forEach(file => {
+                        const isValidType = allowedTypes.includes(file.type);
+                        const isValidSize = file.size <= maxBytes;
+
+                        if (!isValidType) {
+                            this.errors.push(`Unsupported file type: ${file.name}`);
+                            return;
+                        }
+
+                        if (!isValidSize) {
+                            this.errors.push(`File too large (max 5MB): ${file.name}`);
+                            return;
+                        }
+
                         const originalIndex = this.newFiles.length;
                         this.newFiles.push(file);
 
@@ -248,10 +266,36 @@
 
                     this.updateFileInput();
                     event.target.value = ''; 
+
+                    if (this.errors.length > 0) {
+                        window.alert(this.errors.join('\n'));
+                    }
                 },
 
                 removeItem(index) {
-                    this.items.splice(index, 1);
+                    const [removed] = this.items.splice(index, 1);
+
+                    if (removed && removed.type === 'new') {
+                        const survivingNewIndexes = this.items
+                            .filter(item => item.type === 'new')
+                            .map(item => item.originalIndex);
+
+                        this.newFiles = this.newFiles.filter((_, idx) => survivingNewIndexes.includes(idx));
+
+                        let newCounter = 0;
+                        this.items = this.items.map(item => {
+                            if (item.type !== 'new') {
+                                return item;
+                            }
+
+                            return {
+                                ...item,
+                                originalIndex: newCounter++,
+                            };
+                        });
+                    }
+
+                    this.updateFileInput();
                 },
 
                 updateFileInput() {

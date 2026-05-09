@@ -46,6 +46,21 @@ class PortfolioController extends Controller
         return view('public.about');
     }
 
+    public function services()
+    {
+        return view('public.services.index');
+    }
+
+    public function webDevelopment()
+    {
+        return view('public.services.web-development');
+    }
+
+    public function appDevelopment()
+    {
+        return view('public.services.app-development');
+    }
+
     public function cv()
     {
         return view('public.cv');
@@ -85,5 +100,17 @@ class PortfolioController extends Controller
         }
 
         return view('public.quote', compact('quote', 'slug'));
+    }
+
+    public function documentation(string $slug = 'general')
+    {
+        $documentationVersions = config('documentation.versions', []);
+        $documentation = $documentationVersions[$slug] ?? null;
+
+        if (! $documentation) {
+            abort(404);
+        }
+
+        return view('public.documentation', compact('documentation', 'slug'));
     }
 }

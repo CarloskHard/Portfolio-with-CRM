@@ -25,8 +25,18 @@ use App\Http\Controllers\MessageController;
 // Portada
 Route::get('/', [PortfolioController::class, 'index'])->name('home');
 
+// Ubicación tienda Musical Luthier (misma fuente que config/documentation.php → musical-luthier)
+Route::view('/welcome', 'welcome')->name('welcome');
+
 // Ruta para ver el catálogo completo
 Route::get('/proyectos', [PortfolioController::class, 'showAll'])->name('public.projects');
+
+// Ruta de servicios (overview)
+Route::get('/servicios', [PortfolioController::class, 'services'])->name('public.services');
+
+// Rutas de servicios (detalle)
+Route::get('/servicios/desarrollo-web', [PortfolioController::class, 'webDevelopment'])->name('public.services.web');
+Route::get('/servicios/desarrollo-apps', [PortfolioController::class, 'appDevelopment'])->name('public.services.app');
 
 // Para mensajes de contacto
 Route::post('/contact', [ContactController::class, 'storePublicMessage'])->name('contact.store');
@@ -42,6 +52,11 @@ Route::get('/cv/descargar', [PortfolioController::class, 'cvDownload'])->name('p
 Route::get('/presupuesto/{slug?}', [PortfolioController::class, 'quote'])
     ->where('slug', '[A-Za-z0-9\-_]+')
     ->name('public.quote');
+
+// Documentación compartida con clientes (solo por enlace directo)
+Route::get('/documentacion/{slug?}', [PortfolioController::class, 'documentation'])
+    ->where('slug', '[A-Za-z0-9\-_]+')
+    ->name('public.documentation');
 
 /*
 |--------------------------------------------------------------------------

@@ -20,14 +20,24 @@
             
             <!-- BARRA DE HERRAMIENTAS (Filtros) -->
             <div class="bg-white p-4 rounded-lg shadow-sm mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <form method="GET" action="{{ route('messages.index') }}" class="flex items-center gap-2 w-full sm:w-auto">
-                    <label class="text-sm text-gray-600 font-medium">Mostrar:</label>
-                    <select name="status" onchange="this.form.submit()" class="text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                        <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Todos</option>
-                        <option value="unread" {{ request('status') == 'unread' || !request('status') ? 'selected' : '' }}>No leídos</option>
-                        <option value="read" {{ request('status') == 'read' ? 'selected' : '' }}>Leídos</option>
-                    </select>
-                </form>
+                <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                    <span class="text-sm text-gray-600 font-medium mr-1">Filtros:</span>
+
+                    <a href="{{ request('status') === 'unread' ? route('messages.index', request()->except('status', 'page')) : request()->fullUrlWithQuery(['status' => 'unread', 'page' => 1]) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('status') === 'unread' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100' }}">
+                        No leídos
+                    </a>
+
+                    <a href="{{ request('status') === 'read' ? route('messages.index', request()->except('status', 'page')) : request()->fullUrlWithQuery(['status' => 'read', 'page' => 1]) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('status') === 'read' ? 'bg-gray-700 text-white border-gray-700' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                        Leídos
+                    </a>
+
+                    <a href="{{ request('status') === 'trash' ? route('messages.index', request()->except('status', 'page')) : request()->fullUrlWithQuery(['status' => 'trash', 'page' => 1]) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('status') === 'trash' ? 'bg-red-600 text-white border-red-600' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' }}">
+                        Papelera
+                    </a>
+                </div>
 
                 @if(request('status') || request('sort'))
                     <a href="{{ route('messages.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900 underline">
@@ -42,40 +52,8 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <!-- CABECERA FILTRABLE: ESTADO -->
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200 transition select-none group">
-                                    @php
-                                        // Lógica del ciclo: Todos (null/all) -> No Leídos (unread) -> Leídos (read) -> Todos
-                                        $currentStatus = request('status');
-                                        $nextStatus = match($currentStatus) {
-                                            'unread' => 'read',
-                                            'read'   => null, // Vuelve a 'todos'
-                                            default  => 'unread' // Empieza por lo más útil: ver los no leídos
-                                        };
-                                        
-                                        // Generamos URL manteniendo otros filtros (pero reseteando la página a 1)
-                                        $urlStatus = request()->fullUrlWithQuery(['status' => $nextStatus, 'page' => 1]);
-                                    @endphp
-
-                                    <a href="{{ $urlStatus }}" class="flex items-center gap-1" title="Clic para filtrar por estado">
-                                        Estado
-                                        
-                                        <!-- Iconos según el filtro activo -->
-                                        @if($currentStatus === 'unread')
-                                            <!-- Icono Filtro: Solo No Leídos -->
-                                            <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-indigo-100 text-indigo-700 font-bold border border-indigo-200">
-                                                Nuevos
-                                            </span>
-                                        @elseif($currentStatus === 'read')
-                                            <!-- Icono Filtro: Solo Leídos -->
-                                            <span class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-gray-200 text-gray-700 font-bold border border-gray-300">
-                                                Leídos
-                                            </span>
-                                        @else
-                                            <!-- Icono Neutro (Sin filtro) -->
-                                            <svg class="w-4 h-4 text-gray-300 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                                        @endif
-                                    </a>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Estado
                                 </th>
 
                                 <!-- CABECERA: REMITENTE -->
@@ -142,9 +120,13 @@
 
                                     <!-- Asunto -->
                                     <td class="px-6 py-4">
-                                        <a href="{{ route('messages.show', $message) }}" class="text-sm text-gray-900 hover:text-indigo-600 font-medium block truncate max-w-xs">
-                                            {{ $message->subject }}
-                                        </a>
+                                        @if(request('status') === 'trash')
+                                            <span class="text-sm text-gray-900 font-medium block truncate max-w-xs">{{ $message->subject }}</span>
+                                        @else
+                                            <a href="{{ route('messages.show', $message) }}" class="text-sm text-gray-900 hover:text-indigo-600 font-medium block truncate max-w-xs">
+                                                {{ $message->subject }}
+                                            </a>
+                                        @endif
                                         <p class="text-xs text-gray-500 truncate max-w-xs">{{ $message->content }}</p>
                                     </td>
 
@@ -157,13 +139,15 @@
                                     <!-- Acciones -->
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <div class="flex items-center justify-end gap-3">
-                                            <a href="{{ route('messages.show', $message) }}" class="text-indigo-600 hover:text-indigo-900" title="Leer">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                            </a>
+                                            @if(request('status') !== 'trash')
+                                                <a href="{{ route('messages.show', $message) }}" class="text-indigo-600 hover:text-indigo-900" title="Leer">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                </a>
+                                            @endif
                                             
                                             <form action="{{ route('messages.destroy', $message) }}" method="POST" class="inline">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="text-gray-400 hover:text-red-600 transition" onclick="return confirm('¿Borrar mensaje?')" title="Eliminar">
+                                                <button type="submit" class="text-gray-400 hover:text-red-600 transition" onclick="return confirm('{{ request('status') === 'trash' ? '¿Eliminar definitivamente este mensaje?' : '¿Enviar mensaje a la papelera?' }}')" title="{{ request('status') === 'trash' ? 'Eliminar definitivamente' : 'Enviar a papelera' }}">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
                                             </form>

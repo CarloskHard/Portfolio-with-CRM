@@ -29,7 +29,7 @@ return [
                 ],
                 [
                     'name' => 'Panel administrable',
-                    'description' => 'CRUD para gestionar contenido y textos sin tocar codigo.',
+                    'description' => 'CRUD para gestionar contenido y textos sin tocar código.',
                     'price' => 1100,
                 ],
                 [

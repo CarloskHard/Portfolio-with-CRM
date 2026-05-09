@@ -15,47 +15,32 @@
                 </a>
             </div>
 
-            <!-- BARRA DE FILTROS -->
-            <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                <form method="GET" action="{{ route('projects.index') }}" class="flex flex-col md:flex-row gap-4 items-end">
-                    
-                    <!-- Filtro Visibilidad -->
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="visibility" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                            <option value="">Todos</option>
-                            <option value="public" {{ request('visibility') == 'public' ? 'selected' : '' }}>Público</option>
-                            <option value="private" {{ request('visibility') == 'private' ? 'selected' : '' }}>Privado</option>
-                            <option value="draft" {{ request('visibility') == 'draft' ? 'selected' : '' }}>Borrador</option>
-                        </select>
-                    </div>
+            <!-- FILTRO POR ESTADO (PASTILLAS) -->
+            <div class="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex flex-wrap items-center gap-2 justify-between">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm text-gray-600 font-medium mr-1">Estado:</span>
 
-                    <!-- Filtro Cliente -->
-                    <div class="w-full md:w-1/4">
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cliente</label>
-                        <select name="client_id" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                            <option value="">Todos los clientes</option>
-                            @foreach($clients as $client)
-                                <option value="{{ $client->id }}" {{ request('client_id') == $client->id ? 'selected' : '' }}>
-                                    {{ $client->commercial_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <a href="{{ request('visibility') === 'public' ? route('projects.index', request()->except('visibility')) : request()->fullUrlWithQuery(['visibility' => 'public']) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('visibility') === 'public' ? 'bg-green-600 text-white border-green-600' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' }}">
+                        Público
+                    </a>
 
-                    <!-- Botones -->
-                    <div class="flex gap-2">
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded text-sm font-bold transition">
-                            Filtrar
-                        </button>
-                        
-                        @if(request('visibility') || request('client_id'))
-                            <a href="{{ route('projects.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded text-sm font-bold transition">
-                                Limpiar
-                            </a>
-                        @endif
-                    </div>
-                </form>
+                    <a href="{{ request('visibility') === 'private' ? route('projects.index', request()->except('visibility')) : request()->fullUrlWithQuery(['visibility' => 'private']) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('visibility') === 'private' ? 'bg-gray-700 text-white border-gray-700' : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                        Privado
+                    </a>
+
+                    <a href="{{ request('visibility') === 'draft' ? route('projects.index', request()->except('visibility')) : request()->fullUrlWithQuery(['visibility' => 'draft']) }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border transition {{ request('visibility') === 'draft' ? 'bg-amber-200 text-amber-900 border-amber-400' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100' }}">
+                        Borrador
+                    </a>
+                </div>
+
+                @if(request('visibility') || request('client_id'))
+                    <a href="{{ route('projects.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900 underline">
+                        Limpiar filtros
+                    </a>
+                @endif
             </div>
 
             @if($canReorder)
@@ -88,7 +73,18 @@
                                     Estado
                                 </th>
                                 <th class="p-3 border-b-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                                    Cliente
+                                    <form method="GET" action="{{ route('projects.index') }}" class="flex items-center gap-2">
+                                        <span>Cliente</span>
+                                        <input type="hidden" name="visibility" value="{{ request('visibility') }}">
+                                        <select name="client_id" onchange="this.form.submit()" class="text-xs rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 normal-case font-medium">
+                                            <option value="">Todos</option>
+                                            @foreach($clients as $client)
+                                                <option value="{{ $client->id }}" {{ request('client_id') == $client->id ? 'selected' : '' }}>
+                                                    {{ $client->commercial_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
                                 </th>
                                 <th class="p-3 border-b-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-600 uppercase tracking-wider">
                                     Acciones

@@ -9,15 +9,18 @@ class MessageController extends Controller
 {
     public function index(Request $request)
     {
+        $status = $request->input('status');
         $query = Message::with('contact.client');
 
-        // 1. FILTRO: Estado (Leídos / No leídos)
-        if ($request->has('status') && $request->status !== 'all') {
-            if ($request->status === 'unread') {
-                $query->where('is_read', false);
-            } elseif ($request->status === 'read') {
-                $query->where('is_read', true);
-            }
+        if ($status === 'trash') {
+            $query->onlyTrashed();
+        }
+
+        // 1. FILTRO: Estado (Leídos / No leídos / Papelera)
+        if ($status === 'unread') {
+            $query->where('is_read', false);
+        } elseif ($status === 'read') {
+            $query->where('is_read', true);
         }
 
         // 2. ORDENACIÓN
@@ -31,7 +34,7 @@ class MessageController extends Controller
 
         $messages = $query->paginate(15)->withQueryString();
         
-        return view('admin.messages.index', compact('messages'));
+        return view('admin.messages.index', compact('messages', 'status'));
     }
 
     public function show(Message $message)
@@ -44,10 +47,17 @@ class MessageController extends Controller
         return view('admin.messages.show', compact('message'));
     }
 
-    public function destroy(Message $message)
+    public function destroy(string $message)
     {
+        $message = Message::withTrashed()->findOrFail($message);
+
+        if ($message->trashed()) {
+            $message->forceDelete();
+            return redirect()->route('messages.index', ['status' => 'trash'])->with('success', 'Mensaje eliminado definitivamente.');
+        }
+
         $message->delete();
-        return redirect()->route('messages.index')->with('success', 'Mensaje eliminado.');
+        return redirect()->route('messages.index')->with('success', 'Mensaje enviado a la papelera.');
     }
 
     // Método para asignar mensaje a un cliente existente

@@ -53,6 +53,19 @@
                             <p class="text-xs text-gray-500 mt-1">Información visible solo para administradores.</p>
                         </div>
 
+                        @if(($documentationVersionOptions ?? []) !== [])
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Documentación pública vinculada</label>
+                                <select name="documentation_slug" class="mt-1 block w-full max-w-xl rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="">{{ __('Ninguna') }}</option>
+                                    @foreach($documentationVersionOptions as $documentationSlugOption => $documentationTitleOption)
+                                        <option value="{{ $documentationSlugOption }}" @selected(old('documentation_slug', $client->documentation_slug) === $documentationSlugOption)>{{ $documentationTitleOption }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">{{ __('Opcional: aparece como enlace desde esta ficha hacia una página tipo /documentacion/{slug}.') }}</p>
+                            </div>
+                        @endif
+
                         <!-- Botones -->
                         <div class="flex justify-end gap-4 pt-4 border-t border-gray-100">
                             <a href="{{ route('clients.index') }}" class="bg-gray-200 py-2 px-4 rounded hover:bg-gray-300 text-gray-700 transition">Cancelar</a>
@@ -298,6 +311,40 @@
                         <div class="mt-8 p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm border border-yellow-200 flex items-center gap-3">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span>Guarda el cliente primero para poder añadir su agenda de contactos.</span>
+                        </div>
+                    @endif
+
+                    <!-- SECCIÓN DE DOCUMENTACIÓN COMPARTIDA -->
+                    @if($client->exists)
+                        <div class="mt-12 pt-8 border-t border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">Documentación compartida</h3>
+
+                            @if(($documentationLinks ?? collect())->isNotEmpty())
+                                <div class="space-y-3">
+                                    @foreach($documentationLinks as $documentationLink)
+                                        <div class="flex flex-col gap-3 rounded-lg border border-indigo-100 bg-indigo-50/50 p-4 md:flex-row md:items-center md:justify-between">
+                                            <div>
+                                                <p class="text-sm font-semibold text-gray-900">{{ $documentationLink['title'] }}</p>
+                                                @if(!empty($documentationLink['updated_at']))
+                                                    <p class="text-xs text-gray-500">Actualizado: {{ $documentationLink['updated_at'] }}</p>
+                                                @endif
+                                            </div>
+                                            <a
+                                                href="{{ route('public.documentation', $documentationLink['slug']) }}"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                                            >
+                                                Ver documentación
+                                            </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+                                    Este cliente todavía no tiene una versión de documentación compartida vinculada.
+                                </div>
+                            @endif
                         </div>
                     @endif
 
